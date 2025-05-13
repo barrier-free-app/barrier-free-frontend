@@ -108,27 +108,26 @@ val defaultbarrierFreeTypography = barrierFreeTypography(
 )
 val LocalbarrierFreeTypographyProvider = staticCompositionLocalOf { defaultbarrierFreeTypography }
 
-//큰글자모드구힘수
 @Composable
 fun ProvideScaledTypography(
+    isLargeTextMode: Boolean,
     content: @Composable () -> Unit
 ) {
-    val configuration = LocalConfiguration.current
-    val fontScale = configuration.fontScale
+    val scaleMultiplier = if (isLargeTextMode) 1.3f else 1f
 
     val scaledTypography = barrierFreeTypography(
-        H1_SB = defaultbarrierFreeTypography.H1_SB.copy(fontSize = (25 * fontScale).sp),
-        H2_B = defaultbarrierFreeTypography.H2_B.copy(fontSize = (23 * fontScale).sp),
-        H3_B = defaultbarrierFreeTypography.H3_B.copy(fontSize = (20 * fontScale).sp),
-        H4_SB = defaultbarrierFreeTypography.H4_SB.copy(fontSize = (20 * fontScale).sp),
-        H5_SB_5 = defaultbarrierFreeTypography.H5_SB_5.copy(fontSize = (18 * fontScale).sp),
-        H5_SB_10 = defaultbarrierFreeTypography.H5_SB_10.copy(fontSize = (18 * fontScale).sp),
-        H6_M = defaultbarrierFreeTypography.H6_M.copy(fontSize = (16 * fontScale).sp),
-        H7_M_5 = defaultbarrierFreeTypography.H7_M_5.copy(fontSize = (15 * fontScale).sp),
-        H7_M_10 = defaultbarrierFreeTypography.H7_M_10.copy(fontSize = (15 * fontScale).sp),
-        H8_SB = defaultbarrierFreeTypography.H8_SB.copy(fontSize = (14 * fontScale).sp),
-        H9_M = defaultbarrierFreeTypography.H9_M.copy(fontSize = (13 * fontScale).sp),
-        H10_M = defaultbarrierFreeTypography.H10_M.copy(fontSize = (12 * fontScale).sp)
+        H1_SB = defaultbarrierFreeTypography.H1_SB.copy(fontSize = (25 * scaleMultiplier).sp),
+        H2_B = defaultbarrierFreeTypography.H2_B.copy(fontSize = (23 * scaleMultiplier).sp),
+        H3_B = defaultbarrierFreeTypography.H3_B.copy(fontSize = (20 * scaleMultiplier).sp),
+        H4_SB = defaultbarrierFreeTypography.H4_SB.copy(fontSize = (20 * scaleMultiplier).sp),
+        H5_SB_5 = defaultbarrierFreeTypography.H5_SB_5.copy(fontSize = (18 * scaleMultiplier).sp),
+        H5_SB_10 = defaultbarrierFreeTypography.H5_SB_10.copy(fontSize = (18 * scaleMultiplier).sp),
+        H6_M = defaultbarrierFreeTypography.H6_M.copy(fontSize = (16 * scaleMultiplier).sp),
+        H7_M_5 = defaultbarrierFreeTypography.H7_M_5.copy(fontSize = (15 * scaleMultiplier).sp),
+        H7_M_10 = defaultbarrierFreeTypography.H7_M_10.copy(fontSize = (15 * scaleMultiplier).sp),
+        H8_SB = defaultbarrierFreeTypography.H8_SB.copy(fontSize = (14 * scaleMultiplier).sp),
+        H9_M = defaultbarrierFreeTypography.H9_M.copy(fontSize = (13 * scaleMultiplier).sp),
+        H10_M = defaultbarrierFreeTypography.H10_M.copy(fontSize = (12 * scaleMultiplier).sp)
     )
 
     CompositionLocalProvider(LocalbarrierFreeTypographyProvider provides scaledTypography) {
