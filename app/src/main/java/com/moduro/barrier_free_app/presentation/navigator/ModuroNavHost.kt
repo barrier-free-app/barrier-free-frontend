@@ -11,6 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.moduro.barrier_free_app.presentation.auth.navigation.AuthNavigator
 import com.moduro.barrier_free_app.presentation.auth.screen.SplashScreen
+import com.moduro.barrier_free_app.presentation.detail.screen.PlaceDetailScreen
 import com.moduro.barrier_free_app.presentation.home.navigation.HomeNavigator
 import com.moduro.barrier_free_app.presentation.home.navigation.homeNavGraph
 import com.moduro.barrier_free_app.presentation.main.navigation.MainNavigator
@@ -38,9 +39,10 @@ fun ModuroNavHost(
     ) {
         NavHost(
             navController = navController,
-            startDestination = "splash",
+            startDestination = "placeDetail",
         ) {
             composable("splash") { SplashScreen(navController = authNavigator.navController) }
+            composable("placeDetail") { PlaceDetailScreen(onBackClick = {})}
 
             mainNavGraph(
                 mainNavigator,

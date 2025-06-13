@@ -1,6 +1,7 @@
 package com.moduro.barrier_free_app.core_ui.component
 
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,12 +24,12 @@ fun FacilityChip(
         shape = RoundedCornerShape(10.dp),
         color = Button1,
         modifier = Modifier
-            .height(30.dp)
+            .fillMaxWidth()
             .padding(end = 8.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 12.dp)
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
         ) {
             Text(
                 text = label,
@@ -38,6 +39,7 @@ fun FacilityChip(
         }
     }
 }
+
 
 
 @Preview(showBackground = true)
