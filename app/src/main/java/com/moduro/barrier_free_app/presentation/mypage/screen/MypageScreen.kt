@@ -94,6 +94,7 @@ fun MypageScreen(
 
     var showLogoutSheet by remember { mutableStateOf(false) }
     var showWithdrawSheet by remember { mutableStateOf(false) }
+    var showWithdrawReasons by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -245,18 +246,20 @@ fun MypageScreen(
                 onClick = { showLogoutSheet = true })
             MypageMenuItem(icon = R.drawable.ic_question_mark, label = "도움말")
         }
+        // 로그아웃시
         if (showLogoutSheet) {
             CommonBottomSheet(
-                showSheet = true,
+                showSheet = showLogoutSheet,
                 onDismissRequest = { showLogoutSheet = false },
                 title = "로그아웃 하시겠어요?",
                 description = "로그아웃 시 로그인 화면으로 이동해요.",
+                cancelText = "취소",
                 confirmText = "로그아웃",
                 onCancel = { showLogoutSheet = false },
                 onConfirm = {
                     showLogoutSheet = false
-                    onLogoutClick()
-                }
+                },
+                showWithdrawReasons = false
             )
         }
 
@@ -270,18 +273,39 @@ fun MypageScreen(
             modifier = Modifier
                 .clickable(onClick = { showWithdrawSheet = true })
         )
+
+        // 회원탈퇴시
         if (showWithdrawSheet) {
             CommonBottomSheet(
-                showSheet = true,
+                showSheet = showWithdrawSheet,
                 onDismissRequest = { showWithdrawSheet = false },
                 title = "떠나시는 건가요? 아쉬워요🥺",
                 description = "회원 탈퇴 시 회원 정보는 전부 삭제됩니다.",
+                cancelText = "취소",
                 confirmText = "다음",
                 onCancel = { showWithdrawSheet = false },
                 onConfirm = {
+                    showWithdrawReasons = true
                     showWithdrawSheet = false
-                    onWithdrawClick()
-                }
+                },
+                showWithdrawReasons = false
+            )
+        }
+
+        if (showWithdrawReasons) {
+            CommonBottomSheet(
+                showSheet = showWithdrawReasons,
+                onDismissRequest = { showWithdrawReasons = false },
+                title = "회원 탈퇴 사유 선택",
+                description = "회원 탈퇴 사유를 선택해주세요.",
+                cancelText = "취소",
+                confirmText = "탈퇴하기",
+                onCancel = { showWithdrawReasons = false },
+                onConfirm = {
+                    // 탈퇴 처리
+                    showWithdrawReasons = false
+                },
+                showWithdrawReasons = true
             )
         }
 
