@@ -23,6 +23,7 @@ import com.moduro.barrier_free_app.presentation.map.navigation.MapNavigator
 import com.moduro.barrier_free_app.presentation.map.navigation.mapNavGraph
 import com.moduro.barrier_free_app.presentation.mypage.navigation.MypageNavigator
 import com.moduro.barrier_free_app.presentation.mypage.navigation.mypageNavGraph
+import com.moduro.barrier_free_app.presentation.mypage.screen.MypageScreen
 
 
 @Composable
@@ -43,12 +44,13 @@ fun ModuroNavHost(
     ) {
         NavHost(
             navController = navController,
-            startDestination = "placeDetail",
+            startDestination = "my",
         ) {
             composable("splash") { SplashScreen(navController = authNavigator.navController) }
             composable("placeDetail") { PlaceDetailScreen(onBackClick = {}, onWriteReviewClick = {})}
             composable("review") { ReviewWriteScreen(onBackClick = {}, onSubmitClick = {}) }
 
+            composable("my") { MypageScreen() }
             mainNavGraph(
                 mainNavigator,
                 homeNavigator,

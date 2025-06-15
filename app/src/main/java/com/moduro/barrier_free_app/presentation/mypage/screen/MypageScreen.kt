@@ -25,6 +25,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.moduro.barrier_free_app.R
+import com.moduro.barrier_free_app.core_ui.component.CommonBottomSheet
 import com.moduro.barrier_free_app.core_ui.component.FacilityChip
 import com.moduro.barrier_free_app.core_ui.theme.Background2
 import com.moduro.barrier_free_app.core_ui.theme.LocalbarrierFreeTypographyProvider
@@ -75,9 +80,10 @@ fun MypageScreen(
     onReviewClick: () -> Unit = {},
     onFavoritePlaceClick: () -> Unit = {},
     onEditProfileClick: () -> Unit = {},
-    onReportPlaceClick: () -> Unit = {}
+    onReportPlaceClick: () -> Unit = {},
+    onWithdrawClick: () -> Unit = {}
 ) {
-   
+
     val typography = LocalbarrierFreeTypographyProvider.current
     val scrollState = rememberScrollState()
     val systemUiController = rememberSystemUiController()
@@ -85,6 +91,9 @@ fun MypageScreen(
     SideEffect {
         systemUiController.setSystemBarsColor(color = Background2)
     }
+
+    var showLogoutSheet by remember { mutableStateOf(false) }
+    var showWithdrawSheet by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -224,22 +233,60 @@ fun MypageScreen(
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            MypageMenuItem(icon = R.drawable.ic_heart_filled, label = "좋아하는 장소", onClick = onFavoritePlaceClick)
+            MypageMenuItem(
+                icon = R.drawable.ic_heart_filled,
+                label = "좋아하는 장소",
+                onClick = onFavoritePlaceClick
+            )
             MypageMenuItem(icon = R.drawable.ic_talk, label = "내가 쓴 리뷰", onClick = onReviewClick)
-            MypageMenuItem(icon = R.drawable.ic_logout, label = "로그아웃", onClick = onLogoutClick)
+            MypageMenuItem(
+                icon = R.drawable.ic_logout,
+                label = "로그아웃",
+                onClick = { showLogoutSheet = true })
             MypageMenuItem(icon = R.drawable.ic_question_mark, label = "도움말")
         }
+        if (showLogoutSheet) {
+            CommonBottomSheet(
+                showSheet = true,
+                onDismissRequest = { showLogoutSheet = false },
+                title = "로그아웃 하시겠어요?",
+                description = "로그아웃 시 로그인 화면으로 이동해요.",
+                confirmText = "로그아웃",
+                onCancel = { showLogoutSheet = false },
+                onConfirm = {
+                    showLogoutSheet = false
+                    onLogoutClick()
+                }
+            )
+        }
+
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
             text = "회원을 탈퇴하시겠어요?",
             style = typography.H7_M_10,
-            color = Color.Gray
+            color = Color.Gray,
+            modifier = Modifier
+                .clickable(onClick = { showWithdrawSheet = true })
         )
+        if (showWithdrawSheet) {
+            CommonBottomSheet(
+                showSheet = true,
+                onDismissRequest = { showWithdrawSheet = false },
+                title = "떠나시는 건가요? 아쉬워요🥺",
+                description = "회원 탈퇴 시 회원 정보는 전부 삭제됩니다.",
+                confirmText = "다음",
+                onCancel = { showWithdrawSheet = false },
+                onConfirm = {
+                    showWithdrawSheet = false
+                    onWithdrawClick()
+                }
+            )
+        }
+
     }
 }
-
 
 @Composable
 fun MypageMenuItem(
@@ -254,6 +301,7 @@ fun MypageMenuItem(
         modifier = Modifier
             .fillMaxWidth()
             .height(67.dp)
+            .clickable { onClick() }
     ) {
         Row(
             modifier = Modifier
