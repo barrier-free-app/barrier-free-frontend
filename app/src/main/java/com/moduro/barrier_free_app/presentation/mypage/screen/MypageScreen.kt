@@ -40,6 +40,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.moduro.barrier_free_app.R
 import com.moduro.barrier_free_app.core_ui.component.CommonBottomSheet
 import com.moduro.barrier_free_app.core_ui.component.FacilityChip
+import com.moduro.barrier_free_app.core_ui.component.MypageFacilityChip
 import com.moduro.barrier_free_app.core_ui.theme.Background2
 import com.moduro.barrier_free_app.core_ui.theme.LocalbarrierFreeTypographyProvider
 import com.moduro.barrier_free_app.core_ui.theme.MainYellow
@@ -195,7 +196,7 @@ fun MypageScreen(
                         modifier = Modifier.padding(start = 70.dp)
                     ) {
                         items(userFacilities) { facilityId ->
-                            FacilityChip(label = facilityLabels[facilityId] ?: "기타")
+                            MypageFacilityChip(label = facilityLabels[facilityId] ?: "기타")
                         }
                     }
                 }

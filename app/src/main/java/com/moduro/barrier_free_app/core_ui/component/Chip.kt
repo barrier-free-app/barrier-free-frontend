@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moduro.barrier_free_app.core_ui.theme.Background1
 import com.moduro.barrier_free_app.core_ui.theme.Button1
 import com.moduro.barrier_free_app.core_ui.theme.Text5
 
@@ -40,6 +41,29 @@ fun FacilityChip(
     }
 }
 
+@Composable
+fun MypageFacilityChip(
+    label: String
+) {
+    Surface(
+        shape = RoundedCornerShape(10.dp),
+        color = Background1,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(end = 8.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+        ) {
+            Text(
+                text = label,
+                fontSize = 14.sp,
+                color = Text5
+            )
+        }
+    }
+}
 
 
 @Preview(showBackground = true)

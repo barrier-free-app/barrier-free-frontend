@@ -1,7 +1,5 @@
 package com.moduro.barrier_free_app.core_ui.component
 
-import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -35,7 +32,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,6 +43,7 @@ import com.moduro.barrier_free_app.core_ui.theme.LocalbarrierFreeTypographyProvi
 import com.moduro.barrier_free_app.core_ui.theme.MainYellow
 import com.moduro.barrier_free_app.core_ui.theme.Text1
 import com.moduro.barrier_free_app.core_ui.theme.Text2
+import com.moduro.barrier_free_app.core_ui.theme.Text5
 
 @Composable
 private fun CommonBottomSheetContent(
@@ -118,17 +115,31 @@ fun CommonBottomSheet(
     onConfirm: (String) -> Unit,
     showWithdrawReasons: Boolean = false
 ) {
-    if (showSheet) {
+    var showConfirmWithdrawSheet by remember { mutableStateOf(false) }
+    var selectedReason by remember { mutableStateOf("") }
+    var showMainSheet by remember { mutableStateOf(showSheet) }
+
+    if (showMainSheet) {
         ModalBottomSheet(
-            onDismissRequest = onDismissRequest,
+            onDismissRequest = {
+                showMainSheet = false
+                onDismissRequest()
+            },
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
             containerColor = Color.White,
             shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
         ) {
             if (showWithdrawReasons) {
                 WithdrawReasonsContent(
-                    onConfirm = onConfirm,
-                    onCancel = onCancel
+                    onConfirm = { reason ->
+                        selectedReason = reason
+                        showConfirmWithdrawSheet = true
+                        showMainSheet = false
+                    },
+                    onCancel = {
+                        showMainSheet = false
+                        onCancel()
+                    }
                 )
             } else {
                 CommonBottomSheetContent(
@@ -136,13 +147,30 @@ fun CommonBottomSheet(
                     description = description,
                     cancelText = cancelText,
                     confirmText = confirmText,
-                    onCancel = onCancel,
-                    onConfirm = { onConfirm("") }
+                    onCancel = {
+                        showMainSheet = false
+                        onCancel()
+                    },
+                    onConfirm = {
+                        showMainSheet = false
+                        onConfirm("")
+                    }
                 )
             }
         }
     }
+
+    WithdrawalConfirmBottomSheet(
+        showSheet = showConfirmWithdrawSheet,
+        onDismissRequest = { showConfirmWithdrawSheet = false },
+        onConfirm = {
+            showConfirmWithdrawSheet = false
+            onConfirm(selectedReason)
+        },
+        policyDescription = "회원 탈퇴 시 저장된 데이터는 복구할 수 없습니다. 탈퇴하시겠습니까?"
+    )
 }
+
 
 @Composable
 fun WithdrawReasonsContent(
@@ -158,7 +186,6 @@ fun WithdrawReasonsContent(
     var isEditing by remember { mutableStateOf(false) }
     var userInput by remember { mutableStateOf("") }
 
-    // 직접 작성 이유가 추가된 경우 "직접 작성하기" 항목 제외
     val reasonsToShow = if (userInput.isNotBlank() && reasons.contains(userInput)) {
         reasons.filter { it != "직접 작성하기" }
     } else {
@@ -325,6 +352,73 @@ fun WithdrawReasonsContent(
         }
     }
 }
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun WithdrawalConfirmBottomSheet(
+    showSheet: Boolean,
+    onDismissRequest: () -> Unit,
+    onConfirm: () -> Unit,
+    policyDescription: String
+) {
+    val typography = LocalbarrierFreeTypographyProvider.current
+    if (showSheet) {
+        ModalBottomSheet(
+            onDismissRequest = onDismissRequest,
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            containerColor = Color.White,
+            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(700.dp)
+                    .padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "회원 탈퇴시 처리되는 정보",
+                    style = typography.H2_B,
+                    color = Text5,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = policyDescription,
+                    style = typography.H6_M,
+                    modifier = Modifier.padding(16.dp)
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = onDismissRequest,
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Button1),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(text = "취소", color = Text2, style = typography.H4_SB)
+                    }
+                    Button(
+                        onClick = onConfirm,
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Black,
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(text = "회원 탈퇴", style = typography.H4_SB)
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 @Composable
 @Preview(showBackground = true)
