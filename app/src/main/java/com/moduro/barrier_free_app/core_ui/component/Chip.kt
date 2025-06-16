@@ -1,5 +1,6 @@
 package com.moduro.barrier_free_app.core_ui.component
 
+import android.provider.ContactsContract.Profile
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,12 +16,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moduro.barrier_free_app.core_ui.theme.Background1
 import com.moduro.barrier_free_app.core_ui.theme.Button1
+import com.moduro.barrier_free_app.core_ui.theme.LocalbarrierFreeTypographyProvider
+import com.moduro.barrier_free_app.core_ui.theme.MainYellow
+import com.moduro.barrier_free_app.core_ui.theme.Text4
 import com.moduro.barrier_free_app.core_ui.theme.Text5
 
 @Composable
 fun FacilityChip(
     label: String
 ) {
+    val typography = LocalbarrierFreeTypographyProvider.current
     Surface(
         shape = RoundedCornerShape(10.dp),
         color = Button1,
@@ -34,8 +39,8 @@ fun FacilityChip(
         ) {
             Text(
                 text = label,
-                fontSize = 14.sp,
-                color = Text5
+                style = typography.H7_M_10,
+                color = Text4
             )
         }
     }
@@ -45,6 +50,7 @@ fun FacilityChip(
 fun MypageFacilityChip(
     label: String
 ) {
+    val typography = LocalbarrierFreeTypographyProvider.current
     Surface(
         shape = RoundedCornerShape(10.dp),
         color = Background1,
@@ -58,8 +64,35 @@ fun MypageFacilityChip(
         ) {
             Text(
                 text = label,
-                fontSize = 14.sp,
-                color = Text5
+                style = typography.H7_M_10,
+                color = Text4
+            )
+        }
+    }
+}
+
+@Composable
+fun ProfileFacilityChip(
+    label: String,
+    isSelected: Boolean = false,
+    onClick: () -> Unit
+) {
+    val backgroundColor = if (isSelected) MainYellow else Button1
+    val typography = LocalbarrierFreeTypographyProvider.current
+    Surface(
+        shape = RoundedCornerShape(10.dp),
+        color = backgroundColor,
+        onClick = onClick,
+        modifier = Modifier.padding(end = 8.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+        ) {
+            Text(
+                text = label,
+                style = typography.H7_M_10,
+                color = Text4
             )
         }
     }

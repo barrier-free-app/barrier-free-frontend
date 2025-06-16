@@ -65,7 +65,7 @@ fun MypageRoute(
             onLogoutClick = { viewModel.onLogoutClick() },
             onReviewClick = { viewModel.onReviewClick() },
             onFavoritePlaceClick = { viewModel.onFavoritePlaceClick() },
-            onEditProfileClick = { viewModel.onEditProfileClick() },
+            onEditProfileClick = {  navigator.navigateToProfileSetting() },
             onReportPlaceClick = { viewModel.onReportPlaceClick() }
         )
     }
@@ -80,7 +80,7 @@ fun MypageScreen(
     onLogoutClick: () -> Unit = {},
     onReviewClick: () -> Unit = {},
     onFavoritePlaceClick: () -> Unit = {},
-    onEditProfileClick: () -> Unit = {},
+    onEditProfileClick: () -> Unit = { },
     onReportPlaceClick: () -> Unit = {},
     onWithdrawClick: () -> Unit = {}
 ) {

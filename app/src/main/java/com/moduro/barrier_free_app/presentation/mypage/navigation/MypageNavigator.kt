@@ -5,4 +5,7 @@ import androidx.navigation.NavController
 class MypageNavigator(
     val navController: NavController
 ){
+    fun navigateToProfileSetting() {
+        navController.navigate("profile_setting")
+    }
 }
