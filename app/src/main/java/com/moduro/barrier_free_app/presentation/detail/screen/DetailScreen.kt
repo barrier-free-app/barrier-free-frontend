@@ -84,7 +84,6 @@ fun PlaceDetailScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(color = backgroundColor)
-            .padding(bottom = 113.dp)
             .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
