@@ -20,6 +20,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -46,19 +47,29 @@ import com.moduro.barrier_free_app.core_ui.theme.Text5
 @Composable
 fun ProfileSettingScreen(
     isEmailUser: Boolean,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    viewModel: MypageViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
 
     val systemUiController = rememberSystemUiController()
-
     SideEffect {
         systemUiController.setSystemBarsColor(color = Background2)
     }
 
     val typography = LocalbarrierFreeTypographyProvider.current
 
-    val selectedUserTypes = remember { mutableStateListOf("휠체어 사용자") }
-    val selectedFacilities = remember { mutableStateListOf<String>() }
+    val userInfo = viewModel.userInfo.collectAsState().value
+
+    val selectedUserTypes = remember {
+        mutableStateListOf<String>().apply {
+            userInfo?.userType?.let { add(it) }
+        }
+    }
+    val selectedFacilities = remember {
+        mutableStateListOf<String>().apply {
+            userInfo?.userFacilities?.forEach { id -> add(id.toString()) }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -76,9 +87,9 @@ fun ProfileSettingScreen(
                 modifier = Modifier.padding(top = 20.dp, bottom = 8.dp)
             )
             ProfileNicknameField(
-                hint = "현재 닉네임은 버블티먹는코끼리 입니다.",
+                hint = "현재 닉네임은 ${userInfo?.nickName} 입니다.",
                 onCheckDuplicateClick = {
-                    // 중복 확인 로직
+                    // 중복 확인
                 }
             )
 
@@ -100,11 +111,7 @@ fun ProfileSettingScreen(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier.fillMaxSize()
                         ) {
-                            Text(
-                                text = "이메일 인증",
-                                style = typography.H10_M,
-                                color = Text4
-                            )
+                            Text(text = "이메일 인증", style = typography.H10_M, color = Text4)
                         }
                     }
                 }
@@ -180,7 +187,7 @@ fun ProfileSettingScreen(
             Spacer(modifier = Modifier.height(70.dp))
 
             Button(
-                onClick = { /*수정처리*/ },
+                onClick = { /*수정 처리*/ },
                 shape = RoundedCornerShape(10.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Text5,
@@ -195,7 +202,6 @@ fun ProfileSettingScreen(
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
