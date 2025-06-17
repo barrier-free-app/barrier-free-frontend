@@ -54,6 +54,7 @@ import com.moduro.barrier_free_app.core_ui.theme.Text5
 @Composable
 fun PlaceDetailScreen(
     onBackClick: () -> Unit,
+    onWriteReviewClick: () -> Unit,
     isReportedByUser: Boolean = true,
     viewModel: DetailViewModel = hiltViewModel()
 ) {
@@ -218,7 +219,7 @@ fun PlaceDetailScreen(
                     )
 
                     Button(
-                        onClick = { /* TODO: 리뷰 작성 화면 이동 */ },
+                        onClick = { onWriteReviewClick() },
                         shape = RoundedCornerShape(6.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Button1,
@@ -378,14 +379,5 @@ fun ReviewItem(name: String, rating: Int, text: String) {
     }
 }
 
-
-
-@Preview(showBackground = true)
-@Composable
-fun PlaceDetailScreenPreview() {
-    PlaceDetailScreen(
-        onBackClick = {}
-    )
-}
 
 

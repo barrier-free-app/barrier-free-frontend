@@ -1,5 +1,6 @@
 package com.moduro.barrier_free_app.presentation.detail.screen
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moduro.barrier_free_app.core_ui.component.RecommendType
@@ -12,6 +13,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailViewModel @Inject constructor() : ViewModel() {
 
+    //상세 페이지 관련
     private val _placeDetail = MutableStateFlow<PlaceDetail?>(null)
     val placeDetail: StateFlow<PlaceDetail?> = _placeDetail
 
@@ -20,6 +22,16 @@ class DetailViewModel @Inject constructor() : ViewModel() {
 
     private val _recommendType = MutableStateFlow<RecommendType?>(null)
     val recommendType: StateFlow<RecommendType?> = _recommendType
+
+    //리뷰 관련
+    private val _rating = MutableStateFlow(0)
+    val rating: StateFlow<Int> = _rating
+
+    private val _reviewText = MutableStateFlow("")
+    val reviewText: StateFlow<String> = _reviewText
+
+    private val _selectedImageUri = MutableStateFlow<Uri?>(null)
+    val selectedImageUri: StateFlow<Uri?> = _selectedImageUri
 
     fun onThumbUpClicked() {
         _recommendType.value = RecommendType.THUMB_UP
@@ -68,6 +80,27 @@ class DetailViewModel @Inject constructor() : ViewModel() {
             _placeDetail.value = dummy
         }
     }
+
+    //리뷰관련
+    fun setRating(value: Int) {
+        _rating.value = value
+    }
+
+    fun setReviewText(value: String) {
+        _reviewText.value = value
+    }
+
+    fun setSelectedImageUri(uri: Uri?) {
+        _selectedImageUri.value = uri
+    }
+
+    fun resetReviewInputs() {
+        _rating.value = 0
+        _reviewText.value = ""
+        _selectedImageUri.value = null
+    }
+
+
 }
 
 

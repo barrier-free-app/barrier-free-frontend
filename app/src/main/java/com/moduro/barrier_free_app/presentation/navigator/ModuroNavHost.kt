@@ -11,7 +11,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.moduro.barrier_free_app.presentation.auth.navigation.AuthNavigator
 import com.moduro.barrier_free_app.presentation.auth.screen.SplashScreen
+import com.moduro.barrier_free_app.presentation.detail.navigation.DetailNavigator
+import com.moduro.barrier_free_app.presentation.detail.navigation.detailNavGraph
 import com.moduro.barrier_free_app.presentation.detail.screen.PlaceDetailScreen
+import com.moduro.barrier_free_app.presentation.detail.screen.ReviewWriteScreen
 import com.moduro.barrier_free_app.presentation.home.navigation.HomeNavigator
 import com.moduro.barrier_free_app.presentation.home.navigation.homeNavGraph
 import com.moduro.barrier_free_app.presentation.main.navigation.MainNavigator
@@ -30,7 +33,8 @@ fun ModuroNavHost(
     mainNavigator: MainNavigator,
     homeNavigator: HomeNavigator,
     mapNavigator: MapNavigator,
-    mypageNavigator: MypageNavigator
+    mypageNavigator: MypageNavigator,
+    detailNavigator: DetailNavigator
 ) {
     Box(
         modifier = modifier
@@ -42,17 +46,20 @@ fun ModuroNavHost(
             startDestination = "placeDetail",
         ) {
             composable("splash") { SplashScreen(navController = authNavigator.navController) }
-            composable("placeDetail") { PlaceDetailScreen(onBackClick = {})}
+            composable("placeDetail") { PlaceDetailScreen(onBackClick = {}, onWriteReviewClick = {})}
+            composable("review") { ReviewWriteScreen(onBackClick = {}, onSubmitClick = {}) }
 
             mainNavGraph(
                 mainNavigator,
                 homeNavigator,
                 mapNavigator,
-                mypageNavigator
+                mypageNavigator,
+                detailNavigator
             )
             homeNavGraph(homeNavigator)
             mapNavGraph(mapNavigator)
             mypageNavGraph(mypageNavigator)
+            detailNavGraph(detailNavigator)
 
         }
     }
