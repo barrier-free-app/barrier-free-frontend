@@ -50,6 +50,17 @@ import com.moduro.barrier_free_app.core_ui.theme.Text3
 import com.moduro.barrier_free_app.core_ui.theme.Text4
 import com.moduro.barrier_free_app.core_ui.theme.Text5
 
+@Composable
+fun PlaceDetailRoute(
+    onBackClick: () -> Unit,
+    onWriteReviewClick: () -> Unit
+) {
+    PlaceDetailScreen(
+        onBackClick = onBackClick,
+        onWriteReviewClick = onWriteReviewClick
+    )
+}
+
 
 @Composable
 fun PlaceDetailScreen(
@@ -84,7 +95,6 @@ fun PlaceDetailScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(color = backgroundColor)
-            .padding(bottom = 113.dp)
             .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
