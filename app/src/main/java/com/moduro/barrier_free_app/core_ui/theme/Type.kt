@@ -15,6 +15,7 @@ import com.moduro.barrier_free_app.R
 val barrierFreeFontBold = FontFamily(Font(R.font.suit_bold))
 val barrierFreeFontSemiBold = FontFamily(Font(R.font.suit_semibold))
 val barrierFreeFontMedium = FontFamily(Font(R.font.suit_medium))
+val barrierFreeFontExtraBold = FontFamily(Font(R.font.suit_extrabold))
 
 @Immutable
 data class barrierFreeTypography(
@@ -24,6 +25,7 @@ data class barrierFreeTypography(
     val H4_SB: TextStyle,
     val H5_SB_5: TextStyle,
     val H5_SB_10: TextStyle,
+    val H5_EB_5: TextStyle,
     val H6_M: TextStyle,
     val H7_M_5: TextStyle,
     val H7_M_10: TextStyle,
@@ -68,6 +70,12 @@ val defaultbarrierFreeTypography = barrierFreeTypography(
         fontSize = 18.sp,
         lineHeight = 18.sp,
         letterSpacing = (-0.10).em
+    ),
+    H5_EB_5 = TextStyle(
+        fontFamily = barrierFreeFontExtraBold,
+        fontSize = 18.sp,
+        lineHeight = 18.sp,
+        letterSpacing = (-0.05).em
     ),
     H6_M = TextStyle(
         fontFamily = barrierFreeFontMedium,
@@ -122,6 +130,7 @@ fun ProvideScaledTypography(
         H4_SB = defaultbarrierFreeTypography.H4_SB.copy(fontSize = (20 * scaleMultiplier).sp),
         H5_SB_5 = defaultbarrierFreeTypography.H5_SB_5.copy(fontSize = (18 * scaleMultiplier).sp),
         H5_SB_10 = defaultbarrierFreeTypography.H5_SB_10.copy(fontSize = (18 * scaleMultiplier).sp),
+        H5_EB_5 = defaultbarrierFreeTypography.H5_EB_5.copy(fontSize = (18 * scaleMultiplier).sp),
         H6_M = defaultbarrierFreeTypography.H6_M.copy(fontSize = (16 * scaleMultiplier).sp),
         H7_M_5 = defaultbarrierFreeTypography.H7_M_5.copy(fontSize = (15 * scaleMultiplier).sp),
         H7_M_10 = defaultbarrierFreeTypography.H7_M_10.copy(fontSize = (15 * scaleMultiplier).sp),
