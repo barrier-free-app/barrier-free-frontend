@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -28,9 +29,9 @@ fun HomeWeatherBox(
     dustType: Int,
     location: String,
     temp: String,
+    isLargeTextMode: Boolean
 
-
-    ) {
+) {
     val typography = LocalbarrierFreeTypographyProvider.current
 
     var weatherText = when (weatherType) {
@@ -69,12 +70,12 @@ fun HomeWeatherBox(
     Box(
         modifier = Modifier
             .width(380.dp)
-            .height(169.dp)
+            .height(if (isLargeTextMode) 180.dp else 169.dp)
     ) {
         Image(
             painter = painterResource(id = imageResource), // XML or PNG/JPG 이미지
             contentDescription = "",
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(), contentScale = ContentScale.FillBounds
         )
 
         Column(
@@ -97,7 +98,7 @@ fun HomeWeatherBox(
             Text(
                 text = buildAnnotatedString {
                     append("오늘 날씨는 ")
-                    withStyle(style = typography.H5_SB_5.toSpanStyle().copy(color = Text4)) {
+                    withStyle(style = typography.H5_B_5.toSpanStyle().copy(color = Text4)) {
                         append(fullText)
                     }
                     if (dustType == 1) {
@@ -115,7 +116,7 @@ fun HomeWeatherBox(
                 Text(
                     text = buildAnnotatedString {
                         append("가급적 실외보다 ")
-                        withStyle(style = typography.H5_EB_5.toSpanStyle().copy(color = Text4)) {
+                        withStyle(style = typography.H5_B_5.toSpanStyle().copy(color = Text4)) {
                             append("실내 활동")
                         }
                         append("을 추천드릴게요.")
@@ -172,7 +173,7 @@ fun HomeWeatherBox(
 fun weatherBoxPreview() {
 
     HomeWeatherBox(
-        1, 2, "서울특별시 용산구", "10"
+        1, 2, "서울특별시 용산구", "10", false
     )
 
 }
