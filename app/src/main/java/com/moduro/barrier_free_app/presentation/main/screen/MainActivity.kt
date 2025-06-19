@@ -25,6 +25,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.moduro.barrier_free_app.R
 import com.moduro.barrier_free_app.core_ui.theme.Barrier_free_appTheme
 import com.moduro.barrier_free_app.presentation.auth.navigation.AuthNavigator
+import com.moduro.barrier_free_app.presentation.detail.navigation.DetailNavigator
 import com.moduro.barrier_free_app.presentation.example.navigation.ExampleNavigator
 import com.moduro.barrier_free_app.presentation.home.navigation.HomeNavigator
 import com.moduro.barrier_free_app.presentation.main.navigation.MainNavigator
@@ -78,6 +79,7 @@ class MainActivity : ComponentActivity() {
                 val homeNavigator = remember(navController) { HomeNavigator(navController) }
                 val mapNavigator = remember(navController) { MapNavigator(navController) }
                 val mypageNavigator = remember(navController) { MypageNavigator(navController) }
+                val detailNavigator = remember(navController) { DetailNavigator(navController)}
 
 
 
@@ -92,7 +94,8 @@ class MainActivity : ComponentActivity() {
                             mainNavigator = mainNavigator,
                             homeNavigator = homeNavigator,
                             mapNavigator = mapNavigator,
-                            mypageNavigator = mypageNavigator
+                            mypageNavigator = mypageNavigator,
+                            detailNavigator = detailNavigator
                                                     )
                     }
                 )

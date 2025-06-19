@@ -141,4 +141,8 @@ dependencies {
     implementation(libs.naver.map.location)
     implementation(libs.play.services.location)
 
+    //사진 등록시 필요
+    implementation("androidx.activity:activity-compose:1.7.2")
+    implementation("io.coil-kt:coil-compose:2.4.0")
+
 }
