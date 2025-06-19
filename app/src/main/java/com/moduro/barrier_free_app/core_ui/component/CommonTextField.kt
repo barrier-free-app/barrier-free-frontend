@@ -80,14 +80,15 @@ fun ProfilePasswordField(
 fun ProfileNicknameField(
     modifier: Modifier = Modifier,
     hint: String,
+    text: String,
+    onValueChange: (String) -> Unit,
     onCheckDuplicateClick: () -> Unit
 ) {
     val typography = LocalbarrierFreeTypographyProvider.current
-    var nickname by remember { mutableStateOf("") }
 
     TextField(
-        value = nickname,
-        onValueChange = { nickname = it },
+        value = text,
+        onValueChange = onValueChange,
         placeholder = {
             Text(hint, style = typography.H6_M, color = Text2)
         },

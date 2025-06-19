@@ -8,4 +8,8 @@ class MypageNavigator(
     fun navigateToProfileSetting() {
         navController.navigate("profile_setting")
     }
+    fun navigateToMypage() {
+        navController.navigate("mypage")
+    }
+
 }

@@ -28,7 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.moduro.barrier_free_app.R
@@ -43,11 +43,13 @@ import com.moduro.barrier_free_app.core_ui.theme.LocalbarrierFreeTypographyProvi
 import com.moduro.barrier_free_app.core_ui.theme.Text4
 import com.moduro.barrier_free_app.core_ui.theme.Text5
 
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ProfileSettingScreen(
     isEmailUser: Boolean,
     onBackClick: () -> Unit,
+    onNavigateToMypage: () -> Unit,
     viewModel: MypageViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
 
@@ -70,6 +72,9 @@ fun ProfileSettingScreen(
             userInfo?.userFacilities?.forEach { id -> add(id.toString()) }
         }
     }
+    val nicknameChangeStatus by viewModel.nicknameChangeStatus.collectAsState()
+    var nicknameInput by remember { mutableStateOf("") }
+
 
     Column(
         modifier = Modifier
@@ -88,10 +93,46 @@ fun ProfileSettingScreen(
             )
             ProfileNicknameField(
                 hint = "현재 닉네임은 ${userInfo?.nickName} 입니다.",
+                text = nicknameInput,
+                onValueChange = { nicknameInput = it },
                 onCheckDuplicateClick = {
-                    // 중복 확인
+                    viewModel.changeNickname(nicknameInput)
                 }
             )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            when (nicknameChangeStatus) {
+                NicknameChangeStatus.SUCCESS -> {
+                    Text(
+                        text = "닉네임이 변경되었습니다.",
+                        color = Color(0xFF023DFF),
+                        style = typography.H7_M_5,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+
+                NicknameChangeStatus.DUPLICATE -> {
+                    Text(
+                        text = "닉네임 변경은 1개월에 1번 가능합니다.",
+                        color =  Color(0xFFF00000),
+                        style = typography.H7_M_5,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+
+                NicknameChangeStatus.LIMIT_EXCEEDED -> {
+                    Text(
+                        text = "닉네임 변경은 1개월에 1번 가능합니다.",
+                        color = Color(0xFFF00000),
+                        style = typography.H7_M_5,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+
+                else -> {}
+            }
+
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -187,7 +228,7 @@ fun ProfileSettingScreen(
             Spacer(modifier = Modifier.height(70.dp))
 
             Button(
-                onClick = { /*수정 처리*/ },
+                onClick = { onNavigateToMypage() },
                 shape = RoundedCornerShape(10.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Text5,
@@ -201,10 +242,4 @@ fun ProfileSettingScreen(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ProfileSettingScreenPreview() {
-    ProfileSettingScreen(isEmailUser = true, onBackClick = {})
 }
