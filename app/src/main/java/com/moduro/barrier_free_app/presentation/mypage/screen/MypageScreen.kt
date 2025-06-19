@@ -63,7 +63,7 @@ fun MypageRoute(
             userFacilities = user.userFacilities,
             onLogoutClick = { viewModel.onLogoutClick() },
             onReviewClick = { viewModel.onReviewClick() },
-            onFavoritePlaceClick = { viewModel.onFavoritePlaceClick() },
+            onFavoritePlaceClick = { navigator.navigateToFavoritePlace() },
             onEditProfileClick = {  navigator.navigateToProfileSetting() },
             onReportPlaceClick = { viewModel.onReportPlaceClick() }
         )
