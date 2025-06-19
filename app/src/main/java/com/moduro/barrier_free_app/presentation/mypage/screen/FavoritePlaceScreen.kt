@@ -36,6 +36,7 @@ data class FavoritePlace(
     val name: String,
     val description: String,
     val imageRes: Int,
+    val categories: List<String>,
     var isLiked: Boolean = true
 )
 
@@ -46,14 +47,33 @@ fun FavoritePlaceScreen(
 ) {
     val favoritePlaces = remember {
         mutableStateListOf(
-            FavoritePlace("국립현대미술관 서울 MMCA", "배리어프리 서비스 도입 미술관", R.drawable.place),
-            FavoritePlace("쇼어 SHORE", "아이와 함께 가기 좋은 실내 카페", R.drawable.place)
+            FavoritePlace(
+                name = "국립현대미술관 서울 MMCA",
+                description = "배리어프리 서비스 도입 미술관",
+                imageRes = R.drawable.place,
+                categories = listOf("🛗 승강기", "♿ 장애인화장실")
+            ),
+            FavoritePlace(
+                name = "쇼어 SHORE",
+                description = "아이와 함께 가기 좋은 실내 카페",
+                imageRes = R.drawable.place,
+                categories = listOf("👶 영유아동반", "🛁 수유실")
+            )
         )
     }
 
     val selectedFacilities = remember { mutableStateListOf<String>() }
     val scrollState = rememberScrollState()
     val systemUiController = rememberSystemUiController()
+
+    val filteredPlaces = if (selectedFacilities.isEmpty() || selectedFacilities.contains("전체")) {
+        favoritePlaces
+    } else {
+        favoritePlaces.filter { place ->
+            place.categories.any { it in selectedFacilities }
+        }
+    }
+
 
     SideEffect {
         systemUiController.setSystemBarsColor(
@@ -97,7 +117,8 @@ fun FavoritePlaceScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (favoritePlaces.isEmpty()) {
+        if (filteredPlaces.isEmpty()) {
+            // 기존과 동일
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
@@ -119,7 +140,7 @@ fun FavoritePlaceScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
             ) {
-                favoritePlaces.forEach { place ->
+                filteredPlaces.forEach { place ->
                     FavoritePlaceCard(
                         place = place,
                         onRemoveClick = {
@@ -130,6 +151,7 @@ fun FavoritePlaceScreen(
                 }
             }
         }
+
     }
 }
 
