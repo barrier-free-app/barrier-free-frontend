@@ -114,7 +114,7 @@ fun ProfileSettingScreen(
 
                 NicknameChangeStatus.DUPLICATE -> {
                     Text(
-                        text = "닉네임 변경은 1개월에 1번 가능합니다.",
+                        text = "이미 존재하는 닉네임 입니다",
                         color =  Color(0xFFF00000),
                         style = typography.H7_M_5,
                         modifier = Modifier.padding(top = 4.dp)
