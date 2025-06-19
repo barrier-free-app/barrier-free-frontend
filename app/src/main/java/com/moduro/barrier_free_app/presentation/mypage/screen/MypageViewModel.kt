@@ -17,6 +17,9 @@ data class UserInfo(
     val email: String = "aaa@naver.com"
 )
 
+enum class NicknameChangeStatus {
+    NONE, SUCCESS, DUPLICATE, LIMIT_EXCEEDED
+}
 @HiltViewModel
 class MypageViewModel @Inject constructor() : ViewModel() {
 
@@ -54,11 +57,25 @@ class MypageViewModel @Inject constructor() : ViewModel() {
         // 좋아하는 장소 화면 이동 처리
     }
 
-    fun onEditProfileClick() {
-        // 프로필 수정 클릭 처리
-    }
-
     fun onReportPlaceClick() {
         // 장소 제보 클릭 처리
     }
+
+    //닉네임 변경 처리, 아직 API 연동은 하지 않았습니다 !!!
+    private val _nicknameChangeStatus = MutableStateFlow(NicknameChangeStatus.NONE)
+    val nicknameChangeStatus: StateFlow<NicknameChangeStatus> = _nicknameChangeStatus
+
+    fun changeNickname(newNickname: String) {
+        viewModelScope.launch {
+            if (newNickname == "버블티먹는코끼리") {
+                _nicknameChangeStatus.value = NicknameChangeStatus.DUPLICATE
+            } else if (newNickname == "한달초과시도") {
+                _nicknameChangeStatus.value = NicknameChangeStatus.LIMIT_EXCEEDED
+            } else {
+                _userInfo.value = _userInfo.value?.copy(nickName = newNickname)
+                _nicknameChangeStatus.value = NicknameChangeStatus.SUCCESS
+            }
+        }
+    }
+
 }
