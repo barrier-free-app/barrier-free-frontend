@@ -62,7 +62,7 @@ fun MypageRoute(
             userEmail = user.email,
             userFacilities = user.userFacilities,
             onLogoutClick = { viewModel.onLogoutClick() },
-            onReviewClick = { viewModel.onReviewClick() },
+            onReviewClick = { navigator.navigateToMyReview() },
             onFavoritePlaceClick = { navigator.navigateToFavoritePlace() },
             onEditProfileClick = {  navigator.navigateToProfileSetting() },
             onReportPlaceClick = { viewModel.onReportPlaceClick() }
