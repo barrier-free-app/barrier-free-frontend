@@ -52,10 +52,12 @@ import com.moduro.barrier_free_app.core_ui.theme.Text5
 
 @Composable
 fun PlaceDetailRoute(
+    placeId : Int,
     onBackClick: () -> Unit,
     onWriteReviewClick: () -> Unit
 ) {
     PlaceDetailScreen(
+        placeId = placeId,
         onBackClick = onBackClick,
         onWriteReviewClick = onWriteReviewClick
     )
@@ -64,6 +66,7 @@ fun PlaceDetailRoute(
 
 @Composable
 fun PlaceDetailScreen(
+    placeId: Int, //장소 id는 상세 페이지 api 요청 보낼 때 사용하세요
     onBackClick: () -> Unit,
     onWriteReviewClick: () -> Unit,
     isReportedByUser: Boolean = true,
