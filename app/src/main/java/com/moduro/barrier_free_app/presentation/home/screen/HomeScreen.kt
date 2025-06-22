@@ -1,5 +1,6 @@
 package com.moduro.barrier_free_app.presentation.home.screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,7 +15,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,6 +47,7 @@ fun HomeRoute(
 ) {
     val systemUiController = rememberSystemUiController()
     val homeViewModel: HomeViewModel = hiltViewModel()
+    val airKoreaViewModel : AirKoreaViewModel = hiltViewModel()
 
     var isLargeTextMode by remember { mutableStateOf(false) }
 
@@ -56,8 +60,11 @@ fun HomeRoute(
     ProvideScaledTypography(isLargeTextMode = isLargeTextMode) {
         HomeScreen(
             homeViewModel = homeViewModel,
+            airKoreaViewModel = airKoreaViewModel,
             isLargeTextMode = isLargeTextMode,
-            onToggleTextMode = { isLargeTextMode = !isLargeTextMode } // ✅ 토글 함수 전달
+            onToggleTextMode = { isLargeTextMode = !isLargeTextMode },
+            onPlaceClick = {placeId ->
+                navigator.navigateToPlaceDetail(placeId)}
         )
     }
 }
@@ -65,11 +72,32 @@ fun HomeRoute(
 @Composable
 fun HomeScreen(
     homeViewModel: HomeViewModel,
+    airKoreaViewModel: AirKoreaViewModel,
     isLargeTextMode : Boolean,
-    onToggleTextMode : () -> Unit
+    onToggleTextMode : () -> Unit,
+    onPlaceClick : (Int) -> Unit
 ) {
     val hotPlace = homeViewModel.dummyHotPlace
     val weatherPlace = homeViewModel.dummyWeatherPlaces
+
+    LaunchedEffect(Unit) {
+        airKoreaViewModel.fetchPm10Average()
+    }
+
+
+
+    val pm10Average by airKoreaViewModel.pm10Average.collectAsState()
+    val pm10Grade by airKoreaViewModel.pm10Grade.collectAsState()
+    val error by airKoreaViewModel.error.collectAsState()
+
+    // 상태값 변화 로그
+    LaunchedEffect(pm10Average) {
+        Log.d("HomeScreen", "pm10Average 상태 변화: $pm10Average")
+    }
+
+    LaunchedEffect(pm10Grade) {
+        Log.d("HomeScreen", "pm10Grade 상태 변화: $pm10Grade")
+    }
 
     val typography = LocalbarrierFreeTypographyProvider.current
 
@@ -84,7 +112,6 @@ fun HomeScreen(
             onConfirm = { single: String, multi: List<String> ->
                 showFilterSheet = false
                 println("선택된 알고리즘: $single, 선택된 카테고리: $multi")
-                // TODO: API 호출 등
             }
         )
     }
@@ -130,7 +157,7 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            HomeWeatherBox(1, 2, "서울특별시 용산구", "20", isLargeTextMode)
+            HomeWeatherBox(1, pm10Grade, "서울특별시 용산구", "20", isLargeTextMode)
 
             Spacer(modifier = Modifier.height(30.dp))
 
@@ -167,7 +194,9 @@ fun HomeScreen(
 
                 Spacer(modifier = Modifier.height(11.dp))
 
-                HomePlaceBox(place = hotPlace)
+                HomePlaceBox(place = hotPlace){ placeId ->
+                    onPlaceClick(placeId)
+                }
 
                 Spacer(modifier = Modifier.height(29.dp))
 
@@ -187,7 +216,9 @@ fun HomeScreen(
         }
 
         items(weatherPlace) { place ->
-            HomePlaceBox(place = place)
+            HomePlaceBox(place = place){ placeId ->
+                onPlaceClick(placeId)
+            }
             Spacer(modifier = Modifier.height(10.dp))
         }
 
@@ -201,7 +232,8 @@ fun HomeScreen(
 @Composable
 @Preview
 fun HomeScreenPreview() {
-    val dummyViewModel = HomeViewModel()
+    //val dummyViewModel = HomeViewModel()
+    //val dummyViewModel2 9= AirKoreaViewModel()
 
-    HomeScreen(dummyViewModel, false, {})
+    //HomeScreen(dummyViewModel, dummyViewModel2,false, {}, {})
 }

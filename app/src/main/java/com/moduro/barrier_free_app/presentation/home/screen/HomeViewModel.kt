@@ -9,6 +9,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor() : ViewModel() {
 
     val dummyHotPlace = HomePlaceEntity(
+        id = 1,
         type = 1,
         name = "루트205",
         location = "서울 강동구",
@@ -18,6 +19,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
 
     val dummyWeatherPlaces = listOf(
         HomePlaceEntity(
+            id = 2,
             type = 2,
             name = "서울역사박물관",
             location = "서울 종로구",
@@ -25,6 +27,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
             facilities = listOf("승강기", "장애인 화장실")
         ),
         HomePlaceEntity(
+            id = 3,
             type = 3,
             name = "파크하얏트 서울",
             location = "서울 강남구",
@@ -32,6 +35,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
             facilities = listOf("수유실", "영유아 동반")
         ),
         HomePlaceEntity(
+            id = 4,
             type = 4,
             name = "쇼어",
             location = "서울 종로구",
