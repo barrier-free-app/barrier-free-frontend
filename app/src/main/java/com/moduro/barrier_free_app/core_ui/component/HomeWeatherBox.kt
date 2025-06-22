@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -70,7 +71,7 @@ fun HomeWeatherBox(
     Box(
         modifier = Modifier
             .width(380.dp)
-            .height(if (isLargeTextMode) 180.dp else 169.dp)
+            .height(if (isLargeTextMode) 188.dp else 169.dp)
     ) {
         Image(
             painter = painterResource(id = imageResource), // XML or PNG/JPG 이미지
@@ -81,6 +82,7 @@ fun HomeWeatherBox(
         Column(
             modifier = Modifier
                 .offset(x = 19.dp, y = 17.dp)
+                .padding(end = 19.dp)
         ) {
             Row {
                 Image(
@@ -112,7 +114,7 @@ fun HomeWeatherBox(
                 style = typography.H5_SB_5, color = Text4
             )
 
-            if (dustType == 3 || weatherType == 3) {
+            if (dustType == 1 || weatherType == 3) {
                 Text(
                     text = buildAnnotatedString {
                         append("가급적 실외보다 ")
@@ -173,7 +175,7 @@ fun HomeWeatherBox(
 fun weatherBoxPreview() {
 
     HomeWeatherBox(
-        1, 2, "서울특별시 용산구", "10", false
+        1, 2, "서울특별시 용산구", "10", true
     )
 
 }

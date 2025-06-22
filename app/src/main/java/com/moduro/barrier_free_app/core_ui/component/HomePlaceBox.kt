@@ -2,6 +2,7 @@ package com.moduro.barrier_free_app.core_ui.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,7 +32,8 @@ import com.moduro.barrier_free_app.domain.entity.HomePlaceEntity
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun HomePlaceBox(
-    place : HomePlaceEntity
+    place : HomePlaceEntity,
+    onClick: (Int) -> Unit
 ) {
     val typography = LocalbarrierFreeTypographyProvider.current
 
@@ -52,6 +54,7 @@ fun HomePlaceBox(
             .fillMaxWidth()
             .wrapContentHeight()
             .background(color = Background1, shape = RoundedCornerShape(10.dp))
+            .clickable { onClick(place.id) }
     ) {
         Row (
             modifier = Modifier.padding(horizontal = 11.dp).padding(vertical = 10.dp)
@@ -111,12 +114,14 @@ fun HomePlaceBox(
 fun HomePlaceBoxPreview(){
     HomePlaceBox(
         HomePlaceEntity(
+            id = 1,
             type = 1,
             name = "루트205",
             location = "서울 강동구",
             description = "아이와 함께하는 예스키즈존",
             facilities = listOf("수유실", "영유아 동반", "경사로")
-        )
+        ),
+        {}
     )
 }
 
