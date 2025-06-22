@@ -1,5 +1,6 @@
 package com.moduro.barrier_free_app.app.di
 
+import com.moduro.barrier_free_app.data.service.AirKoreaApiService
 import com.moduro.barrier_free_app.data.service.ExampleApiService
 import dagger.Module
 import dagger.Provides
@@ -17,5 +18,11 @@ object ServiceModule {
     fun provideExampleService(
         @ModuroRetrofit retrofit: Retrofit
     ): ExampleApiService = retrofit.create(ExampleApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideAirKoreaService(
+        @AirKoreaRetrofit retrofit: Retrofit
+    ): AirKoreaApiService = retrofit.create(AirKoreaApiService::class.java)
 
 }

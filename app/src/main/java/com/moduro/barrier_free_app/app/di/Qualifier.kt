@@ -8,6 +8,10 @@ annotation class ModuroRetrofit
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
+annotation class AirKoreaRetrofit
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
 annotation class AccessToken
 
 @Qualifier
