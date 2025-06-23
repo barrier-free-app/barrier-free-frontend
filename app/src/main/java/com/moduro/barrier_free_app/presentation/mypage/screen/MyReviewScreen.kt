@@ -126,14 +126,26 @@ fun MyReviewScreen(
             ).forEach { label ->
                 FavoriteFacilityChip(
                     label = label,
-                    isSelected = selectedFacilities.contains(label),
+                    isSelected = selectedFacilities.contains(label) ||
+                            (selectedFacilities.contains("전체") && label != "전체")
+                    ,
                     onClick = {
-                        if (selectedFacilities.contains(label)) {
-                            selectedFacilities.remove(label)
+                        if (label == "전체") {
+                            selectedFacilities.clear()
+                            selectedFacilities.add("전체")
                         } else {
-                            selectedFacilities.add(label)
+                            if (selectedFacilities.contains("전체")) {
+                                selectedFacilities.remove("전체")
+                            }
+
+                            if (selectedFacilities.contains(label)) {
+                                selectedFacilities.remove(label)
+                            } else {
+                                selectedFacilities.add(label)
+                            }
                         }
                     }
+
                 )
             }
         }
