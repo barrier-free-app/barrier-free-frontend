@@ -215,7 +215,7 @@ fun ProfileSettingScreen(
                 modifier = Modifier.padding(top = 28.dp, bottom = 8.dp)
             )
             FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(3.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 listOf(
