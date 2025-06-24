@@ -24,7 +24,7 @@ fun SplashScreen(navController: NavController, modifier: Modifier = Modifier){
 
     LaunchedEffect(Unit) {
         delay(2500) // 2.5초 대기
-        navController.navigate("main") {
+        navController.navigate("start") {
             popUpTo("splash") {
                 inclusive = true
             }

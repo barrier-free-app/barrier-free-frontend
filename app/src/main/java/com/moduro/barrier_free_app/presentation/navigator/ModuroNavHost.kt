@@ -10,7 +10,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.moduro.barrier_free_app.presentation.auth.navigation.AuthNavigator
+import com.moduro.barrier_free_app.presentation.auth.navigation.authNavGraph
 import com.moduro.barrier_free_app.presentation.auth.screen.SplashScreen
+import com.moduro.barrier_free_app.presentation.auth.screen.StartRoute
 import com.moduro.barrier_free_app.presentation.detail.navigation.DetailNavigator
 import com.moduro.barrier_free_app.presentation.detail.navigation.detailNavGraph
 import com.moduro.barrier_free_app.presentation.detail.screen.PlaceDetailScreen
@@ -47,6 +49,7 @@ fun ModuroNavHost(
             startDestination = "splash",
         ) {
             composable("splash") { SplashScreen(navController = authNavigator.navController) }
+            composable("start") { StartRoute(navigator = authNavigator) }
             composable("placeDetail") { PlaceDetailScreen(onBackClick = {}, onWriteReviewClick = {})}
             composable("review") { ReviewWriteScreen(onBackClick = {}, onSubmitClick = {}) }
 
@@ -62,7 +65,7 @@ fun ModuroNavHost(
             mapNavGraph(mapNavigator)
             mypageNavGraph(mypageNavigator)
             detailNavGraph(detailNavigator)
-
+            authNavGraph(authNavigator)
         }
     }
 }

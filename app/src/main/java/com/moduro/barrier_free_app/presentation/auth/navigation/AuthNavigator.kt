@@ -5,5 +5,7 @@ import androidx.navigation.NavController
 class AuthNavigator(
     val navController: NavController
 ){
-
+    fun navigateToLogin() {
+        navController.navigate("login")
+    }
 }
