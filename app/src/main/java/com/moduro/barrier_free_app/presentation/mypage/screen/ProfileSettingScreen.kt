@@ -185,17 +185,28 @@ fun ProfileSettingScreen(
                 listOf("전체", "휠체어 사용자", "영유아 동반").forEach { label ->
                     ProfileFacilityChip(
                         label = label,
-                        isSelected = selectedUserTypes.contains(label),
+                        isSelected = selectedUserTypes.contains(label) ||
+                                (selectedUserTypes.contains("전체") && label != "전체"),
                         onClick = {
-                            if (selectedUserTypes.contains(label)) {
-                                selectedUserTypes.remove(label)
+                            if (label == "전체") {
+                                selectedUserTypes.clear()
+                                selectedUserTypes.add("전체")
                             } else {
-                                selectedUserTypes.add(label)
+                                if (selectedUserTypes.contains("전체")) {
+                                    selectedUserTypes.remove("전체")
+                                }
+
+                                if (selectedUserTypes.contains(label)) {
+                                    selectedUserTypes.remove(label)
+                                } else {
+                                    selectedUserTypes.add(label)
+                                }
                             }
                         }
                     )
                 }
             }
+
 
             Text(
                 text = "편의정보 선택",
@@ -204,7 +215,7 @@ fun ProfileSettingScreen(
                 modifier = Modifier.padding(top = 28.dp, bottom = 8.dp)
             )
             FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(3.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 listOf(
@@ -213,12 +224,22 @@ fun ProfileSettingScreen(
                 ).forEach { label ->
                     ProfileFacilityChip(
                         label = label,
-                        isSelected = selectedFacilities.contains(label),
+                        isSelected = selectedFacilities.contains(label) ||
+                                (selectedFacilities.contains("전체") && label != "전체"),
                         onClick = {
-                            if (selectedFacilities.contains(label)) {
-                                selectedFacilities.remove(label)
+                            if (label == "전체") {
+                                selectedFacilities.clear()
+                                selectedFacilities.add("전체")
                             } else {
-                                selectedFacilities.add(label)
+                                if (selectedFacilities.contains("전체")) {
+                                    selectedFacilities.remove("전체")
+                                }
+
+                                if (selectedFacilities.contains(label)) {
+                                    selectedFacilities.remove(label)
+                                } else {
+                                    selectedFacilities.add(label)
+                                }
                             }
                         }
                     )
