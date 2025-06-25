@@ -53,10 +53,6 @@ class MypageViewModel @Inject constructor() : ViewModel() {
         // 내가 쓴 리뷰 화면 이동 처리
     }
 
-    fun onFavoritePlaceClick() {
-        // 좋아하는 장소 화면 이동 처리
-    }
-
     fun onReportPlaceClick() {
         // 장소 제보 클릭 처리
     }

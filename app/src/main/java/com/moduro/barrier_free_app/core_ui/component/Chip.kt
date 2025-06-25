@@ -16,8 +16,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moduro.barrier_free_app.core_ui.theme.Background1
 import com.moduro.barrier_free_app.core_ui.theme.Button1
+import com.moduro.barrier_free_app.core_ui.theme.Button2
 import com.moduro.barrier_free_app.core_ui.theme.LocalbarrierFreeTypographyProvider
 import com.moduro.barrier_free_app.core_ui.theme.MainYellow
+import com.moduro.barrier_free_app.core_ui.theme.Text1
 import com.moduro.barrier_free_app.core_ui.theme.Text4
 import com.moduro.barrier_free_app.core_ui.theme.Text5
 
@@ -93,6 +95,34 @@ fun ProfileFacilityChip(
                 text = label,
                 style = typography.H7_M_10,
                 color = Text4
+            )
+        }
+    }
+}
+
+@Composable
+fun FavoriteFacilityChip(
+    label: String,
+    isSelected: Boolean = false,
+    onClick: () -> Unit
+) {
+    val backgroundColor = if (isSelected) Button2 else Button1
+    val textColor = if (isSelected) Text1 else Text4
+    val typography = LocalbarrierFreeTypographyProvider.current
+    Surface(
+        shape = RoundedCornerShape(10.dp),
+        color = backgroundColor,
+        onClick = onClick,
+        modifier = Modifier.padding(end = 8.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+        ) {
+            Text(
+                text = label,
+                style = typography.H7_M_10,
+                color = textColor
             )
         }
     }

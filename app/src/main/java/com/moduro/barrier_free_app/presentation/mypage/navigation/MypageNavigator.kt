@@ -11,5 +11,8 @@ class MypageNavigator(
     fun navigateToMypage() {
         navController.navigate("mypage")
     }
+    fun navigateToFavoritePlace() {
+        navController.navigate("favorite_place")
+    }
 
 }
