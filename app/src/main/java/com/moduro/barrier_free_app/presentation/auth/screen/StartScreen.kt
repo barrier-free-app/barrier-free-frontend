@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -27,6 +29,7 @@ import com.moduro.barrier_free_app.R
 import com.moduro.barrier_free_app.core_ui.theme.Background1
 import com.moduro.barrier_free_app.core_ui.theme.Background2
 import com.moduro.barrier_free_app.core_ui.theme.LocalbarrierFreeTypographyProvider
+import com.moduro.barrier_free_app.core_ui.theme.Text2
 import com.moduro.barrier_free_app.core_ui.theme.Text5
 import com.moduro.barrier_free_app.presentation.auth.navigation.AuthNavigator
 
@@ -64,12 +67,7 @@ fun StartScreen(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_start_image),
-                contentDescription = "moduro image",
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
+
             Text(
                 "모두에게 연결되는 길, \n누구에게나 이지모드로",
                 style = typography.H1_SB,
@@ -79,7 +77,7 @@ fun StartScreen(
                 textAlign = TextAlign.Center
             )
         }
-
+        Spacer(modifier = Modifier.height(300.dp))
         Button(
             onClick = { onNavigateToLogin() },
             shape = RoundedCornerShape(10.dp),
@@ -103,9 +101,10 @@ fun StartScreen(
         ) {
             HorizontalDivider(
                 modifier = Modifier
+                    .padding(horizontal = 16.dp)
                     .weight(1f)
                     .height(1.dp),
-                color = Color.Gray
+                color = Text2
             )
 
             Text(
@@ -116,9 +115,29 @@ fun StartScreen(
 
             HorizontalDivider(
                 modifier = Modifier
+                    .padding(horizontal = 16.dp)
                     .weight(1f)
                     .height(1.dp),
-                color = Color.Gray
+                color = Text2
+            )
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // TODO 클릭 시 소셜로그인 진행 로직 구현하기
+            Image(
+                painter = painterResource(id = R.drawable.ic_start_kakao),
+                contentDescription = "kakao",
+                modifier = Modifier
+                    .size(50.dp)
+            )
+            Spacer(modifier = Modifier.width(15.dp))
+            Image(
+                painter = painterResource(id = R.drawable.ic_start_naver),
+                contentDescription = "naver",
+                modifier = Modifier
+                    .size(50.dp)
             )
         }
     }
