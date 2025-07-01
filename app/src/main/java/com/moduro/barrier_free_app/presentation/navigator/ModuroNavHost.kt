@@ -47,10 +47,7 @@ fun ModuroNavHost(
             startDestination = "mypage",
         ) {
             composable("splash") { SplashScreen(navController = authNavigator.navController) }
-            composable("placeDetail") { PlaceDetailScreen(onBackClick = {}, onWriteReviewClick = {})}
-            composable("review") { ReviewWriteScreen(onBackClick = {}, onSubmitClick = {}) }
 
-            composable("my") { MypageScreen() }
             mainNavGraph(
                 mainNavigator,
                 homeNavigator,

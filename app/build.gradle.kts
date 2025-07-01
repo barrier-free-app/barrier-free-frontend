@@ -29,6 +29,10 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        buildConfigField("String", "AIR_KOREA_BASE_URL", "\"${properties["AIR_KOREA_BASE_URL"]}\"")
+        buildConfigField("String", "AIR_KOREA_SERVICE_KEY", "\"${properties["AIR_KOREA_SERVICE_KEY"]}\"")
+
+
     }
 
     buildTypes {
