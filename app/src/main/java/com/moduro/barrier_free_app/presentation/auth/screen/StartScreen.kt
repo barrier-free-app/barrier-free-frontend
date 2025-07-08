@@ -56,28 +56,29 @@ fun StartScreen(
             .background(color = Background2),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(124.dp))
-
-        Image(
-            painter = painterResource(id = R.drawable.ic_start_mini_logo),
-            contentDescription = "moduro logo"
-        )
+        Spacer(modifier = Modifier.height(90.dp))
 
         Box(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
         ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_start_image),
+                contentDescription = "moduro logo"
+            )
 
             Text(
                 "모두에게 연결되는 길, \n누구에게나 이지모드로",
                 style = typography.H1_SB,
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .padding(top = 50.dp),
+                    .padding(top = 100.dp),
                 textAlign = TextAlign.Center
             )
+
         }
-        Spacer(modifier = Modifier.height(300.dp))
+
+        Spacer(modifier = Modifier.padding(50.dp))
         Button(
             onClick = { onNavigateToLogin() },
             shape = RoundedCornerShape(10.dp),
@@ -92,7 +93,6 @@ fun StartScreen(
         ) {
             Text("이메일로 로그인", style = typography.H4_SB)
         }
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
