@@ -8,19 +8,21 @@ class AuthNavigator(
     fun navigateToLogin() {
         navController.navigate("login")
     }
-    fun navigateToHome() {
-        navController.navigate("home") {
-            popUpTo("login") { inclusive = true }
+    fun navigateToMain() {
+        navController.navigate("main") {
+            navController.navigate(route = "main"){
+                popUpTo(0){
+                    inclusive = true
+                }
+            }
         }
     }
     fun navigateToSignUp() {
         navController.navigate("signup") {
-            popUpTo("login") { inclusive = true }
         }
     }
     fun navigateToFindAccount() {
         navController.navigate("find-account") {
-            popUpTo("login") { inclusive = true }
         }
     }
 }

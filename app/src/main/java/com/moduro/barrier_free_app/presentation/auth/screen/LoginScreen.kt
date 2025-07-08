@@ -37,7 +37,7 @@ fun LoginRoute(
     LoginScreen(
         viewModel = viewModel,
         onBackClick = { navigator.navController.popBackStack() },
-        onLoginSuccess = { navigator.navigateToHome() },
+        onLoginSuccess = { navigator.navigateToMain() },
         onSignUpClick = { navigator.navigateToSignUp() },
         onFindAccountClick = { navigator.navigateToFindAccount() }
     )
