@@ -46,7 +46,7 @@ fun ModuroNavHost(
     ) {
         NavHost(
             navController = navController,
-            startDestination = "mypage",
+            startDestination = "splash",
         ) {
             composable("splash") { SplashScreen(navController = authNavigator.navController) }
 

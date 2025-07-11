@@ -13,7 +13,7 @@ class LoginViewModel : ViewModel() {
     var emailError by mutableStateOf<String?>(null)
     var passwordError by mutableStateOf<String?>(null)
 
-    val  isLoginEnabled: Boolean
+    val isLoginEnabled: Boolean
         get() = email.isNotBlank() && password.isNotBlank()
 
     fun login(onSuccess: () -> Unit) {
