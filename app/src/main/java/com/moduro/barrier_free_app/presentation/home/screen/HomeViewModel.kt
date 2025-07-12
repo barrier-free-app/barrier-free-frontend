@@ -43,4 +43,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
             facilities = listOf("장애인 화장실", "승강기", "수유실", "경사로")
         )
     )
+
+
+
 }

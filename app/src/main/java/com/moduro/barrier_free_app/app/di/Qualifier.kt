@@ -12,6 +12,14 @@ annotation class AirKoreaRetrofit
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
+annotation class LocationTempRetrofit
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class LocationNameRetrofit
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
 annotation class AccessToken
 
 @Qualifier

@@ -20,7 +20,7 @@ android {
 
     defaultConfig {
         applicationId = "com.moduro.barrier_free_app"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -30,7 +30,16 @@ android {
             useSupportLibrary = true
         }
         buildConfigField("String", "AIR_KOREA_BASE_URL", "\"${properties["AIR_KOREA_BASE_URL"]}\"")
-        buildConfigField("String", "AIR_KOREA_SERVICE_KEY", "\"${properties["AIR_KOREA_SERVICE_KEY"]}\"")
+        buildConfigField("String", "PUBLIC_DATA_SERVICE_KEY", "\"${properties["PUBLIC_DATA_SERVICE_KEY"]}\"")
+
+        buildConfigField("String", "LOCATION_TEMP_BASE_URL", "\"${properties["LOCATION_TEMP_BASE_URL"]}\"")
+
+        buildConfigField("String", "LOCATION_NAME_BASE_URL", "\"${properties["LOCATION_NAME_BASE_URL"]}\"")
+        buildConfigField("String", "LOCATION_NAME_SERVICE_KEY", "\"${properties["LOCATION_NAME_SERVICE_KEY"]}\"")
+
+
+        buildConfigField("String", "NAVER_CLIENT_ID", "\"${properties["naver.client.id"]}\"")
+        buildConfigField("String", "NAVER_CLIENT_SECRET", "\"${properties["naver.client.secret"]}\"")
 
 
     }
@@ -45,11 +54,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
     buildFeatures {
         compose = true
@@ -144,9 +153,13 @@ dependencies {
     implementation(libs.naver.map.compose)
     implementation(libs.naver.map.location)
     implementation(libs.play.services.location)
+    implementation("com.naver.maps:map-sdk:3.22.0")
 
     //사진 등록시 필요
     implementation("androidx.activity:activity-compose:1.7.2")
     implementation("io.coil-kt:coil-compose:2.4.0")
+
+    //실시간 경도 위도 받아오기
+    implementation("com.google.android.gms:play-services-location:21.0.1")
 
 }
