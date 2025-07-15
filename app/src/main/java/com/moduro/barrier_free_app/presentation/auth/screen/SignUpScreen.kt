@@ -27,17 +27,17 @@ fun SignUpRoute(
 ) {
     SignUpScreen(
         onBackClick = { navigator.navController.popBackStack() },
-        viewModel = viewModel
+        viewModel = viewModel,
+        onSignUpSuccess = { navigator.navigateToSignUpSetting() }
     )
 }
 
 @Composable
 fun SignUpScreen(
     onBackClick: () -> Unit,
-    viewModel: SignUpViewModel
+    viewModel: SignUpViewModel,
+    onSignUpSuccess: () -> Unit
 ) {
-    // 텍스트 필드 회원가입 용 만들고
-    //
     val typography = LocalbarrierFreeTypographyProvider.current
 
     Column(
@@ -99,7 +99,7 @@ fun SignUpScreen(
                 style = typography.H1_SB
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(79.dp))
 
             SignUpTextField(
                 label = "이메일 주소",
@@ -111,7 +111,7 @@ fun SignUpScreen(
                 enabled = false
             )
 
-            Spacer(modifier = Modifier.height(79.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             SignUpTextField(
                 label = "인증번호 확인",
@@ -123,13 +123,14 @@ fun SignUpScreen(
                 enabled = true
             )
 
-            Spacer(modifier = Modifier.height(374.dp))
+            Spacer(modifier = Modifier.height(340.dp))
 
             StartButton(
                 value = "다음",
                 enabled = viewModel.isSignUpEnabled,
                 onClick = {
                     // 인증번호 확인
+                    viewModel.signUp(onSignUpSuccess)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -144,6 +145,7 @@ fun SignUpScreen(
 fun SignUpPreview() {
     SignUpScreen(
         onBackClick = {},
-        viewModel = viewModel()
+        viewModel = viewModel(),
+        onSignUpSuccess = {}
     )
 }
