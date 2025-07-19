@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
@@ -21,8 +20,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.moduro.barrier_free_app.core_ui.component.CommonTopBar
+import com.moduro.barrier_free_app.core_ui.component.LoginTextField
 import com.moduro.barrier_free_app.core_ui.component.StartButton
-import com.moduro.barrier_free_app.core_ui.component.StartTextField
 import com.moduro.barrier_free_app.core_ui.theme.Background2
 import com.moduro.barrier_free_app.core_ui.theme.LocalbarrierFreeTypographyProvider
 import com.moduro.barrier_free_app.core_ui.theme.Text3
@@ -70,7 +69,7 @@ fun LoginScreen(
         
         Spacer(modifier = Modifier.height(79.dp))
 
-        StartTextField(
+        LoginTextField(
             label = "이메일 주소",
             hint = "아이디 또는 이메일 주소",
             text = viewModel.email,
@@ -93,7 +92,7 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        StartTextField(
+        LoginTextField(
             label = "비밀번호",
             hint = "비밀번호(영문+숫자 6~16자)",
             text = viewModel.password,
