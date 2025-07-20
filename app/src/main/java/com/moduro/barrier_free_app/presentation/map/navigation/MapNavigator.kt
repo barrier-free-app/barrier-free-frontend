@@ -9,6 +9,10 @@ class MapNavigator(
         navController.navigate("placeDetail/$placeId")
     }
 
+    fun navigateToSearch() {
+        navController.navigate("search")
+    }
+
     fun navigateBack() {
         navController.popBackStack()
     }

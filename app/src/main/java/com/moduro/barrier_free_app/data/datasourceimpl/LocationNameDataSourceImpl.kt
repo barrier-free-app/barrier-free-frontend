@@ -9,8 +9,18 @@ import javax.inject.Inject
 class LocationNameDataSourceImpl @Inject constructor(
     private val apiService: LocationNameApiService
 ) : LocationNameDataSource {
+
     override suspend fun getAddress(latitude: Double, longitude: Double): LocationNamesResponseDto {
         Log.d("HomeScreen", "getLocationName datasource 호출 완료")
-        return apiService.getAddressFromCoord(longitude, latitude)
+
+        return try {
+            apiService.getAddressFromCoord(
+                longitude = longitude,
+                latitude = latitude
+            )
+        } catch (e: Exception) {
+            Log.e("HomeScreen", "카카오 API 요청 실패: ${e.message}")
+            throw e
+        }
     }
 }

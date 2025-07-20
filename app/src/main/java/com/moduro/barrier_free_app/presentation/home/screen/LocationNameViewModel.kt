@@ -3,7 +3,6 @@ package com.moduro.barrier_free_app.presentation.home.screen
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.moduro.barrier_free_app.BuildConfig
 import com.moduro.barrier_free_app.domain.repository.LocationNameRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,9 +30,9 @@ class LocationNameViewModel @Inject constructor(
             )
 
             result.onSuccess { responseDto ->
-                val address = responseDto.documents.firstOrNull()?.address
-                val gu = address?.region_2depth_name
-                val dong = address?.region_3depth_name
+                val firstDoc = responseDto.documents.firstOrNull()
+                val gu = firstDoc?.region2depthName
+                val dong = firstDoc?.region3depthName
 
                 _locationName.value = if (!gu.isNullOrBlank() && !dong.isNullOrBlank()) {
                     "$gu $dong"
@@ -43,6 +42,8 @@ class LocationNameViewModel @Inject constructor(
 
                 _error.value = null
                 Log.d("LocationViewModel", "주소: ${_locationName.value}")
+
+
             }.onFailure { e ->
                 _error.value = e.message ?: "알 수 없는 오류"
             }

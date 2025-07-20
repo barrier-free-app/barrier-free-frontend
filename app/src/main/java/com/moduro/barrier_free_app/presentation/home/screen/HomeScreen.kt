@@ -38,8 +38,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.moduro.barrier_free_app.R
 import com.moduro.barrier_free_app.core_ui.component.HomePlaceBox
 import com.moduro.barrier_free_app.core_ui.component.HomeWeatherBox
@@ -48,8 +48,6 @@ import com.moduro.barrier_free_app.core_ui.theme.LocalbarrierFreeTypographyProvi
 import com.moduro.barrier_free_app.core_ui.theme.ProvideScaledTypography
 import com.moduro.barrier_free_app.core_ui.theme.Text4
 import com.moduro.barrier_free_app.presentation.home.navigation.HomeNavigator
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.resume
 
 
 @Composable
@@ -60,7 +58,7 @@ fun HomeRoute(
     val homeViewModel: HomeViewModel = hiltViewModel()
     val airKoreaViewModel: AirKoreaViewModel = hiltViewModel()
     val locationViewModel: LocationViewModel = hiltViewModel()
-    val locationNameViewModel : LocationNameViewModel = hiltViewModel()
+    val locationNameViewModel: LocationNameViewModel = hiltViewModel()
 
     var isLargeTextMode by remember { mutableStateOf(false) }
 
@@ -122,22 +120,40 @@ fun HomeScreen(
     LaunchedEffect(hasLocationPermission) {
         if (!hasLocationPermission) {
             permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            Log.d("HomeScreen", "hasLocationPermission 취소")
         } else {
             val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                location?.let {
-                    locationViewModel.fetchTemperature(37.5, 127.0)
-                    Log.d("HomeScreen", "getLocationName 호출 전")
-                    locationNameViewModel.getLocationName(37.5, 127.0)
-                    Log.d("HomeScreen", "getLocationName 호출 완료")
-                    Log.d("HomeScreen", "logitude: ${it.longitude}")
-                    Log.d("HomeScreen", "latitude: ${it.latitude}")
+
+            fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+                .addOnSuccessListener { location ->
+                    val lat = 37.5  // 테스트용 서울 위도
+                    val lon = 127.0 // 테스트용 서울 경도
+
+                    Log.d("HomeScreen", "현재 위치 latitude: $lat, longitude: $lon (테스트용 서울 좌표 고정)")
+
+                    locationViewModel.fetchTemperature(lat, lon)
+                    locationNameViewModel.getLocationName(lat, lon)
                 }
-            }
         }
     }
 
+    //순서대로 현재 기온, 1시간 강수량, 하늘상태
     val temperature by locationViewModel.temperature.collectAsState()
+    val rain by locationViewModel.rain.collectAsState()
+    val sky by locationViewModel.sky.collectAsState()
+
+    var weathertype = 1
+
+    if (rain != "강수없음") {
+        weathertype = 3
+    } else {
+        if (sky != "1") {
+            weathertype = 2
+        }
+    }
+
+
+
     val locationError by locationViewModel.error.collectAsState()
 
     val locationName by locationNameViewModel.locationName.collectAsState()
@@ -219,7 +235,7 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            HomeWeatherBox(1, pm10Grade, locationName, temperature , isLargeTextMode)
+            HomeWeatherBox(weathertype, pm10Grade, locationName, temperature, isLargeTextMode)
 
             Spacer(modifier = Modifier.height(30.dp))
 
@@ -289,9 +305,6 @@ fun HomeScreen(
 
 
 }
-
-
-
 
 
 @Composable

@@ -1,11 +1,8 @@
 package com.moduro.barrier_free_app.presentation.home.screen
 
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.location.*
 import com.moduro.barrier_free_app.BuildConfig
 import com.moduro.barrier_free_app.domain.repository.LocationTempRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,6 +23,12 @@ class LocationViewModel @Inject constructor(
     private val _temperature = MutableStateFlow<String?>(null)
     val temperature: StateFlow<String?> = _temperature
 
+    private val _rain = MutableStateFlow<String?>(null)
+    val rain: StateFlow<String?> = _rain
+
+    private val _sky = MutableStateFlow<String?>(null)
+    val sky: StateFlow<String?> = _sky
+
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
@@ -43,14 +46,22 @@ class LocationViewModel @Inject constructor(
             )
 
             result.onSuccess { tempEntity ->
-                _temperature.value = tempEntity?.value ?: "값 없음"
+                _temperature.value = tempEntity?.temperature ?: "값 없음"
+                _rain.value = tempEntity?.rain ?: "값 없음"
+                _sky.value = tempEntity?.sky ?: "값 없음"
+
                 _error.value = null
-                Log.d("TempViewModel", "기온: ${tempEntity?.value}")
+
+                Log.d(
+                    "LocationViewModel",
+                    "기온: ${tempEntity?.temperature}, 강수량: ${tempEntity?.rain}, 하늘상태: ${tempEntity?.sky}"
+                )
             }.onFailure { e ->
                 _error.value = e.message ?: "알 수 없는 오류"
             }
         }
     }
+
 
     private fun getBaseDateTime(): Pair<String, String> {
         val now = LocalDateTime.now(ZoneId.of("Asia/Seoul"))

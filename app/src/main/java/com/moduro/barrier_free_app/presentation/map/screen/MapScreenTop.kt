@@ -2,6 +2,7 @@ package com.moduro.barrier_free_app.presentation.map.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -38,7 +39,8 @@ import com.moduro.barrier_free_app.core_ui.theme.Text2
 fun MapScreenTop(
     search: String,
     onSearchChange: (String) -> Unit,
-    onSearchClick : () -> Unit
+    onSearchClick : () -> Unit,
+    onFilterClick : () -> Unit
 ) {
     val typography = LocalbarrierFreeTypographyProvider.current
 
@@ -53,9 +55,9 @@ fun MapScreenTop(
             Image(painter = painterResource(R.drawable.ic_moduro), contentDescription = "로고")
             Spacer(modifier = Modifier.weight(1f))
             Image(
-                modifier = Modifier.height(22.dp).width(22.dp),
+                modifier = Modifier.height(22.dp).width(22.dp).clickable { onFilterClick() },
 
-                painter = painterResource(R.drawable.map_filter), contentDescription = "로고")
+                painter = painterResource(R.drawable.map_filter), contentDescription = "필터")
         }
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -97,6 +99,7 @@ fun MapScreenTopPreview() {
 
     MapScreenTop(
         "원하는 장소를 검색하세요.",
+        {},
         {},
         {}
     )

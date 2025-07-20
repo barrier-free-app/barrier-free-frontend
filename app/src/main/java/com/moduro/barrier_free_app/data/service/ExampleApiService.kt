@@ -8,7 +8,7 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface ExampleApiService {
-    @GET("/$API/$USERS")
+    @GET("$API/$USERS")
     suspend fun getUsers(
         @Query("page") page: Int
     ): ExampleBaseResponse<List<ResponseGetExampleDto>>

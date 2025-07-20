@@ -41,6 +41,7 @@ android {
         buildConfigField("String", "NAVER_CLIENT_ID", "\"${properties["naver.client.id"]}\"")
         buildConfigField("String", "NAVER_CLIENT_SECRET", "\"${properties["naver.client.secret"]}\"")
 
+        buildConfigField("String", "MODURO_BASE_URL", "\"${properties["MODURO_BASE_URL"]}\"")
 
     }
 

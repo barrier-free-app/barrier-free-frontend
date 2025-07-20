@@ -92,7 +92,7 @@ object RetrofitModule {
         Retrofit.Builder()
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .client(okHttpClient)
-            .baseUrl("")
+            .baseUrl(BuildConfig.MODURO_BASE_URL)
             .build()
 
 
