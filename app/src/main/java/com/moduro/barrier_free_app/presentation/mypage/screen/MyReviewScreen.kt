@@ -56,12 +56,12 @@ data class ReviewPlace(
 )
 
 enum class PlaceType(val placeholderResId: Int) {
-    PARKING(R.drawable.placeholder_parking),
-    CULTURE(R.drawable.placeholder_culture),
-    RESTAURANT(R.drawable.placeholder_restaurant),
-    ELEVATOR(R.drawable.placeholder_elevator),
-    NURSING_ROOM(R.drawable.placeholder_nursing_room),
-    TOILET(R.drawable.placeholder_toilet);
+    PARKING(R.drawable.review_placeholder_parking),
+    CULTURE(R.drawable.review_placeholder_culture),
+    RESTAURANT(R.drawable.review_placeholder_restaurant),
+    ELEVATOR(R.drawable.review_placeholder_elevator),
+    NURSING_ROOM(R.drawable.review_placeholder_nursing_room),
+    TOILET(R.drawable.review_placeholder_toilet);
 
     companion object {
         fun from(type: String): PlaceType? =
