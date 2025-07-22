@@ -6,8 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,7 +36,6 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.moduro.barrier_free_app.R
 import com.moduro.barrier_free_app.core_ui.component.CommonBottomSheet
 import com.moduro.barrier_free_app.core_ui.component.CommonTopBar
-import com.moduro.barrier_free_app.core_ui.component.FavoriteFacilityChip
 import com.moduro.barrier_free_app.core_ui.theme.Background2
 import com.moduro.barrier_free_app.core_ui.theme.Button1
 import com.moduro.barrier_free_app.core_ui.theme.LocalbarrierFreeTypographyProvider
@@ -57,8 +54,6 @@ data class ReviewPlace(
     val onDetailClick: () -> Unit
 )
 
-
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MyReviewScreen(
     onBackClick: () -> Unit
@@ -111,46 +106,8 @@ fun MyReviewScreen(
             .verticalScroll(scrollState)
     ) {
         CommonTopBar(title = "내가 쓴 리뷰", onBackClick = onBackClick)
-        Spacer(modifier = Modifier.height(8.dp))
 
-        FlowRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp),
-            horizontalArrangement = Arrangement.spacedBy(3.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            listOf(
-                "전체", "🛗 승강기", "♿ 장애인화장실", "👶 영유아동반",
-                "🛁 수유실", "🧑‍🦽 경사로"
-            ).forEach { label ->
-                FavoriteFacilityChip(
-                    label = label,
-                    isSelected = selectedFacilities.contains(label) ||
-                            (selectedFacilities.contains("전체") && label != "전체")
-                    ,
-                    onClick = {
-                        if (label == "전체") {
-                            selectedFacilities.clear()
-                            selectedFacilities.add("전체")
-                        } else {
-                            if (selectedFacilities.contains("전체")) {
-                                selectedFacilities.remove("전체")
-                            }
-
-                            if (selectedFacilities.contains(label)) {
-                                selectedFacilities.remove(label)
-                            } else {
-                                selectedFacilities.add(label)
-                            }
-                        }
-                    }
-
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         if (filteredPlaces.isEmpty()) {
             Box(
@@ -204,7 +161,7 @@ fun ReviewCard(
         modifier = Modifier
             .fillMaxWidth()
             .background(color = Color.White, shape = RoundedCornerShape(12.dp))
-            .padding(12.dp)
+            .padding(18.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
