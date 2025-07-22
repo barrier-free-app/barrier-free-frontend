@@ -42,7 +42,6 @@ import com.moduro.barrier_free_app.core_ui.theme.LocalbarrierFreeTypographyProvi
 import com.moduro.barrier_free_app.core_ui.theme.Text3
 import com.moduro.barrier_free_app.core_ui.theme.Text4
 
-
 data class ReviewPlace(
     val placeName: String,
     val subDescription: String,
@@ -69,7 +68,6 @@ enum class PlaceType(val placeholderResId: Int) {
             entries.find { it.name.equals(type, ignoreCase = true) }
     }
 }
-
 
 @Composable
 fun MyReviewScreen(
@@ -305,7 +303,6 @@ fun ReviewCard(
         }
     }
 }
-
 
 @Composable
 @Preview(showBackground = true)
