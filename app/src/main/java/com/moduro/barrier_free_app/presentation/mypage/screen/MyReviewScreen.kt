@@ -49,10 +49,27 @@ data class ReviewPlace(
     val reviewText: String,
     val rating: Int,
     val userName: String,
-    val imageRes: Int,
+    val imageRes: Int?,
+    val isImage: Boolean,
+    val type: String,
     val categories: List<String>,
     val onDetailClick: () -> Unit
 )
+
+enum class PlaceType(val placeholderResId: Int) {
+    PARKING(R.drawable.placeholder_parking),
+    CULTURE(R.drawable.placeholder_culture),
+    RESTAURANT(R.drawable.placeholder_restaurant),
+    ELEVATOR(R.drawable.placeholder_elevator),
+    NURSING_ROOM(R.drawable.placeholder_nursing_room),
+    TOILET(R.drawable.placeholder_toilet);
+
+    companion object {
+        fun from(type: String): PlaceType? =
+            entries.find { it.name.equals(type, ignoreCase = true) }
+    }
+}
+
 
 @Composable
 fun MyReviewScreen(
@@ -68,18 +85,23 @@ fun MyReviewScreen(
                 userName = "나현",
                 imageRes = R.drawable.place,
                 categories = listOf("🛗 승강기", "♿ 장애인화장실"),
-                onDetailClick = {}
+                onDetailClick = {},
+                isImage = true,
+                type = "CULTURE",
             ),
             ReviewPlace(
-                placeName = "쇼어 SHORE",
-                subDescription = "아이와 함께 가기 좋은 실내 카페",
-                reviewText = "카페가 크고 내부에 엘리베이터도 있어 이동하기 굉장히 편합니다! 다만 거리가 좀 있다는 게 아쉽네요.",
-                rating = 4,
+                placeName = "국립현대미술관 서울 MMCA",
+                subDescription = "배리어프리 서비스 도입 미술관",
+                reviewText = "시설이 전반적으로 이동하는 데 어려움이 크진 않아 좋았던 것 같아요.",
+                rating = 5,
                 userName = "나현",
-                imageRes = R.drawable.place,
-                categories = listOf("👶 영유아동반", "🛁 수유실"),
+                imageRes = null,
+                isImage = false,
+                type = "CULTURE",
+                categories = listOf("🛗 승강기", "♿ 장애인화장실"),
                 onDetailClick = {}
             )
+
         )
     }
 
@@ -138,6 +160,8 @@ fun MyReviewScreen(
                         reviewText = place.reviewText,
                         rating = place.rating,
                         imageRes = place.imageRes,
+                        isImage = place.isImage,
+                        type = place.type,
                         onDetailClick = place.onDetailClick
                     )
                 }
@@ -152,11 +176,20 @@ fun ReviewCard(
     subDescription: String,
     reviewText: String,
     rating: Int,
-    imageRes: Int,
+    imageRes: Int?,
+    isImage: Boolean,
+    type: String,
     onDetailClick: () -> Unit
 ) {
     var showDeleteSheet by remember { mutableStateOf(false) }
     val typography = LocalbarrierFreeTypographyProvider.current
+    val imagePainter = if (isImage && imageRes != null) {
+        painterResource(id = imageRes)
+    } else {
+        val placeholderId = PlaceType.from(type)!!.placeholderResId
+        painterResource(id = placeholderId)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -165,7 +198,7 @@ fun ReviewCard(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
-                painter = painterResource(id = imageRes),
+                painter = imagePainter,
                 contentDescription = null,
                 modifier = Modifier
                     .width(90.dp)
