@@ -55,18 +55,48 @@ data class ReviewPlace(
     val onDetailClick: () -> Unit
 )
 
-enum class PlaceType(val placeholderResId: Int) {
-    PARKING(R.drawable.review_placeholder_parking),
-    CULTURE(R.drawable.review_placeholder_culture),
-    RESTAURANT(R.drawable.review_placeholder_restaurant),
-    ELEVATOR(R.drawable.review_placeholder_elevator),
-    NURSING_ROOM(R.drawable.review_placeholder_nursing_room),
-    TOILET(R.drawable.review_placeholder_toilet);
+enum class PlaceType(
+    val reviewPlaceholderResId: Int,
+    val savedPlaceholderResId: Int
+) {
+    PARKING(
+        R.drawable.review_placeholder_parking,
+        R.drawable.saved_placeholder_parking
+    ),
+    CULTURE(
+        R.drawable.review_placeholder_culture,
+        R.drawable.saved_placeholder_culture
+    ),
+    RESTAURANT(
+        R.drawable.review_placeholder_restaurant,
+        R.drawable.saved_placeholder_restaurant
+    ),
+    ELEVATOR(
+        R.drawable.review_placeholder_elevator,
+        R.drawable.saved_placeholder_elevator
+    ),
+    NURSING_ROOM(
+        R.drawable.review_placeholder_nursing_room,
+        R.drawable.saved_placeholder_nursing_room
+    ),
+    TOILET(
+        R.drawable.review_placeholder_toilet,
+        R.drawable.saved_placeholder_toilet
+    );
+
+    fun getPlaceholderResId(context: PlaceholderContext): Int = when (context) {
+        PlaceholderContext.REVIEW -> reviewPlaceholderResId
+        PlaceholderContext.SAVED -> savedPlaceholderResId
+    }
 
     companion object {
         fun from(type: String): PlaceType? =
             entries.find { it.name.equals(type, ignoreCase = true) }
     }
+}
+
+enum class PlaceholderContext {
+    REVIEW, SAVED
 }
 
 @Composable
@@ -184,7 +214,7 @@ fun ReviewCard(
     val imagePainter = if (isImage && imageRes != null) {
         painterResource(id = imageRes)
     } else {
-        val placeholderId = PlaceType.from(type)!!.placeholderResId
+        val placeholderId = PlaceType.from(type)!!.getPlaceholderResId(PlaceholderContext.REVIEW)
         painterResource(id = placeholderId)
     }
 
