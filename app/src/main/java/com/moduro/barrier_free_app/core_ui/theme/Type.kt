@@ -28,6 +28,7 @@ data class barrierFreeTypography(
     val H4_SB: TextStyle,
     val H5_SB_5: TextStyle,
     val H5_SB_10: TextStyle,
+    val H5_M_10: TextStyle,
     val H5_B_5: TextStyle,
     val H6_M: TextStyle,
     val H7_M_5: TextStyle,
@@ -99,6 +100,12 @@ val defaultbarrierFreeTypography = barrierFreeTypography(
         lineHeight = 15.sp,
         letterSpacing = (-0.10).em
     ),
+    H5_M_10 = TextStyle(
+        fontFamily = barrierFreeFontMedium,
+        fontSize = 15.sp,
+        lineHeight = 15.sp,
+        letterSpacing = (-0.10).em
+    ),
     H8_SB = TextStyle(
         fontFamily = barrierFreeFontMedium,
         fontSize = 14.sp,
@@ -144,6 +151,7 @@ fun ProvideScaledTypography(
         H6_M = defaultbarrierFreeTypography.H6_M.copy(fontSize = (16 * scaleMultiplier).sp),
         H7_M_5 = defaultbarrierFreeTypography.H7_M_5.copy(fontSize = (15 * scaleMultiplier).sp),
         H7_M_10 = defaultbarrierFreeTypography.H7_M_10.copy(fontSize = (15 * scaleMultiplier).sp),
+        H5_M_10 = defaultbarrierFreeTypography.H5_M_10.copy(fontSize = (15 * scaleMultiplier).sp),
         H8_SB = defaultbarrierFreeTypography.H8_SB.copy(fontSize = (14 * scaleMultiplier).sp),
         H9_M = defaultbarrierFreeTypography.H9_M.copy(fontSize = (13 * scaleMultiplier).sp),
         H9_B = defaultbarrierFreeTypography.H9_B.copy(fontSize = (13 * scaleMultiplier).sp),

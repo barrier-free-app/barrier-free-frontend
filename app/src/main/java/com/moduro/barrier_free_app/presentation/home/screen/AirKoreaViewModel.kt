@@ -26,7 +26,7 @@ class AirKoreaViewModel @Inject constructor(
 
     fun fetchPm10Average() {
         viewModelScope.launch {
-            val result = repository.getPm10Average(BuildConfig.AIR_KOREA_SERVICE_KEY)
+            val result = repository.getPm10Average(BuildConfig.PUBLIC_DATA_SERVICE_KEY)
             result.onSuccess { avg ->
                 _pm10Average.value = avg
                 _pm10Grade.value = getPm10Grade(avg)

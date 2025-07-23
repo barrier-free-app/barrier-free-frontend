@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -28,8 +27,8 @@ import com.moduro.barrier_free_app.core_ui.theme.Text4
 fun HomeWeatherBox(
     weatherType: Int,
     dustType: Int,
-    location: String,
-    temp: String,
+    location: String?,
+    temp: String?,
     isLargeTextMode: Boolean
 
 ) {
@@ -92,7 +91,14 @@ fun HomeWeatherBox(
 
                 Spacer(modifier = Modifier.width(7.dp))
 
-                Text(location, style = typography.H8_SB, color = Text4)
+                if (location != null){
+                    Text(location, style = typography.H8_SB, color = Text4)
+
+                }
+                else {
+                    Text("위치 미상", style = typography.H8_SB, color = Text4)
+                }
+
             }
 
             Spacer(modifier = Modifier.height(21.dp))
@@ -150,7 +156,12 @@ fun HomeWeatherBox(
 
                 Spacer(modifier = Modifier.width(4.dp))
 
-                Text(temp + "℃", style = typography.H7_M_5, color = Text4)
+                if (temp != null){
+                    Text(temp + "℃", style = typography.H7_M_5, color = Text4)
+                }
+                else {
+                    Text("미상", style = typography.H7_M_5, color = Text4)
+                }
 
                 Spacer(modifier = Modifier.width(29.dp))
 

@@ -32,6 +32,7 @@ import com.moduro.barrier_free_app.presentation.main.navigation.MainNavigator
 import com.moduro.barrier_free_app.presentation.map.navigation.MapNavigator
 import com.moduro.barrier_free_app.presentation.mypage.navigation.MypageNavigator
 import com.moduro.barrier_free_app.presentation.navigator.ModuroNavHost
+import com.moduro.barrier_free_app.presentation.search.navigation.SearchNavigator
 import com.moduro.barrier_free_app.util.toast
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -80,7 +81,7 @@ class MainActivity : ComponentActivity() {
                 val mapNavigator = remember(navController) { MapNavigator(navController) }
                 val mypageNavigator = remember(navController) { MypageNavigator(navController) }
                 val detailNavigator = remember(navController) { DetailNavigator(navController)}
-
+                val searchNavigator = remember(navController) { SearchNavigator(navController) }
 
 
                 Scaffold(
@@ -95,7 +96,8 @@ class MainActivity : ComponentActivity() {
                             homeNavigator = homeNavigator,
                             mapNavigator = mapNavigator,
                             mypageNavigator = mypageNavigator,
-                            detailNavigator = detailNavigator
+                            detailNavigator = detailNavigator,
+                            searchNavigator = searchNavigator
                                                     )
                     }
                 )

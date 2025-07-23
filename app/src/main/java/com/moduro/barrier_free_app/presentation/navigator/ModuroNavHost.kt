@@ -26,6 +26,8 @@ import com.moduro.barrier_free_app.presentation.map.navigation.mapNavGraph
 import com.moduro.barrier_free_app.presentation.mypage.navigation.MypageNavigator
 import com.moduro.barrier_free_app.presentation.mypage.navigation.mypageNavGraph
 import com.moduro.barrier_free_app.presentation.mypage.screen.MypageScreen
+import com.moduro.barrier_free_app.presentation.search.navigation.SearchNavigator
+import com.moduro.barrier_free_app.presentation.search.navigation.searchNavGraph
 
 
 @Composable
@@ -37,7 +39,8 @@ fun ModuroNavHost(
     homeNavigator: HomeNavigator,
     mapNavigator: MapNavigator,
     mypageNavigator: MypageNavigator,
-    detailNavigator: DetailNavigator
+    detailNavigator: DetailNavigator,
+    searchNavigator : SearchNavigator
 ) {
     Box(
         modifier = modifier
@@ -59,6 +62,7 @@ fun ModuroNavHost(
             )
             homeNavGraph(homeNavigator)
             mapNavGraph(mapNavigator)
+            searchNavGraph(searchNavigator)
             mypageNavGraph(mypageNavigator)
             detailNavGraph(detailNavigator)
             authNavGraph(authNavigator)
