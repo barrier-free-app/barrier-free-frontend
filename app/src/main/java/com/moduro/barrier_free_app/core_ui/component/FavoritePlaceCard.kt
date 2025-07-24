@@ -25,7 +25,8 @@ import com.moduro.barrier_free_app.R
 import com.moduro.barrier_free_app.core_ui.theme.Background1
 import com.moduro.barrier_free_app.core_ui.theme.LocalbarrierFreeTypographyProvider
 import com.moduro.barrier_free_app.presentation.mypage.screen.FavoritePlace
-
+import com.moduro.barrier_free_app.presentation.mypage.screen.PlaceType
+import com.moduro.barrier_free_app.presentation.mypage.screen.PlaceholderContext
 
 @Composable
 fun FavoritePlaceCard(
@@ -33,6 +34,12 @@ fun FavoritePlaceCard(
     onRemoveClick: () -> Unit
 ) {
     val typography = LocalbarrierFreeTypographyProvider.current
+    val imagePainter = if (place.isImage && place.imageRes != null) {
+        painterResource(id = place.imageRes)
+    } else {
+        val placeholderId = PlaceType.from(place.type)!!.getPlaceholderResId(PlaceholderContext.SAVED)
+        painterResource(id = placeholderId)
+    }
 
     Surface(
         modifier = Modifier
@@ -48,7 +55,7 @@ fun FavoritePlaceCard(
                 .padding(20.dp)
         ) {
             Image(
-                painter = painterResource(id = place.imageRes),
+                painter = imagePainter,
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()

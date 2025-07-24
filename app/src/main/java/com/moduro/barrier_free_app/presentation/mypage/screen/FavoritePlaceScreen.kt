@@ -35,8 +35,10 @@ import com.moduro.barrier_free_app.core_ui.theme.Background2
 data class FavoritePlace(
     val name: String,
     val description: String,
-    val imageRes: Int,
+    val imageRes: Int?,
     val categories: List<String>,
+    val type: String,
+    val isImage: Boolean = true,
     var isLiked: Boolean = true
 )
 
@@ -51,13 +53,17 @@ fun FavoritePlaceScreen(
                 name = "국립현대미술관 서울 MMCA",
                 description = "배리어프리 서비스 도입 미술관",
                 imageRes = R.drawable.place,
-                categories = listOf("🛗 승강기", "♿ 장애인화장실")
+                categories = listOf("🛗 승강기", "♿ 장애인화장실"),
+                type = "CULTURE",
+                isImage = true
             ),
             FavoritePlace(
                 name = "쇼어 SHORE",
                 description = "아이와 함께 가기 좋은 실내 카페",
-                imageRes = R.drawable.place,
-                categories = listOf("👶 영유아동반", "🛁 수유실")
+                imageRes = null,
+                categories = listOf("👶 영유아동반", "🛁 수유실"),
+                type = "RESTAURANT",
+                isImage = false
             )
         )
     }
@@ -130,7 +136,6 @@ fun FavoritePlaceScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         if (filteredPlaces.isEmpty()) {
-            // 기존과 동일
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
@@ -150,7 +155,7 @@ fun FavoritePlaceScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 5.dp)
             ) {
                 filteredPlaces.forEach { place ->
                     FavoritePlaceCard(
