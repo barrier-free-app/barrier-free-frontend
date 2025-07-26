@@ -6,8 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,13 +36,11 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.moduro.barrier_free_app.R
 import com.moduro.barrier_free_app.core_ui.component.CommonBottomSheet
 import com.moduro.barrier_free_app.core_ui.component.CommonTopBar
-import com.moduro.barrier_free_app.core_ui.component.FavoriteFacilityChip
 import com.moduro.barrier_free_app.core_ui.theme.Background2
 import com.moduro.barrier_free_app.core_ui.theme.Button1
 import com.moduro.barrier_free_app.core_ui.theme.LocalbarrierFreeTypographyProvider
 import com.moduro.barrier_free_app.core_ui.theme.Text3
 import com.moduro.barrier_free_app.core_ui.theme.Text4
-
 
 data class ReviewPlace(
     val placeName: String,
@@ -52,13 +48,57 @@ data class ReviewPlace(
     val reviewText: String,
     val rating: Int,
     val userName: String,
-    val imageRes: Int,
+    val imageRes: Int?,
+    val isImage: Boolean,
+    val type: String,
     val categories: List<String>,
     val onDetailClick: () -> Unit
 )
 
+enum class PlaceType(
+    val reviewPlaceholderResId: Int,
+    val savedPlaceholderResId: Int
+) {
+    PARKING(
+        R.drawable.review_placeholder_parking,
+        R.drawable.saved_placeholder_parking
+    ),
+    CULTURE(
+        R.drawable.review_placeholder_culture,
+        R.drawable.saved_placeholder_culture
+    ),
+    RESTAURANT(
+        R.drawable.review_placeholder_restaurant,
+        R.drawable.saved_placeholder_restaurant
+    ),
+    ELEVATOR(
+        R.drawable.review_placeholder_elevator,
+        R.drawable.saved_placeholder_elevator
+    ),
+    NURSING_ROOM(
+        R.drawable.review_placeholder_nursing_room,
+        R.drawable.saved_placeholder_nursing_room
+    ),
+    TOILET(
+        R.drawable.review_placeholder_toilet,
+        R.drawable.saved_placeholder_toilet
+    );
 
-@OptIn(ExperimentalLayoutApi::class)
+    fun getPlaceholderResId(context: PlaceholderContext): Int = when (context) {
+        PlaceholderContext.REVIEW -> reviewPlaceholderResId
+        PlaceholderContext.SAVED -> savedPlaceholderResId
+    }
+
+    companion object {
+        fun from(type: String): PlaceType? =
+            entries.find { it.name.equals(type, ignoreCase = true) }
+    }
+}
+
+enum class PlaceholderContext {
+    REVIEW, SAVED
+}
+
 @Composable
 fun MyReviewScreen(
     onBackClick: () -> Unit
@@ -73,18 +113,23 @@ fun MyReviewScreen(
                 userName = "나현",
                 imageRes = R.drawable.place,
                 categories = listOf("🛗 승강기", "♿ 장애인화장실"),
-                onDetailClick = {}
+                onDetailClick = {},
+                isImage = true,
+                type = "CULTURE",
             ),
             ReviewPlace(
-                placeName = "쇼어 SHORE",
-                subDescription = "아이와 함께 가기 좋은 실내 카페",
-                reviewText = "카페가 크고 내부에 엘리베이터도 있어 이동하기 굉장히 편합니다! 다만 거리가 좀 있다는 게 아쉽네요.",
-                rating = 4,
+                placeName = "국립현대미술관 서울 MMCA",
+                subDescription = "배리어프리 서비스 도입 미술관",
+                reviewText = "시설이 전반적으로 이동하는 데 어려움이 크진 않아 좋았던 것 같아요.",
+                rating = 5,
                 userName = "나현",
-                imageRes = R.drawable.place,
-                categories = listOf("👶 영유아동반", "🛁 수유실"),
+                imageRes = null,
+                isImage = false,
+                type = "CULTURE",
+                categories = listOf("🛗 승강기", "♿ 장애인화장실"),
                 onDetailClick = {}
             )
+
         )
     }
 
@@ -111,46 +156,8 @@ fun MyReviewScreen(
             .verticalScroll(scrollState)
     ) {
         CommonTopBar(title = "내가 쓴 리뷰", onBackClick = onBackClick)
-        Spacer(modifier = Modifier.height(8.dp))
 
-        FlowRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp),
-            horizontalArrangement = Arrangement.spacedBy(3.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            listOf(
-                "전체", "🛗 승강기", "♿ 장애인화장실", "👶 영유아동반",
-                "🛁 수유실", "🧑‍🦽 경사로"
-            ).forEach { label ->
-                FavoriteFacilityChip(
-                    label = label,
-                    isSelected = selectedFacilities.contains(label) ||
-                            (selectedFacilities.contains("전체") && label != "전체")
-                    ,
-                    onClick = {
-                        if (label == "전체") {
-                            selectedFacilities.clear()
-                            selectedFacilities.add("전체")
-                        } else {
-                            if (selectedFacilities.contains("전체")) {
-                                selectedFacilities.remove("전체")
-                            }
-
-                            if (selectedFacilities.contains(label)) {
-                                selectedFacilities.remove(label)
-                            } else {
-                                selectedFacilities.add(label)
-                            }
-                        }
-                    }
-
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         if (filteredPlaces.isEmpty()) {
             Box(
@@ -181,6 +188,8 @@ fun MyReviewScreen(
                         reviewText = place.reviewText,
                         rating = place.rating,
                         imageRes = place.imageRes,
+                        isImage = place.isImage,
+                        type = place.type,
                         onDetailClick = place.onDetailClick
                     )
                 }
@@ -195,20 +204,29 @@ fun ReviewCard(
     subDescription: String,
     reviewText: String,
     rating: Int,
-    imageRes: Int,
+    imageRes: Int?,
+    isImage: Boolean,
+    type: String,
     onDetailClick: () -> Unit
 ) {
     var showDeleteSheet by remember { mutableStateOf(false) }
     val typography = LocalbarrierFreeTypographyProvider.current
+    val imagePainter = if (isImage && imageRes != null) {
+        painterResource(id = imageRes)
+    } else {
+        val placeholderId = PlaceType.from(type)!!.getPlaceholderResId(PlaceholderContext.REVIEW)
+        painterResource(id = placeholderId)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(color = Color.White, shape = RoundedCornerShape(12.dp))
-            .padding(12.dp)
+            .padding(18.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
-                painter = painterResource(id = imageRes),
+                painter = imagePainter,
                 contentDescription = null,
                 modifier = Modifier
                     .width(90.dp)
@@ -315,7 +333,6 @@ fun ReviewCard(
         }
     }
 }
-
 
 @Composable
 @Preview(showBackground = true)
