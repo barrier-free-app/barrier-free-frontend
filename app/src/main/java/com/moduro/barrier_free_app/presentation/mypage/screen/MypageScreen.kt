@@ -65,7 +65,7 @@ fun MypageRoute(
             onReviewClick = { navigator.navigateToMyReview() },
             onFavoritePlaceClick = { navigator.navigateToFavoritePlace() },
             onEditProfileClick = {  navigator.navigateToProfileSetting() },
-            onReportPlaceClick = { viewModel.onReportPlaceClick() }
+            onReportPlaceClick = { navigator.navigateToPlaceReport() }
         )
     }
 

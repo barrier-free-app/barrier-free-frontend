@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -49,26 +50,26 @@ fun MultiSelectChip(
     var bgColor = if (selected) MainYellow else Button1
 
     Box(
-        modifier = Modifier.wrapContentWidth().height(25.dp)
+        modifier = Modifier.wrapContentWidth().height(32.dp)
             .background(color = bgColor, shape = RoundedCornerShape(8.2.dp))
             .clickable { onClick() }
     ){
         Row(
-            modifier = Modifier.padding(end = 6.5.dp).padding(start = 5.5.dp).padding(vertical = 4.dp)
+            modifier = Modifier.padding(horizontal = 7.dp).padding(vertical = 7.dp)
         ){
             imageResource?.let {
                 Image(
                     painter = painterResource(id = it),
                     contentDescription = "",
                     modifier = Modifier
-                        .height(14.dp)
-                        .width(18.dp)
+                        .height(17.dp)
+
                 )
 
-                Spacer(modifier = Modifier.width(2.dp))
+                Spacer(modifier = Modifier.width(4.dp))
             }
 
-            Text(text, style = typography.H10_M, color = Text4)
+            Text(text, style = typography.H7_M_10, color = Text4)
 
         }
 
@@ -81,8 +82,8 @@ fun MultiSelectChip(
 @Composable
 fun PreviewMultiSelectChip() {
     MultiSelectChip(
-        text = "전체",
-        selected = false,
+        text = "수유실",
+        selected = true,
         onClick = {}
     )
 }

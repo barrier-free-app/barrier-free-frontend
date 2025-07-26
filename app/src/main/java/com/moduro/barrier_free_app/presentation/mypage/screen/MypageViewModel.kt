@@ -53,9 +53,6 @@ class MypageViewModel @Inject constructor() : ViewModel() {
         // 내가 쓴 리뷰 화면 이동 처리
     }
 
-    fun onReportPlaceClick() {
-        // 장소 제보 클릭 처리
-    }
 
     //닉네임 변경 처리, 아직 API 연동은 하지 않았습니다 !!!
     private val _nicknameChangeStatus = MutableStateFlow(NicknameChangeStatus.NONE)

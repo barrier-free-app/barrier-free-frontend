@@ -1,25 +1,16 @@
 package com.moduro.barrier_free_app.presentation.map.screen
 
 import android.graphics.Color
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
@@ -29,10 +20,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,9 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.moduro.barrier_free_app.R
-import com.moduro.barrier_free_app.core_ui.theme.Background1
 import com.moduro.barrier_free_app.core_ui.theme.LocalbarrierFreeTypographyProvider
-import com.moduro.barrier_free_app.core_ui.theme.MainYellow
 import com.moduro.barrier_free_app.domain.entity.MapPlaceEntity
 import com.moduro.barrier_free_app.presentation.map.navigation.MapNavigator
 import com.naver.maps.geometry.LatLng
@@ -50,6 +38,8 @@ import com.naver.maps.map.CameraAnimation
 import com.naver.maps.map.CameraPosition
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.clustering.Clusterer
+import com.naver.maps.map.clustering.DefaultClusterOnClickListener
+import com.naver.maps.map.clustering.DefaultDistanceStrategy
 import com.naver.maps.map.clustering.DefaultMarkerManager
 import com.naver.maps.map.clustering.DistanceStrategy
 import com.naver.maps.map.clustering.Node
@@ -66,12 +56,6 @@ import com.naver.maps.map.overlay.Overlay
 import com.naver.maps.map.overlay.OverlayImage
 import kotlinx.coroutines.launch
 import kotlin.math.abs
-import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
-import com.naver.maps.map.clustering.DefaultClusterOnClickListener
-import com.naver.maps.map.clustering.DefaultDistanceStrategy
-import com.naver.maps.map.util.MarkerIcons
 
 @Composable
 fun MapRoute(
@@ -128,6 +112,7 @@ fun MapScreen(
 
     val guPlaces = placeList.filter { it.gu == currentGu }
     val facilityList = guPlaces.flatMap { it.facilities }.distinct()
+
 
     // 필터용 바텀시트
     if (showFilterSheet) {
@@ -192,7 +177,11 @@ fun MapScreen(
                             }
                             .distanceStrategy(object : DistanceStrategy {
                                 private val defaultDistanceStrategy = DefaultDistanceStrategy()
-                                override fun getDistance(zoom: Int, node1: Node, node2: Node): Double {
+                                override fun getDistance(
+                                    zoom: Int,
+                                    node1: Node,
+                                    node2: Node
+                                ): Double {
                                     return if (zoom <= 9) {
                                         -1.0
                                     } else if ((node1.tag as MapPlaceEntity).gu == (node2.tag as MapPlaceEntity).gu) {
@@ -246,15 +235,15 @@ fun MapScreen(
                                     marker.captionText = ""
                                     marker.subCaptionText = ""
                                 } else {
-                                    // 일반 클러스터 - NaverMap 기본 원형
-                                    marker.icon = when {
-                                        size < 10 -> MarkerIcons.CLUSTER_LOW_DENSITY
-                                        else -> MarkerIcons.CLUSTER_MEDIUM_DENSITY
-                                    }
-                                    marker.captionText = size.toString()
+                                    val bitmap = createCircleClusterBitmap(context, size)
+                                    marker.icon = OverlayImage.fromBitmap(bitmap)
+                                    val density = context.resources.displayMetrics.density
+                                    val diameter = (40 * density).toInt()  // 고정 크기 (원형)
+                                    marker.width = diameter
+                                    marker.height = diameter
+
+                                    marker.captionText = ""
                                     marker.subCaptionText = ""
-                                    marker.setCaptionAligns(Align.Center)
-                                    marker.captionColor = Color.WHITE
                                 }
 
                                 marker.anchor = Marker.DEFAULT_ANCHOR
@@ -310,30 +299,14 @@ fun MapScreen(
                 }
             }
 
-            // 현재 구 표시 UI (줌 레벨 조건 있음)
-            if (currentGu != null && zoomLevel > 14) {
-                Surface(
-                    modifier = Modifier
-                        .padding(top = 18.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(Black)
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    color = Black
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Text("${guPlaces.size}", style = typography.H5_M_10, color = MainYellow)
-                        Text("$currentGu", style = typography.H5_M_10, color = Background1)
-                        Text("이미지", style = typography.H5_M_10, color = Background1)
-                    }
-                }
-            }
             val place = selectedPlace
+            var isHeartClicked by remember(placeDetail) {
+                mutableStateOf(placeDetail?.isLike == false)
+            }
             // 장소 상세 바텀시트 (중복 제거)
             if (showPlaceSheet && placeDetail != null && place != null) {
                 val data = placeDetail!!
+
                 Surface(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
@@ -346,16 +319,21 @@ fun MapScreen(
                 ) {
                     MapDetailComponent(
                         place = data,
-                        distance = "3.8", //distance 재는 로직 업데이트 필요
+                        distance = "3.8",
                         facilities = place.facilities,
-                        onClick = { onDetailClick(data.id) }
+                        onClick = { onDetailClick(data.id) },
+                        isHeartClicked = isHeartClicked,
+                        onHeartClickChanged = { newValue ->
+                            isHeartClicked = newValue
+                            // viewModel로 좋아요 상태 변경 요청할때는 아래 같은 코드 추가
+                            // mapViewModel.toggleLike(data.id, newValue)
+                        }
                     )
                 }
             }
         }
     }
 }
-
 
 
 @Preview(showBackground = true)

@@ -1,9 +1,9 @@
 package com.moduro.barrier_free_app.core_ui.component
 
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
 
 data class BottomNavigationItem(
-    val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector,
+    val selectedIcon: Painter,
+    val unselectedIcon: Painter,
     val label: String,
 )

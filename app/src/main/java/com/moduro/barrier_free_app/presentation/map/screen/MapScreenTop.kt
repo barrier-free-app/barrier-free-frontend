@@ -63,19 +63,27 @@ fun MapScreenTop(
         Spacer(modifier = Modifier.height(10.dp))
 
         TextField(
-            value = search,
+            modifier =  Modifier.fillMaxWidth(),
+            value = search ,
             onValueChange = onSearchChange,
+
             shape = RoundedCornerShape(10.dp),
+            placeholder = {
+                Text(
+                    text = "원하는 장소를 검색하세요.",
+                    color = Text2,
+                    style = typography.H5_SB_5
+                )
+            },
             singleLine = true,
-            colors = TextFieldDefaults.textFieldColors(
-                unfocusedTextColor = Text2,
+            colors = TextFieldDefaults.colors(
                 focusedTextColor = Text2,
-                focusedPlaceholderColor = Text2,
-                unfocusedPlaceholderColor = Text2,
-                containerColor = Color.White,
-                cursorColor = Color.Gray,
+                unfocusedTextColor = Text2,
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color.White,
+                disabledContainerColor = Color.White,
                 focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
+                unfocusedIndicatorColor = Color.Transparent,
             ),
             trailingIcon = {
                 IconButton(onClick = onSearchClick) {
@@ -86,8 +94,6 @@ fun MapScreenTop(
                     )
                 }
             },
-            modifier = Modifier
-                .fillMaxWidth()
         )
     }
 }
