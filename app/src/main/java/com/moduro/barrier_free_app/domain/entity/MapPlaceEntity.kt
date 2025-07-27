@@ -5,7 +5,7 @@ data class MapPlaceEntity (
     val name : String,
     val type : Int,
     val gu : String,
-    val facilities: List<String>,
+    val facilities: List<Int>,
     val latitude: Double,
     val longitude: Double
 )

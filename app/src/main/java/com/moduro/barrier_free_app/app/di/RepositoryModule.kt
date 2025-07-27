@@ -3,10 +3,12 @@ package com.moduro.barrier_free_app.app.di
 
 import com.moduro.barrier_free_app.data.repositoryimpl.AirKoreaRepositoryImpl
 import com.moduro.barrier_free_app.data.repositoryimpl.ExampleRepositoryImpl
+import com.moduro.barrier_free_app.data.repositoryimpl.HomeRepositoryImpl
 import com.moduro.barrier_free_app.data.repositoryimpl.LocationNameRepositoryImpl
 import com.moduro.barrier_free_app.data.repositoryimpl.LocationTempRepositoryImpl
 import com.moduro.barrier_free_app.domain.repository.AirKoreaRepository
 import com.moduro.barrier_free_app.domain.repository.ExampleRepository
+import com.moduro.barrier_free_app.domain.repository.HomeRepository
 import com.moduro.barrier_free_app.domain.repository.LocationNameRepository
 import com.moduro.barrier_free_app.domain.repository.LocationTempRepository
 
@@ -35,5 +37,9 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindLocationNameRepository(locationNameRepositoryImpl: LocationNameRepositoryImpl) : LocationNameRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindHomeRepository(homeRepositoryImpl: HomeRepositoryImpl) : HomeRepository
 
 }

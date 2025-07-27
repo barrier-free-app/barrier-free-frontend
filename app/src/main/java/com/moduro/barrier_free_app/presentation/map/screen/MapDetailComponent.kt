@@ -40,7 +40,7 @@ import com.moduro.barrier_free_app.domain.entity.MapPlaceSummEntity
 fun MapDetailComponent(
     place : MapPlaceSummEntity,
     distance : String,
-    facilities : List<String>,
+    facilities : List<Int>,
     onClick: (Int) -> Unit,
     isHeartClicked: Boolean,
     onHeartClickChanged: (Boolean) -> Unit
@@ -172,7 +172,7 @@ fun HomePlaceBoxPreview(){
             isLike = true
         ),
         distance = "3.8",
-        facilities = listOf("영유아 동반", "승강기"),
+        facilities = listOf(1,2),
         {},
         true, {}
     )

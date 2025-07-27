@@ -43,7 +43,7 @@ fun SearchScreen(
     searchViewModel: SearchViewModel,
     onBackClick : () -> Unit,
     onSearchClick: () -> Unit,
-    onDetailClick: (Int) -> Unit
+    onDetailClick: (Long) -> Unit
 ) {
 
     var search by remember { mutableStateOf("") }

@@ -2,10 +2,12 @@ package com.moduro.barrier_free_app.app.di
 
 import com.moduro.barrier_free_app.data.datasource.AirKoreaDataSource
 import com.moduro.barrier_free_app.data.datasource.ExampleDataSource
+import com.moduro.barrier_free_app.data.datasource.HomeDataSource
 import com.moduro.barrier_free_app.data.datasource.LocationNameDataSource
 import com.moduro.barrier_free_app.data.datasource.LocationTempDataSource
 import com.moduro.barrier_free_app.data.datasourceimpl.AirKoreaDataSourceImpl
 import com.moduro.barrier_free_app.data.datasourceimpl.ExampleDataSourceImpl
+import com.moduro.barrier_free_app.data.datasourceimpl.HomeDataSourceImpl
 import com.moduro.barrier_free_app.data.datasourceimpl.LocationNameDataSourceImpl
 import com.moduro.barrier_free_app.data.datasourceimpl.LocationTempDataSourceImpl
 import dagger.Binds
@@ -33,5 +35,9 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindLocationNameDataSource(locationNameDataSourceImpl: LocationNameDataSourceImpl) : LocationNameDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindHomeDataSource(homeDataSourceImpl: HomeDataSourceImpl) : HomeDataSource
 
 }

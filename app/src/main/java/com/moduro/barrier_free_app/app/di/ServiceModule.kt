@@ -2,6 +2,7 @@ package com.moduro.barrier_free_app.app.di
 
 import com.moduro.barrier_free_app.data.service.AirKoreaApiService
 import com.moduro.barrier_free_app.data.service.ExampleApiService
+import com.moduro.barrier_free_app.data.service.HomeApiService
 import com.moduro.barrier_free_app.data.service.LocationNameApiService
 import com.moduro.barrier_free_app.data.service.LocationTempApiService
 import dagger.Module
@@ -38,5 +39,11 @@ object ServiceModule {
     fun provideLocationNameService(
         @LocationNameRetrofit retrofit: Retrofit
     ) : LocationNameApiService = retrofit.create(LocationNameApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideHomeService(
+        @ModuroRetrofit retrofit: Retrofit
+    ): HomeApiService = retrofit.create(HomeApiService::class.java)
 
 }

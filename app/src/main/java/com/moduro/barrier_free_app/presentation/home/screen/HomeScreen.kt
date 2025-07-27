@@ -3,6 +3,9 @@ package com.moduro.barrier_free_app.presentation.home.screen
 import android.Manifest
 import android.content.pm.PackageManager
 import android.location.Location
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -37,6 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
@@ -91,9 +95,11 @@ fun HomeScreen(
     locationNameViewModel: LocationNameViewModel,
     isLargeTextMode: Boolean,
     onToggleTextMode: () -> Unit,
-    onPlaceClick: (Int) -> Unit
+    onPlaceClick: (Long) -> Unit
 ) {
-    val hotPlace = homeViewModel.dummyHotPlace
+    val hotPlaceList by homeViewModel.hotPlaceList.observeAsState(emptyList())
+    val isLoading by homeViewModel.isLoading.observeAsState(false)
+
     val weatherPlace = homeViewModel.dummyWeatherPlaces
 
     val context = LocalContext.current
@@ -160,6 +166,7 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) {
         airKoreaViewModel.fetchPm10Average()
+        homeViewModel.getHotPlaces()
     }
 
 
@@ -273,9 +280,27 @@ fun HomeScreen(
 
                 Spacer(modifier = Modifier.height(11.dp))
 
-                HomePlaceBox(place = hotPlace) { placeId ->
-                    onPlaceClick(placeId)
+                hotPlaceList.getOrNull(0)?.let { place ->
+                    HomePlaceBox(place = place) { placeId ->
+                        onPlaceClick(placeId)
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
                 }
+
+                hotPlaceList.getOrNull(1)?.let { place ->
+                    HomePlaceBox(place = place) { placeId ->
+                        onPlaceClick(placeId)
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+
+                hotPlaceList.getOrNull(2)?.let { place ->
+                    HomePlaceBox(place = place) { placeId ->
+                        onPlaceClick(placeId)
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+
 
                 Spacer(modifier = Modifier.height(29.dp))
 
@@ -310,8 +335,7 @@ fun HomeScreen(
 @Composable
 @Preview
 fun HomeScreenPreview() {
-    //val dummyViewModel = HomeViewModel()
-    //val dummyViewModel2 9= AirKoreaViewModel()
-
-    //HomeScreen(dummyViewModel, dummyViewModel2,false, {}, {})
+    HomeScreen(
+        viewModel(), viewModel(), viewModel(), viewModel(), true, {}, {}
+    )
 }

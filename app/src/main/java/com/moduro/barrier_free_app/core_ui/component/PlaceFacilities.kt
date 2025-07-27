@@ -23,18 +23,27 @@ import com.moduro.barrier_free_app.core_ui.theme.Text4
 
 @Composable
 fun PlaceFacilities (
-    type : String
+    type : Int
 ){
 
     val typography = LocalbarrierFreeTypographyProvider.current
 
 
     var imageResource = when (type) {
-        "수유실" -> R.drawable.home_type_mother
-        "승강기" -> R.drawable.home_type_elevator
-        "영유아 동반" -> R.drawable.home_type_baby
-        "장애인 화장실" -> R.drawable.home_type_toilet
+        1 -> R.drawable.home_type_elevator
+        2 -> R.drawable.home_type_toilet
+        3 -> R.drawable.home_type_baby
+        4 -> R.drawable.home_type_mother
         else -> R.drawable.home_type_wheelchair
+        //경사로
+    }
+
+    var typeString = when (type) {
+        1 -> "승강기"
+        2 -> "장애인 화장실"
+        3 -> "영유아 동반"
+        4 -> "수유실"
+        else -> "경사로"
         //경사로
     }
 
@@ -53,7 +62,7 @@ fun PlaceFacilities (
 
             Spacer(modifier = Modifier.width(2.dp))
 
-            Text(type, style = typography.H10_M, color = Text4)
+            Text(typeString, style = typography.H10_M, color = Text4)
 
         }
 
@@ -67,5 +76,5 @@ fun PlaceFacilities (
 @Composable
 fun PlaceFacilitiesPreview(){
 
-    PlaceFacilities("경사로")
+    PlaceFacilities(1)
 }

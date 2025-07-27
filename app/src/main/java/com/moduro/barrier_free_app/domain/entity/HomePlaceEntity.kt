@@ -1,11 +1,11 @@
 package com.moduro.barrier_free_app.domain.entity
 
 data class HomePlaceEntity(
-    val id : Int,
-    val type: Int,
+    val placeId: Long,
+    val placeType: String,
     val name: String,
-    val location: String,
+    val region: String,
     val description: String,
-    val facilities: List<String>,
-    val isReported : Boolean,
+    val facility: List<Int>,
+    val imageType: Int,
 )

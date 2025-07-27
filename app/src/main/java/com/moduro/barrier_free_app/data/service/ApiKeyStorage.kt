@@ -6,4 +6,6 @@ object ApiKeyStorage {
     const val USERS = "users"
     const val AUTH = "auth"
     const val ME = "me"
+    const val PLACES = "places"
+    const val POPULARS = "populars"
 }
