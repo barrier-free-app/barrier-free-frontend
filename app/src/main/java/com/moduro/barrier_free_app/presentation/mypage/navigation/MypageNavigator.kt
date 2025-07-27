@@ -18,4 +18,12 @@ class MypageNavigator(
         navController.navigate("my_review")
     }
 
+    fun navigateBack() {
+        navController.popBackStack()
+    }
+
+    fun navigateToPlaceReport(){
+        navController.navigate("place_report")
+    }
+
 }

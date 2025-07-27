@@ -6,5 +6,6 @@ data class HomePlaceEntity(
     val name: String,
     val location: String,
     val description: String,
-    val facilities: List<String>
+    val facilities: List<String>,
+    val isReported : Boolean,
 )

@@ -6,6 +6,7 @@ import com.moduro.barrier_free_app.presentation.mypage.screen.FavoritePlaceScree
 import com.moduro.barrier_free_app.presentation.mypage.screen.MyReviewScreen
 import com.moduro.barrier_free_app.presentation.mypage.screen.MyReviewScreenPreview
 import com.moduro.barrier_free_app.presentation.mypage.screen.MypageRoute
+import com.moduro.barrier_free_app.presentation.mypage.screen.PlaceReportRoute
 import com.moduro.barrier_free_app.presentation.mypage.screen.ProfileSettingScreen
 
 fun NavGraphBuilder.mypageNavGraph(
@@ -26,5 +27,9 @@ fun NavGraphBuilder.mypageNavGraph(
     }
     composable("my_review"){
         MyReviewScreen(onBackClick = {navigator.navController.popBackStack()})
+    }
+
+    composable("place_report"){
+        PlaceReportRoute(navigator = navigator)
     }
 }

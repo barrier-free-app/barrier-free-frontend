@@ -41,7 +41,9 @@ fun MapDetailComponent(
     place : MapPlaceSummEntity,
     distance : String,
     facilities : List<String>,
-    onClick: (Int) -> Unit
+    onClick: (Int) -> Unit,
+    isHeartClicked: Boolean,
+    onHeartClickChanged: (Boolean) -> Unit
 ) {
     val typography = LocalbarrierFreeTypographyProvider.current
 
@@ -89,19 +91,21 @@ fun MapDetailComponent(
 
                         Spacer(modifier = Modifier.weight(1.0f))
 
-                        if (place.isLike == false){
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_heart_unfilled),
-                                contentDescription = "",
-                                modifier = Modifier.width(20.dp).height(17.dp)
-                            )
-                        }else {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_heart_filled),
-                                contentDescription = "",
-                                modifier = Modifier.width(20.dp).height(17.dp)
-                            )
+                        val heartIconRes = if (isHeartClicked) {
+                            R.drawable.ic_heart_filled
+                        } else {
+                            R.drawable.ic_heart_unfilled
                         }
+
+                        Image(
+                            painter = painterResource(id = heartIconRes),
+                            contentDescription = "heart icon",
+                            modifier = Modifier
+                                .width(20.dp).height(17.dp)
+                                .clickable {
+                                    onHeartClickChanged(!isHeartClicked)
+                                }
+                        )
 
                     }
                     Spacer(modifier = Modifier.height(7.dp))
@@ -169,7 +173,8 @@ fun HomePlaceBoxPreview(){
         ),
         distance = "3.8",
         facilities = listOf("영유아 동반", "승강기"),
-        {}
+        {},
+        true, {}
     )
 }
 

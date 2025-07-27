@@ -1,4 +1,4 @@
-package com.moduro.barrier_free_app.presentation.home.screen
+package com.moduro.barrier_free_app.core_ui.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -11,24 +11,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.moduro.barrier_free_app.R
 import com.moduro.barrier_free_app.core_ui.theme.Button1
-import com.moduro.barrier_free_app.core_ui.theme.Button2
 import com.moduro.barrier_free_app.core_ui.theme.LocalbarrierFreeTypographyProvider
 import com.moduro.barrier_free_app.core_ui.theme.MainYellow
 import com.moduro.barrier_free_app.core_ui.theme.Text4
 
+
 @Composable
-fun MultiSelectChip(
+fun PlaceReportTypeChip(
     text: String,
     selected: Boolean,
     onClick: () -> Unit
@@ -38,13 +35,12 @@ fun MultiSelectChip(
 
 
     var imageResource = when (text) {
-        "수유실" -> R.drawable.home_type_mother
-        "승강기" -> R.drawable.home_type_elevator
-        "영유아 동반" -> R.drawable.home_type_baby
-        "장애인 화장실" -> R.drawable.home_type_toilet
-        "경사로" -> R.drawable.home_type_wheelchair
-        else -> null
-        //경사로
+        "주차장" -> R.drawable.place_report_parking
+        "문화시설" -> R.drawable.place_report_culture2
+        "식당" -> R.drawable.place_report_restaurant
+        "승강기" -> R.drawable.place_report_elevator
+        "수유실" -> R.drawable.place_report_mom
+        else -> R.drawable.place_report_toilet
     }
 
     var bgColor = if (selected) MainYellow else Button1
@@ -80,10 +76,10 @@ fun MultiSelectChip(
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewMultiSelectChip() {
-    MultiSelectChip(
-        text = "수유실",
-        selected = true,
+fun PreviewChip() {
+    PlaceReportTypeChip(
+        text = "문화시설",
+        selected = false,
         onClick = {}
     )
 }

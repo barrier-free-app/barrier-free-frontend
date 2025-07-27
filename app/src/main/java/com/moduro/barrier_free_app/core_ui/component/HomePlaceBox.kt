@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.tooling.preview.Preview
 import com.moduro.barrier_free_app.core_ui.theme.Background1
 import com.moduro.barrier_free_app.core_ui.theme.Button1
+import com.moduro.barrier_free_app.core_ui.theme.SubYellow
 import com.moduro.barrier_free_app.domain.entity.HomePlaceEntity
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -47,13 +48,18 @@ fun HomePlaceBox(
         else -> R.drawable.place_icon_toilet
     }
 
+    var bgColor = when (place.isReported){
+        false -> Background1
+        true -> SubYellow
+    }
+
 
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .background(color = Background1, shape = RoundedCornerShape(10.dp))
+            .background(color = bgColor, shape = RoundedCornerShape(10.dp))
             .clickable { onClick(place.id) }
     ) {
         Row (
@@ -119,7 +125,8 @@ fun HomePlaceBoxPreview(){
             name = "루트205",
             location = "서울 강동구",
             description = "아이와 함께하는 예스키즈존",
-            facilities = listOf("수유실", "영유아 동반", "경사로")
+            facilities = listOf("수유실", "영유아 동반", "경사로"),
+            isReported = true
         ),
         {}
     )

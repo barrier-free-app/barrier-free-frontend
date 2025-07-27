@@ -2,6 +2,7 @@ package com.moduro.barrier_free_app.presentation.main.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.ripple.LocalRippleTheme
@@ -25,6 +26,7 @@ import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,6 +36,8 @@ import androidx.navigation.compose.rememberNavController
 import com.moduro.barrier_free_app.R
 import com.moduro.barrier_free_app.core_ui.component.BottomNavigationItem
 import com.moduro.barrier_free_app.core_ui.theme.Barrier_free_appTheme
+import com.moduro.barrier_free_app.core_ui.theme.LocalbarrierFreeTypographyProvider
+import com.moduro.barrier_free_app.core_ui.theme.Text4
 import com.moduro.barrier_free_app.presentation.example.navigation.ExampleNavigator
 import com.moduro.barrier_free_app.presentation.example.screen.ExampleRoute
 import com.moduro.barrier_free_app.presentation.home.navigation.HomeNavigator
@@ -58,22 +62,23 @@ fun MainRoute(
 fun MainScreen(
     navController: NavHostController,
 ) {
+    val typography = LocalbarrierFreeTypographyProvider.current
     var selectedItem by rememberSaveable { mutableIntStateOf(0) }
     val items = listOf(
         BottomNavigationItem(
-            selectedIcon = ImageVector.vectorResource(id = R.drawable.ic_launcher_selected),
-            unselectedIcon = ImageVector.vectorResource(id = R.drawable.ic_launcher_foreground),
-            label = "홈화면"
+            selectedIcon = painterResource(id = R.drawable.nav_home_selected),
+            unselectedIcon = painterResource(id = R.drawable.nav_home_unselected),
+            label = "홈 화면"
         ),
         BottomNavigationItem(
-            selectedIcon = ImageVector.vectorResource(id = R.drawable.ic_launcher_selected),
-            unselectedIcon = ImageVector.vectorResource(id = R.drawable.ic_launcher_foreground),
-            label = "지도"
+            selectedIcon = painterResource(id = R.drawable.nav_map_selected),
+            unselectedIcon = painterResource(id = R.drawable.nav_map_unselected),
+            label = "지도 보기"
         ),
         BottomNavigationItem(
-            selectedIcon = ImageVector.vectorResource(id = R.drawable.ic_launcher_selected),
-            unselectedIcon = ImageVector.vectorResource(id = R.drawable.ic_launcher_foreground),
-            label = "마이페이지"
+            selectedIcon = painterResource(id = R.drawable.nav_mypage_selected),
+            unselectedIcon = painterResource(id = R.drawable.nav_mypage_unselected),
+            label = "마이 페이지"
         ),
     )
 
@@ -88,24 +93,23 @@ fun MainScreen(
                         NavigationBarItem(
                             icon = {
                                 Icon(
-                                    imageVector = if (selectedItem == index) item.selectedIcon else item.unselectedIcon,
+                                    painter = if (selectedItem == index) item.selectedIcon else item.unselectedIcon,
                                     contentDescription = null,
                                     tint = Color.Unspecified,
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.height(29.dp)
                                 )
                             },
                             label = {
                                 Text(
                                     text = item.label,
-
+                                    style = typography.H9_M,
                                 )
                             },
                             selected = selectedItem == index,
                             onClick = { selectedItem = index },
                             colors = NavigationBarItemDefaults.colors(
                                 selectedTextColor = Black,
-                                unselectedTextColor = Gray,
-                                indicatorColor = White
+                                unselectedTextColor = Text4,
                             ),
                         )
                     }

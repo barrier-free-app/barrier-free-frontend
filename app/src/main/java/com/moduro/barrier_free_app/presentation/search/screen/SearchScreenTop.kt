@@ -1,4 +1,5 @@
-package com.moduro.barrier_free_app.presentation.map.screen
+package com.moduro.barrier_free_app.presentation.search.screen
+
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,31 +37,35 @@ import com.moduro.barrier_free_app.core_ui.theme.Text2
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MapScreenTop(
+fun SearchScreenTop(
     search: String,
+    onBackClick : () -> Unit,
     onSearchChange: (String) -> Unit,
     onSearchClick : () -> Unit,
-    onFilterClick : () -> Unit
+    //onFilterClick : () -> Unit
 ) {
     val typography = LocalbarrierFreeTypographyProvider.current
 
     Column (
-        modifier = Modifier.background(Background2).padding(horizontal = 24.dp).padding(bottom = 15.dp)
+        modifier = Modifier.background(Background2).padding(horizontal = 8.dp).padding(bottom = 15.dp)
     ){
 
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
         ) {
-            Image(painter = painterResource(R.drawable.ic_moduro), contentDescription = "로고")
+            Image(
+                modifier = Modifier.width(11.dp).height(22.dp).clickable { onBackClick() },
+                painter = painterResource(R.drawable.ic_back), contentDescription = "뒤로가기")
             Spacer(modifier = Modifier.weight(1f))
             Image(
-                modifier = Modifier.height(22.dp).width(22.dp).clickable { onFilterClick() },
-
+                modifier = Modifier.height(22.dp).width(22.dp),
+                //clickable { onFilterClick() }
                 painter = painterResource(R.drawable.map_filter), contentDescription = "필터")
         }
 
         Spacer(modifier = Modifier.height(10.dp))
+
 
         TextField(
             modifier =  Modifier.fillMaxWidth(),
@@ -101,13 +106,13 @@ fun MapScreenTop(
 
 @Preview
 @Composable
-fun MapScreenTopPreview() {
+fun SearchScreenTopPreview() {
 
-    MapScreenTop(
+    SearchScreenTop(
         "원하는 장소를 검색하세요.",
+        onBackClick = {},
         {},
         {},
-        {}
     )
 
 }
