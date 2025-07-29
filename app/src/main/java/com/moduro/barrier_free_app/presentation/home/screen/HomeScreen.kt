@@ -98,7 +98,6 @@ fun HomeScreen(
     onPlaceClick: (Long) -> Unit
 ) {
     val hotPlaceList by homeViewModel.hotPlaceList.observeAsState(emptyList())
-    val isLoading by homeViewModel.isLoading.observeAsState(false)
 
     val weatherPlace = homeViewModel.dummyWeatherPlaces
 
@@ -194,7 +193,7 @@ fun HomeScreen(
         HomeBottomSheet(
             showSheet = showFilterSheet,
             onDismiss = { showFilterSheet = false },
-            onConfirm = { single: String, multi: List<String> ->
+            onConfirm = { single: String, multi: List<Int> ->
                 showFilterSheet = false
                 println("선택된 알고리즘: $single, 선택된 카테고리: $multi")
             }
