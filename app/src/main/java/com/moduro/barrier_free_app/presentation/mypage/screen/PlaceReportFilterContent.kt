@@ -5,30 +5,28 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.moduro.barrier_free_app.core_ui.component.PlaceReportTypeChip
 import com.moduro.barrier_free_app.core_ui.theme.LocalbarrierFreeTypographyProvider
 import com.moduro.barrier_free_app.presentation.home.screen.MultiSelectChip
 
-
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PlaceReportFilterContent(
     valueType: Int,
-    onValueChange: (List<String>) -> Unit
+    onValueChange: (List<Int>) -> Unit
 ) {
+    val multiOptions = listOf(0, 1, 2, 3, 4, 5)
+    val multiSelected = remember { mutableStateListOf(0) }
 
-    val typography = LocalbarrierFreeTypographyProvider.current
-
-    val multiOptions = listOf("전체", "승강기", "장애인 화장실", "영유아 동반", "수유실", "경사로")
-    val multiSelected = remember { mutableStateListOf<String>("전체") }
-
-    val singleOptions = listOf("주차장", "문화시설", "식당", "승강기", "수유실", "화장실")
-    val singleSelected = remember { mutableStateListOf<String>() }
-
+    val singleOptions = listOf(0, 1, 2, 3, 4, 5)
+    var singleSelected by remember { mutableStateOf(0) }
 
     if (valueType == 1) {
         FlowRow(
@@ -37,28 +35,28 @@ fun PlaceReportFilterContent(
         ) {
             multiOptions.forEach { option ->
                 MultiSelectChip(
-                    text = option,
+                    type = option,
                     selected = multiSelected.contains(option),
                     onClick = {
-                        if (option == "전체") {
-                            // 전체 선택 시, 다른 건 모두 해제하고 전체만 선택
+                        if (option == 0) {
                             multiSelected.clear()
-                            multiSelected.add("전체")
+                            multiSelected.add(0)
                         } else {
                             if (multiSelected.contains(option)) {
                                 multiSelected.remove(option)
                             } else {
                                 multiSelected.add(option)
                             }
-                            // '전체' 선택 상태 해제
-                            if (multiSelected.contains("전체")) {
-                                multiSelected.remove("전체")
+                            // '전체' 선택 해제
+                            if (multiSelected.contains(0)) {
+                                multiSelected.remove(0)
                             }
-                            // 아무것도 선택 안 됐으면 '전체' 자동 선택
+                            // 아무것도 없으면 다시 전체
                             if (multiSelected.isEmpty()) {
-                                multiSelected.add("전체")
+                                multiSelected.add(0)
                             }
                         }
+                        onValueChange(multiSelected.toList())
                     }
                 )
             }
@@ -70,23 +68,18 @@ fun PlaceReportFilterContent(
         ) {
             singleOptions.forEach { option ->
                 PlaceReportTypeChip(
-                    text = option,
-                    selected = singleSelected.contains(option),
+                    type = option,
+                    selected = singleSelected == option,
                     onClick = {
-                        singleSelected.clear()
-                        singleSelected.add(option)
-                        onValueChange(singleSelected.toList())
-
+                        singleSelected = option
+                        onValueChange(listOf(option))  // 리스트로 감싸서 전달
                     }
                 )
             }
         }
-
-
     }
-
-
 }
+
 
 @Preview
 @Composable
