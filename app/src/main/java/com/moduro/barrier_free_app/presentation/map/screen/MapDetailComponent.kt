@@ -41,14 +41,14 @@ fun MapDetailComponent(
     place : MapPlaceSummEntity,
     distance : String,
     facilities : List<Int>,
-    onClick: (Int) -> Unit,
+    onClick: () -> Unit,
     isHeartClicked: Boolean,
     onHeartClickChanged: (Boolean) -> Unit
 ) {
     val typography = LocalbarrierFreeTypographyProvider.current
 
 
-    var imageResource = when (place.type) {
+    var imageResource = when (place.imageType) {
         1 -> R.drawable.place_icon_parking
         2 -> R.drawable.place_icon_cultural
         3 -> R.drawable.place_icon_resturant
@@ -64,7 +64,7 @@ fun MapDetailComponent(
             .fillMaxWidth()
             .wrapContentHeight()
             .background(color = Background1, shape = RoundedCornerShape(10.dp))
-            .clickable { onClick(place.id) }
+            //.clickable { onClick(id) }
     ) {
 
         Column (
@@ -139,7 +139,7 @@ fun MapDetailComponent(
                     .fillMaxWidth()
                     .background(color = Button1, shape = RoundedCornerShape(10.dp))
                     .clickable {
-                        onClick(place.id)
+                        onClick()
                     },
                 contentAlignment = Alignment.Center
             ) {
@@ -165,11 +165,13 @@ fun MapDetailComponent(
 fun HomePlaceBoxPreview(){
     MapDetailComponent(
         MapPlaceSummEntity(
-            id = 1,
-            type = 1,
+            imageType = 1,
             name = "루트205",
             address = "서울 종로구 삼청로 30",
-            isLike = true
+            favorite = true,
+            description = "설명",
+            facilities = listOf(1,2),
+            placeType = "map"
         ),
         distance = "3.8",
         facilities = listOf(1,2),

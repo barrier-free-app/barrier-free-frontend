@@ -13,9 +13,10 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -82,15 +83,15 @@ fun MapRoute(
 @Composable
 fun MapScreen(
     mapViewModel: MapViewModel = hiltViewModel(),
-    onDetailClick: (Int) -> Unit,
+    onDetailClick: (Long) -> Unit,
     onSearchClick: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val typography = LocalbarrierFreeTypographyProvider.current
     val context = LocalContext.current
 
-    val placeList by mapViewModel.placeList.collectAsState()
-    val placeDetail by mapViewModel.placeDetail.collectAsState()
+    val placeList by mapViewModel.mapPlaceList.observeAsState(emptyList())
+    val placeSumm by mapViewModel.mapPlaceSumm.observeAsState()
 
     var showFilterSheet by remember { mutableStateOf(false) }
     var selectedPlace by remember { mutableStateOf<MapPlaceEntity?>(null) }
@@ -108,11 +109,13 @@ fun MapScreen(
     val currentGu = placeList.find {
         abs(it.latitude - cameraCenter.latitude) < 0.01 &&
                 abs(it.longitude - cameraCenter.longitude) < 0.01
-    }?.gu
+    }?.region
 
-    val guPlaces = placeList.filter { it.gu == currentGu }
-    val facilityList = guPlaces.flatMap { it.facilities }.distinct()
+    val guPlaces = placeList.filter { it.region == currentGu }
 
+    LaunchedEffect(Unit) {
+        mapViewModel.getMapPlaces()
+    }
 
     // 필터용 바텀시트
     if (showFilterSheet) {
@@ -184,7 +187,7 @@ fun MapScreen(
                                 ): Double {
                                     return if (zoom <= 9) {
                                         -1.0
-                                    } else if ((node1.tag as MapPlaceEntity).gu == (node2.tag as MapPlaceEntity).gu) {
+                                    } else if ((node1.tag as MapPlaceEntity).region == (node2.tag as MapPlaceEntity).region) {
                                         if (zoom <= 11) {
                                             -1.0
                                         } else {
@@ -203,9 +206,8 @@ fun MapScreen(
                                     MapPlaceEntity(
                                         id = -1L,
                                         name = "",
-                                        type = first.type,
-                                        gu = first.gu,
-                                        facilities = emptyList(),
+                                        placeType = first.placeType,
+                                        region = first.region,
                                         latitude = first.latitude,
                                         longitude = first.longitude
                                     )
@@ -226,7 +228,7 @@ fun MapScreen(
                                     // 구 단위 클러스터 - 커스텀 가로형 마커
                                     val tag = info.tag as? MapPlaceEntity
                                     if (tag != null) {
-                                        val bitmap = createClusterBitmap(context, size, tag.gu)
+                                        val bitmap = createClusterBitmap(context, size, tag.region)
                                         marker.icon = OverlayImage.fromBitmap(bitmap)
                                         val density = context.resources.displayMetrics.density
                                         marker.width = (86 * density).toInt()
@@ -252,8 +254,8 @@ fun MapScreen(
                             .leafMarkerUpdater { info, marker ->
                                 val tag = info.tag as MapPlaceEntity
 
-                                marker.icon = when (tag.type) {
-                                    1 -> OverlayImage.fromResource(R.drawable.ic_map_marker)
+                                marker.icon = when (tag.placeType) {
+                                    "map" -> OverlayImage.fromResource(R.drawable.ic_map_marker)
                                     else -> OverlayImage.fromResource(R.drawable.ic_map_marker_yellow)
                                 }
 
@@ -276,7 +278,10 @@ fun MapScreen(
                                     map.moveCamera(cameraUpdate)
 
                                     if (selectedPlace?.id != tag.id) {
-                                        mapViewModel.loadPlaceDetail(tag.id)
+                                        mapViewModel.getMapPlaceSumm(
+                                            (tag.id).toInt(),
+                                            tag.placeType
+                                        )
                                         selectedPlace = tag
                                     }
                                     showPlaceSheet = true
@@ -300,12 +305,12 @@ fun MapScreen(
             }
 
             val place = selectedPlace
-            var isHeartClicked by remember(placeDetail) {
-                mutableStateOf(placeDetail?.isLike == false)
+            var isHeartClicked by remember(placeSumm) {
+                mutableStateOf(placeSumm?.favorite == true)
             }
             // 장소 상세 바텀시트 (중복 제거)
-            if (showPlaceSheet && placeDetail != null && place != null) {
-                val data = placeDetail!!
+            if (showPlaceSheet && placeSumm != null && place != null) {
+                val data = placeSumm!!
 
                 Surface(
                     modifier = Modifier
@@ -320,13 +325,15 @@ fun MapScreen(
                     MapDetailComponent(
                         place = data,
                         distance = "3.8",
-                        facilities = place.facilities,
-                        onClick = { onDetailClick(data.id) },
+                        facilities = data.facilities,
+                        onClick = { onDetailClick(place.id) },
                         isHeartClicked = isHeartClicked,
                         onHeartClickChanged = { newValue ->
                             isHeartClicked = newValue
-                            // viewModel로 좋아요 상태 변경 요청할때는 아래 같은 코드 추가
-                            // mapViewModel.toggleLike(data.id, newValue)
+                            mapViewModel.postMapLike(
+                                placeId = place.id,
+                                type = place.placeType
+                            )
                         }
                     )
                 }
