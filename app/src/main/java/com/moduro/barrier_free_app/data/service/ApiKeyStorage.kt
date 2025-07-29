@@ -8,4 +8,7 @@ object ApiKeyStorage {
     const val ME = "me"
     const val PLACES = "places"
     const val POPULARS = "populars"
+    const val ALL = "all"
+    const val FAVORITES = "favorites"
+    const val REPORTS = "reports"
 }

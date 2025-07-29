@@ -5,6 +5,8 @@ import com.moduro.barrier_free_app.data.service.ExampleApiService
 import com.moduro.barrier_free_app.data.service.HomeApiService
 import com.moduro.barrier_free_app.data.service.LocationNameApiService
 import com.moduro.barrier_free_app.data.service.LocationTempApiService
+import com.moduro.barrier_free_app.data.service.MapApiService
+import com.moduro.barrier_free_app.data.service.PlaceReportApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -45,5 +47,17 @@ object ServiceModule {
     fun provideHomeService(
         @ModuroRetrofit retrofit: Retrofit
     ): HomeApiService = retrofit.create(HomeApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideMapService(
+        @ModuroRetrofit retrofit: Retrofit
+    ) : MapApiService = retrofit.create(MapApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun providePlaceReportService(
+        @ModuroRetrofit retrofit: Retrofit
+    ) : PlaceReportApiService = retrofit.create(PlaceReportApiService::class.java)
 
 }
