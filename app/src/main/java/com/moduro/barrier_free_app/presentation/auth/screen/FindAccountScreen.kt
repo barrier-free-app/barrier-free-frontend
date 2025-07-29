@@ -133,6 +133,5 @@ fun FindAccountScreen(
                 .fillMaxWidth()
                 .padding(bottom = 24.dp)
         )
-
     }
 }
