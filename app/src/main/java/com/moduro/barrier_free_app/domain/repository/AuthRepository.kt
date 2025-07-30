@@ -13,4 +13,9 @@ interface AuthRepository {
         userType: String,
         userFacilityIds: List<Int>
     ) : Result<JsonElement>
+
+    suspend fun login(
+        username: String,
+        password: String
+    ) : Result<JsonElement>
 }

@@ -1,6 +1,7 @@
 package com.moduro.barrier_free_app.data.repositoryimpl
 
 import com.moduro.barrier_free_app.data.datasource.AuthDataSource
+import com.moduro.barrier_free_app.data.dto.request.LoginRequestDto
 import com.moduro.barrier_free_app.data.dto.request.SignUpRequestDto
 import com.moduro.barrier_free_app.domain.repository.AuthRepository
 import kotlinx.serialization.json.JsonElement
@@ -29,6 +30,23 @@ class AuthRepositoryImpl @Inject constructor(
                     verifyPassword = verifyPassword,
                     userType = userType,
                     userFacilityIds = userFacilityIds
+                )
+            )
+            val result = response.result ?: throw Exception("result is null")
+
+            result
+        }
+    }
+
+    override suspend fun login(
+        username: String,
+        password: String
+    ) : Result<JsonElement> {
+        return kotlin.runCatching {
+            val response = authDataSource.login(
+                LoginRequestDto(
+                    username = username,
+                    password = password
                 )
             )
             val result = response.result ?: throw Exception("result is null")
