@@ -4,6 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class FindRequestDto (
-    @SerialName("email") val email: String
+data class VerifyRequestDto (
+    @SerialName("email") val email: String,
+    @SerialName("verificationCode") val verificationCode: String
 )

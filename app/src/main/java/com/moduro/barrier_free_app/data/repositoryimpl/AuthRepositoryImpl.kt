@@ -1,9 +1,10 @@
 package com.moduro.barrier_free_app.data.repositoryimpl
 
 import com.moduro.barrier_free_app.data.datasource.AuthDataSource
-import com.moduro.barrier_free_app.data.dto.request.FindRequestDto
+import com.moduro.barrier_free_app.data.dto.request.EmailRequestDto
 import com.moduro.barrier_free_app.data.dto.request.LoginRequestDto
 import com.moduro.barrier_free_app.data.dto.request.SignUpRequestDto
+import com.moduro.barrier_free_app.data.dto.request.VerifyRequestDto
 import com.moduro.barrier_free_app.domain.repository.AuthRepository
 import kotlinx.serialization.json.JsonElement
 import javax.inject.Inject
@@ -60,7 +61,29 @@ class AuthRepositoryImpl @Inject constructor(
         return kotlin.runCatching {
             val response = authDataSource.find(
                 type = type,
-                FindRequestDto(email = email)
+                EmailRequestDto(email = email)
+            )
+            val result = response.result ?: throw Exception("result is null")
+
+            result
+        }
+    }
+
+    override suspend fun send(email: String): Result<JsonElement> {
+        return kotlin.runCatching {
+            val response = authDataSource.send(
+                EmailRequestDto(email = email)
+            )
+            val result = response.result ?: throw Exception("result is null")
+
+            result
+        }
+    }
+
+    override suspend fun verify(email: String, verificationCode: String): Result<JsonElement> {
+        return kotlin.runCatching {
+            val response = authDataSource.verify(
+                VerifyRequestDto(email = email, verificationCode = verificationCode)
             )
             val result = response.result ?: throw Exception("result is null")
 

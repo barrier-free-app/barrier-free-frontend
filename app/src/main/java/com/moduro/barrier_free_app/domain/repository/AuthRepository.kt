@@ -23,4 +23,13 @@ interface AuthRepository {
         type: String,
         email: String
     ) : Result<JsonElement>
+
+    suspend fun send(
+        email: String
+    ) : Result<JsonElement>
+
+    suspend fun verify(
+        email: String,
+        verificationCode: String
+    ) : Result<JsonElement>
 }

@@ -2,9 +2,10 @@ package com.moduro.barrier_free_app.data.datasourceimpl
 
 import com.moduro.barrier_free_app.data.datasource.AuthDataSource
 import com.moduro.barrier_free_app.data.dto.ModuroBaseResponse
-import com.moduro.barrier_free_app.data.dto.request.FindRequestDto
+import com.moduro.barrier_free_app.data.dto.request.EmailRequestDto
 import com.moduro.barrier_free_app.data.dto.request.LoginRequestDto
 import com.moduro.barrier_free_app.data.dto.request.SignUpRequestDto
+import com.moduro.barrier_free_app.data.dto.request.VerifyRequestDto
 import com.moduro.barrier_free_app.data.service.AuthApiService
 import kotlinx.serialization.json.JsonElement
 import javax.inject.Inject
@@ -20,7 +21,15 @@ class AuthDataSourceImpl @Inject constructor(
         return authApiService.login(loginRequestDto)
     }
 
-    override suspend fun find(type: String, findRequestDto: FindRequestDto): ModuroBaseResponse<JsonElement> {
-        return authApiService.find(type, findRequestDto)
+    override suspend fun find(type: String, emailRequestDto: EmailRequestDto): ModuroBaseResponse<JsonElement> {
+        return authApiService.find(type, emailRequestDto)
+    }
+
+    override suspend fun send(emailRequestDto: EmailRequestDto): ModuroBaseResponse<JsonElement> {
+        return authApiService.send(emailRequestDto)
+    }
+
+    override suspend fun verify(verifyRequestDto: VerifyRequestDto): ModuroBaseResponse<JsonElement> {
+        return authApiService.verify(verifyRequestDto)
     }
 }
