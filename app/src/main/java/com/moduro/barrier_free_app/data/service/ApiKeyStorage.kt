@@ -8,4 +8,5 @@ object ApiKeyStorage {
     const val ME = "me"
     const val SIGNUP = "signup"
     const val LOGIN = "login"
+    const val FIND = "find"
 }

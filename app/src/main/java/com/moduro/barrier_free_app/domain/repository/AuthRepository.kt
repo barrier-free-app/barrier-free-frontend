@@ -18,4 +18,9 @@ interface AuthRepository {
         username: String,
         password: String
     ) : Result<JsonElement>
+
+    suspend fun find(
+        type: String,
+        email: String
+    ) : Result<JsonElement>
 }
