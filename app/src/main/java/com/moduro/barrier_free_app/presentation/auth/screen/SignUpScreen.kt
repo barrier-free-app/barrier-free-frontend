@@ -136,8 +136,13 @@ fun SignUpScreen(
                 value = "다음",
                 enabled = viewModel.isSignUpEnabled,
                 onClick = {
-                    // 인증번호 확인
-                    viewModel.signUp(onSignUpSuccess)
+                    //viewModel.signUp(onSignUpSuccess)
+                    viewModel.verifyVerificationCode(
+                        email = viewModel.email,
+                        verificationCode = viewModel.verificationCode,
+                        onSuccess = onSignUpSuccess,
+                        onFailure = { message -> Toast.makeText(context, message, Toast.LENGTH_SHORT).show() }
+                    )
                 },
                 modifier = Modifier
                     .fillMaxWidth()

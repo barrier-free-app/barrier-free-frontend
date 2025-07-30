@@ -30,13 +30,6 @@ class SignUpViewModel @Inject constructor(
     val isSignUpEnabled: Boolean
         get() = email.isNotBlank()
 
-    val isEmailValid: Boolean
-        get() = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
-
-    fun signUp(onSuccess: () -> Unit) {
-        onSuccess()
-    }
-
     fun setNickname(nicknameInput: String) {
         // TODO: 닉네임 중복 확인 API 호출
     }
@@ -49,7 +42,20 @@ class SignUpViewModel @Inject constructor(
         viewModelScope.launch {
             val result = authRepository.send(email)
             if (result.isSuccess) onSuccess()
-            else onFailure(result.exceptionOrNull()?.message ?: "전송 실패")
+            else onFailure(result.exceptionOrNull()?.message ?: "전송 실패, 다시 시도해 주세요")
+        }
+    }
+
+    fun verifyVerificationCode(
+        email: String,
+        verificationCode: String,
+        onSuccess: () -> Unit,
+        onFailure: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            val result = authRepository.verify(email, verificationCode)
+            if (result.isSuccess) onSuccess()
+            else onFailure(result.exceptionOrNull()?.message ?: "인증 실패, 다시 시도해 주세요")
         }
     }
 }
