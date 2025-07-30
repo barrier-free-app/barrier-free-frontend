@@ -4,12 +4,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.moduro.barrier_free_app.domain.repository.AuthRepository
 import com.moduro.barrier_free_app.presentation.mypage.screen.UserInfo
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SignUpViewModel : ViewModel() {
-
+@HiltViewModel
+class SignUpViewModel @Inject constructor(
+    private val authRepository: AuthRepository
+): ViewModel() {
     private val _userInfo = MutableStateFlow<UserInfo?>(null)
     val userInfo: StateFlow<UserInfo?> = _userInfo
 
@@ -32,5 +39,17 @@ class SignUpViewModel : ViewModel() {
 
     fun setNickname(nicknameInput: String) {
         // TODO: 닉네임 중복 확인 API 호출
+    }
+
+    fun sendVerificationCode(
+        email: String,
+        onSuccess: () -> Unit,
+        onFailure: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            val result = authRepository.send(email)
+            if (result.isSuccess) onSuccess()
+            else onFailure(result.exceptionOrNull()?.message ?: "전송 실패")
+        }
     }
 }

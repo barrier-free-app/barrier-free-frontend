@@ -1,5 +1,6 @@
 package com.moduro.barrier_free_app.presentation.auth.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -39,6 +41,7 @@ fun SignUpScreen(
     onSignUpSuccess: () -> Unit
 ) {
     val typography = LocalbarrierFreeTypographyProvider.current
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -74,7 +77,11 @@ fun SignUpScreen(
                 value = "인증번호 요청하기",
                 enabled = viewModel.isSignUpEnabled,
                 onClick = {
-                    viewModel.currentStep = 2
+                    viewModel.sendVerificationCode(
+                        email = viewModel.email,
+                        onSuccess = { viewModel.currentStep = 2 },
+                        onFailure = { message -> Toast.makeText(context, message, Toast.LENGTH_SHORT).show()}
+                    )
                 },
                 modifier = Modifier
                     .fillMaxWidth()
