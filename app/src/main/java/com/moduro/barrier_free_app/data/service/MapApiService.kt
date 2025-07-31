@@ -17,7 +17,9 @@ import retrofit2.http.Query
 
 interface MapApiService {
     @GET("/$PLACES")
-    suspend fun getMapPlaces() : ModuroBaseResponse<List<ResponseMapPlaceDto>>
+    suspend fun getMapPlaces(
+        @Query("facilities") facilities : List<Int>? = null
+    ) : ModuroBaseResponse<List<ResponseMapPlaceDto>>
 
     @GET("/$PLACES/{placeId}/summary")
     suspend fun getMapPlaceSumm(

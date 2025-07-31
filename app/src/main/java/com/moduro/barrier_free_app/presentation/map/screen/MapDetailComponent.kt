@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.moduro.barrier_free_app.core_ui.theme.Background1
 import com.moduro.barrier_free_app.core_ui.theme.Button1
+import com.moduro.barrier_free_app.core_ui.theme.Text2
 import com.moduro.barrier_free_app.core_ui.theme.Text3
 import com.moduro.barrier_free_app.domain.entity.HomePlaceEntity
 import com.moduro.barrier_free_app.domain.entity.MapPlaceSummEntity
@@ -108,7 +109,11 @@ fun MapDetailComponent(
                         )
 
                     }
-                    Spacer(modifier = Modifier.height(7.dp))
+                    Spacer(modifier = Modifier.height(5.dp))
+
+                    Text(place.description , style = typography.H8_SB, color = Text2 )
+
+                    Spacer(modifier = Modifier.height(15.dp))
 
 
                     Text("${place.address} · 거리 ${distance}km ", style = typography.H8_SB, color = Text4)
@@ -169,7 +174,7 @@ fun HomePlaceBoxPreview(){
             name = "루트205",
             address = "서울 종로구 삼청로 30",
             favorite = true,
-            description = "설명",
+            description = "배리어프리 시설이 있는 호텔",
             facilities = listOf(1,2),
             placeType = "map"
         ),

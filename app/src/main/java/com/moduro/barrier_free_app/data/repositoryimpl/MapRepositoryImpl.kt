@@ -10,9 +10,11 @@ import javax.inject.Inject
 class MapRepositoryImpl @Inject constructor(
     private val mapDataSource: MapDataSource
 ) : MapRepository {
-    override suspend fun getMapPlaces(): Result<List<MapPlaceEntity>> {
+    override suspend fun getMapPlaces(
+        facilities : List<Int>?
+    ): Result<List<MapPlaceEntity>> {
         return runCatching {
-            val response = mapDataSource.getMapPlaces()
+            val response = mapDataSource.getMapPlaces(facilities)
 
             val result = response.result ?: throw Exception("Result is null")
 

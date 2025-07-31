@@ -14,8 +14,8 @@ import javax.inject.Inject
 class MapDataSourceImpl @Inject constructor(
     private val mapApiService: MapApiService
 ) : MapDataSource {
-    override suspend fun getMapPlaces(): ModuroBaseResponse<List<ResponseMapPlaceDto>> {
-        return mapApiService.getMapPlaces()
+    override suspend fun getMapPlaces(facilities : List<Int>?): ModuroBaseResponse<List<ResponseMapPlaceDto>> {
+        return mapApiService.getMapPlaces(facilities)
     }
 
     override suspend fun getMapPlaceSumm(

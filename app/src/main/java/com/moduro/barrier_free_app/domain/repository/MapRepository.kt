@@ -5,7 +5,7 @@ import com.moduro.barrier_free_app.domain.entity.MapPlaceEntity
 import com.moduro.barrier_free_app.domain.entity.MapPlaceSummEntity
 
 interface MapRepository {
-    suspend fun getMapPlaces() : Result<List<MapPlaceEntity>>
+    suspend fun getMapPlaces(facilities : List<Int>?) : Result<List<MapPlaceEntity>>
 
     suspend fun getMapPlaceSumm(placeId : Int, placeType : String) : Result<MapPlaceSummEntity>
 

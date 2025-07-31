@@ -1,6 +1,12 @@
 package com.moduro.barrier_free_app.presentation.map.screen
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.graphics.Color
+import android.location.Location
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,11 +35,15 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.moduro.barrier_free_app.R
 import com.moduro.barrier_free_app.core_ui.theme.LocalbarrierFreeTypographyProvider
 import com.moduro.barrier_free_app.domain.entity.MapPlaceEntity
+import com.moduro.barrier_free_app.presentation.home.screen.LocationViewModel
 import com.moduro.barrier_free_app.presentation.map.navigation.MapNavigator
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraAnimation
@@ -75,20 +86,21 @@ fun MapRoute(
     MapScreen(
         mapViewModel = mapViewModel,
         onDetailClick = { id -> navigator.navigateToPlaceDetail(id.toInt()) },
-        onSearchClick = { navigator.navigateToSearch() }
+        onSearchClick = { searchValue -> navigator.navigateToSearch(searchValue) }
     )
 }
 
 @OptIn(ExperimentalNaverMapApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
-    mapViewModel: MapViewModel = hiltViewModel(),
+    mapViewModel: MapViewModel,
     onDetailClick: (Long) -> Unit,
-    onSearchClick: () -> Unit
+    onSearchClick: (String?) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val typography = LocalbarrierFreeTypographyProvider.current
     val context = LocalContext.current
+
 
     val placeList by mapViewModel.mapPlaceList.observeAsState(emptyList())
     val placeSumm by mapViewModel.mapPlaceSumm.observeAsState()
@@ -117,6 +129,52 @@ fun MapScreen(
         mapViewModel.getMapPlaces()
     }
 
+
+    var hasLocationPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        )
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { granted -> hasLocationPermission = granted }
+    )
+
+    // 위치 상태 저장
+    var location by remember { mutableStateOf<Location?>(null) }
+
+    // 권한 요청 및 위치 가져오기
+    LaunchedEffect(hasLocationPermission) {
+        if (!hasLocationPermission) {
+            permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            Log.d("HomeScreen", "hasLocationPermission 취소")
+        } else {
+            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+
+            fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+                .addOnSuccessListener { location ->
+                    val lat = 37.5  // 테스트용 서울 위도
+                    val lon = 127.0 // 테스트용 서울 경도
+
+                    Log.d("MapScreen", "현재 위치 latitude: $lat, longitude: $lon (테스트용 서울 좌표 고정)")
+
+                }
+        }
+    }
+
+
+    // UI: 위치 값이 있으면 출력
+    location?.let {
+        Log.e("MapScreen","현재 위치: 위도 ${it.latitude}, 경도 ${it.longitude}")
+    } ?: run {
+    }
+
+
+
     // 필터용 바텀시트
     if (showFilterSheet) {
         ModalBottomSheet(
@@ -129,7 +187,13 @@ fun MapScreen(
                 onDismiss = { showFilterSheet = false },
                 onConfirm = { multi ->
                     showFilterSheet = false
-                    // 필터 선택 처리 (필요하면 여기에 구현)
+                    val selected = if (multi == listOf(0)){
+                        listOf(1,2,3,4,5)
+                    } else multi
+
+                    mapViewModel.getMapPlaces(
+                        facilities = if (selected.isEmpty()) null else selected
+                    )
                 }
             )
         }
@@ -143,7 +207,7 @@ fun MapScreen(
         MapScreenTop(
             search = search,
             onSearchChange = { search = it },
-            onSearchClick = { onSearchClick() },
+            onSearchClick = { onSearchClick(search) },
             onFilterClick = {
                 coroutineScope.launch { showFilterSheet = true }
             }
@@ -308,6 +372,7 @@ fun MapScreen(
             var isHeartClicked by remember(placeSumm) {
                 mutableStateOf(placeSumm?.favorite == true)
             }
+
             // 장소 상세 바텀시트 (중복 제거)
             if (showPlaceSheet && placeSumm != null && place != null) {
                 val data = placeSumm!!
@@ -322,9 +387,22 @@ fun MapScreen(
                     color = White,
                     shape = RoundedCornerShape(16.dp)
                 ) {
+                    val userLat = location?.latitude
+                    val userLon = location?.longitude
+
+                    val placeLat = place.latitude
+                    val placeLon = place.longitude
+
+                    val distance = if (userLat != null && userLon != null && placeLat != null && placeLon != null) {
+                        val d = calculateDistanceInKm(userLat, userLon, 37.5 , 127.0) //테스트용, placeLat이랑 placeLon으로 수정
+                        String.format("%.1f", d) // 소수점 1자리까지 포맷 (예: "3.8")
+                    } else {
+                        ""
+                    }
+
                     MapDetailComponent(
                         place = data,
-                        distance = "3.8",
+                        distance = distance,
                         facilities = data.facilities,
                         onClick = { onDetailClick(place.id) },
                         isHeartClicked = isHeartClicked,

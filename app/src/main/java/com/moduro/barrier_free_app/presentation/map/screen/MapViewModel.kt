@@ -31,9 +31,11 @@ class MapViewModel @Inject constructor(
     val isLike : MutableLiveData<Boolean> = _isLike
 
 
-    fun getMapPlaces() {
+    fun getMapPlaces(
+        facilities : List<Int>? = null
+    ) {
         viewModelScope.launch {
-            val result = mapRepository.getMapPlaces()
+            val result = mapRepository.getMapPlaces(facilities)
 
             result.onSuccess { places ->
                 _mapPlaceList.value = places

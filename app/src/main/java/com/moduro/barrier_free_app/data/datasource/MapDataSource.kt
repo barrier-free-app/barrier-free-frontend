@@ -7,7 +7,7 @@ import com.moduro.barrier_free_app.data.dto.response.ResponseMapPlaceDto
 import com.moduro.barrier_free_app.data.dto.response.ResponseMapPlaceSummDto
 
 interface MapDataSource {
-    suspend fun getMapPlaces() : ModuroBaseResponse<List<ResponseMapPlaceDto>>
+    suspend fun getMapPlaces(facilities : List<Int>?) : ModuroBaseResponse<List<ResponseMapPlaceDto>>
 
     suspend fun getMapPlaceSumm(placeId : Int, placeType : String) : ModuroBaseResponse<ResponseMapPlaceSummDto>
 
