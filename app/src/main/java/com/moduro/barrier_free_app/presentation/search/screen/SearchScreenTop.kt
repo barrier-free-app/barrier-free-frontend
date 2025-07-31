@@ -57,11 +57,7 @@ fun SearchScreenTop(
             Image(
                 modifier = Modifier.width(11.dp).height(22.dp).clickable { onBackClick() },
                 painter = painterResource(R.drawable.ic_back), contentDescription = "뒤로가기")
-            Spacer(modifier = Modifier.weight(1f))
-            Image(
-                modifier = Modifier.height(22.dp).width(22.dp),
-                //clickable { onFilterClick() }
-                painter = painterResource(R.drawable.map_filter), contentDescription = "필터")
+
         }
 
         Spacer(modifier = Modifier.height(10.dp))

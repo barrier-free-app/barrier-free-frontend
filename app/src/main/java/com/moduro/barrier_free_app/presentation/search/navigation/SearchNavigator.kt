@@ -10,6 +10,7 @@ class SearchNavigator(
         navController.navigate("placeDetail/$placeId")
     }
 
+
     fun navigateBack() {
         navController.popBackStack()
     }
