@@ -14,6 +14,7 @@ import com.moduro.barrier_free_app.data.service.ApiKeyStorage.SIGNUP
 import com.moduro.barrier_free_app.data.service.ApiKeyStorage.VERIFY
 import kotlinx.serialization.json.JsonElement
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
@@ -43,5 +44,11 @@ interface AuthApiService {
     @POST("/$AUTH/$EMAIL/$VERIFY")
     suspend fun verify(
         @Body verifyRequestDto: VerifyRequestDto
+    ) : ModuroBaseResponse<JsonElement>
+
+    @GET("/$AUTH/$SIGNUP/$VERIFY")
+    suspend fun duplicate(
+        @Query("type") type: String,
+        @Query("input") input: String
     ) : ModuroBaseResponse<JsonElement>
 }

@@ -17,4 +17,6 @@ interface AuthDataSource {
     suspend fun send(emailRequestDto: EmailRequestDto) : ModuroBaseResponse<JsonElement>
 
     suspend fun verify(verifyRequestDto: VerifyRequestDto) : ModuroBaseResponse<JsonElement>
+
+    suspend fun duplicate(type: String, input: String) : ModuroBaseResponse<JsonElement>
 }
