@@ -13,12 +13,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.moduro.barrier_free_app.core_ui.component.CommonTopBar
 import com.moduro.barrier_free_app.core_ui.component.LoginTextField
 import com.moduro.barrier_free_app.core_ui.component.StartButton
@@ -31,7 +29,7 @@ import com.moduro.barrier_free_app.presentation.auth.navigation.AuthNavigator
 @Composable
 fun LoginRoute(
     navigator: AuthNavigator,
-    viewModel: LoginViewModel = viewModel(),
+    viewModel: LoginViewModel = hiltViewModel(),
 ) {
     LoginScreen(
         viewModel = viewModel,
@@ -72,18 +70,18 @@ fun LoginScreen(
         LoginTextField(
             label = "이메일 주소",
             hint = "아이디 또는 이메일 주소",
-            text = viewModel.email,
+            text = viewModel.username,
             onValueChange = {
-                viewModel.email = it
-                viewModel.emailError = null
+                viewModel.username = it
+                viewModel.usernameError = null
             },
-            isError = viewModel.emailError != null,
-            errorMessage = viewModel.emailError
+            isError = viewModel.usernameError != null,
+            errorMessage = viewModel.usernameError
         )
 
-        if (viewModel.emailError != null) {
+        if (viewModel.usernameError != null) {
             Text(
-                text = viewModel.emailError!!,
+                text = viewModel.usernameError!!,
                 color = Warning,
                 style = typography.H7_M_5,
                 modifier = Modifier.padding(top = 7.dp, start = 16.dp)
@@ -145,25 +143,4 @@ fun LoginScreen(
             )
         }
     }
-}
-
-@Composable
-@Preview
-fun LoginPreview() {
-    val viewModel = remember {
-        LoginViewModel().apply {
-            email = ""
-            password = ""
-            emailError = "존재하지 않는 회원입니다."
-            passwordError = "비밀번호 오류입니다.\n5번 제한시 비밀번호 찾기가 필요합니다.(1/5)"
-        }
-    }
-
-    LoginScreen(
-        viewModel = viewModel,
-        onBackClick = {},
-        onLoginSuccess = {},
-        onSignUpClick = {},
-        onFindAccountClick = {}
-    )
 }

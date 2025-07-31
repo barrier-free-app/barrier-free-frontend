@@ -6,6 +6,7 @@ import com.moduro.barrier_free_app.data.dto.request.EmailRequestDto
 import com.moduro.barrier_free_app.data.dto.request.LoginRequestDto
 import com.moduro.barrier_free_app.data.dto.request.SignUpRequestDto
 import com.moduro.barrier_free_app.data.dto.request.VerifyRequestDto
+import com.moduro.barrier_free_app.data.dto.response.LoginResponseDto
 import com.moduro.barrier_free_app.data.service.AuthApiService
 import kotlinx.serialization.json.JsonElement
 import javax.inject.Inject
@@ -17,7 +18,7 @@ class AuthDataSourceImpl @Inject constructor(
         return authApiService.signup(signUpRequestDto)
     }
 
-    override suspend fun login(loginRequestDto: LoginRequestDto): ModuroBaseResponse<JsonElement> {
+    override suspend fun login(loginRequestDto: LoginRequestDto): ModuroBaseResponse<LoginResponseDto> {
         return authApiService.login(loginRequestDto)
     }
 

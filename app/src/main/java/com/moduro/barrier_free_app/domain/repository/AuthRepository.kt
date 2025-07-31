@@ -1,8 +1,10 @@
 package com.moduro.barrier_free_app.domain.repository
 
+import com.moduro.barrier_free_app.data.dto.request.LoginRequestDto
+import com.moduro.barrier_free_app.data.dto.response.LoginResponseDto
 import kotlinx.serialization.json.JsonElement
 
-interface AuthRepository {
+interface AuthRepository{
 
     suspend fun signup(
         email: String,
@@ -14,10 +16,7 @@ interface AuthRepository {
         userFacilityIds: List<Int>
     ) : Result<JsonElement>
 
-    suspend fun login(
-        username: String,
-        password: String
-    ) : Result<JsonElement>
+    suspend fun login(dto: LoginRequestDto) : Result<LoginResponseDto>
 
     suspend fun find(
         type: String,

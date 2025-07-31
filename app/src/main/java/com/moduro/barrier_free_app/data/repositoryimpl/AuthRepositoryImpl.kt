@@ -5,6 +5,7 @@ import com.moduro.barrier_free_app.data.dto.request.EmailRequestDto
 import com.moduro.barrier_free_app.data.dto.request.LoginRequestDto
 import com.moduro.barrier_free_app.data.dto.request.SignUpRequestDto
 import com.moduro.barrier_free_app.data.dto.request.VerifyRequestDto
+import com.moduro.barrier_free_app.data.dto.response.LoginResponseDto
 import com.moduro.barrier_free_app.domain.repository.AuthRepository
 import kotlinx.serialization.json.JsonElement
 import javax.inject.Inject
@@ -40,20 +41,15 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun login(
-        username: String,
-        password: String
-    ) : Result<JsonElement> {
+    override suspend fun login(dto: LoginRequestDto) : Result<LoginResponseDto> {
         return kotlin.runCatching {
-            val response = authDataSource.login(
-                LoginRequestDto(
-                    username = username,
-                    password = password
-                )
-            )
-            val result = response.result ?: throw Exception("result is null")
+            val response = authDataSource.login(dto)
 
-            result
+            if (response.isSuccess && response.result != null) {
+                response.result
+            } else {
+                throw IllegalStateException(response.message)
+            }
         }
     }
 
