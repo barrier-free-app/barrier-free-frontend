@@ -90,4 +90,16 @@ class AuthRepositoryImpl @Inject constructor(
             result
         }
     }
+
+    override suspend fun duplicate(type: String, input: String): Result<JsonElement> {
+        return kotlin.runCatching {
+            val response = authDataSource.duplicate(
+                type = type,
+                input = input
+            )
+            val result = response.result ?: throw Exception("result is null")
+
+            result
+        }
+    }
 }

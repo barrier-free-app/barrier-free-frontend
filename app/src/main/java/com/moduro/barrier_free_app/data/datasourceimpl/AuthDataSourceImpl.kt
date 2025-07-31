@@ -32,4 +32,8 @@ class AuthDataSourceImpl @Inject constructor(
     override suspend fun verify(verifyRequestDto: VerifyRequestDto): ModuroBaseResponse<JsonElement> {
         return authApiService.verify(verifyRequestDto)
     }
+
+    override suspend fun duplicate(type: String, input: String): ModuroBaseResponse<JsonElement> {
+        return authApiService.duplicate(type, input)
+    }
 }

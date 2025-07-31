@@ -32,4 +32,9 @@ interface AuthRepository {
         email: String,
         verificationCode: String
     ) : Result<JsonElement>
+
+    suspend fun duplicate(
+        type: String,
+        input: String
+    ) : Result<JsonElement>
 }
