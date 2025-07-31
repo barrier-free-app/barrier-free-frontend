@@ -8,7 +8,7 @@ class TokenInterceptor @Inject constructor() : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
         val newRequest = originalRequest.newBuilder()
-            .addHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0IiwiaWF0IjoxNzUzODAwMzA1LCJleHAiOjE3NTM4MDM5MDV9.7O3mjTMuzgtXS2re4QAq6MbTeVYlRLTv38et6chcWoM") // 임시 토큰
+            .addHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0IiwiaWF0IjoxNzUzOTA1Nzk4LCJleHAiOjE3NTM5MDkzOTh9.Rpj8bbrLumHyshN-nGiH9Mk2vtbz7j4ntbfr4D9kl4U") // 임시 토큰
             .build()
         return chain.proceed(newRequest)
     }

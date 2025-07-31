@@ -7,6 +7,7 @@ import com.moduro.barrier_free_app.data.datasource.LocationNameDataSource
 import com.moduro.barrier_free_app.data.datasource.LocationTempDataSource
 import com.moduro.barrier_free_app.data.datasource.MapDataSource
 import com.moduro.barrier_free_app.data.datasource.PlaceReportDataSource
+import com.moduro.barrier_free_app.data.datasource.SearchDataSource
 import com.moduro.barrier_free_app.data.datasourceimpl.AirKoreaDataSourceImpl
 import com.moduro.barrier_free_app.data.datasourceimpl.ExampleDataSourceImpl
 import com.moduro.barrier_free_app.data.datasourceimpl.HomeDataSourceImpl
@@ -14,6 +15,7 @@ import com.moduro.barrier_free_app.data.datasourceimpl.LocationNameDataSourceImp
 import com.moduro.barrier_free_app.data.datasourceimpl.LocationTempDataSourceImpl
 import com.moduro.barrier_free_app.data.datasourceimpl.MapDataSourceImpl
 import com.moduro.barrier_free_app.data.datasourceimpl.PlaceReportDataSourceImpl
+import com.moduro.barrier_free_app.data.datasourceimpl.SearchDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -51,5 +53,9 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindPlaceReportDataSource(placeReportDataSourceImpl: PlaceReportDataSourceImpl) : PlaceReportDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindSearchDataSource(searchDataSourceImpl: SearchDataSourceImpl) : SearchDataSource
 
 }

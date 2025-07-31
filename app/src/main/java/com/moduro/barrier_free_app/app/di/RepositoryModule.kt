@@ -8,6 +8,7 @@ import com.moduro.barrier_free_app.data.repositoryimpl.LocationNameRepositoryImp
 import com.moduro.barrier_free_app.data.repositoryimpl.LocationTempRepositoryImpl
 import com.moduro.barrier_free_app.data.repositoryimpl.MapRepositoryImpl
 import com.moduro.barrier_free_app.data.repositoryimpl.PlaceReportRepositoryImpl
+import com.moduro.barrier_free_app.data.repositoryimpl.SearchRepositoryImpl
 import com.moduro.barrier_free_app.domain.repository.AirKoreaRepository
 import com.moduro.barrier_free_app.domain.repository.ExampleRepository
 import com.moduro.barrier_free_app.domain.repository.HomeRepository
@@ -15,6 +16,7 @@ import com.moduro.barrier_free_app.domain.repository.LocationNameRepository
 import com.moduro.barrier_free_app.domain.repository.LocationTempRepository
 import com.moduro.barrier_free_app.domain.repository.MapRepository
 import com.moduro.barrier_free_app.domain.repository.PlaceReportRepository
+import com.moduro.barrier_free_app.domain.repository.SearchRepository
 
 import dagger.Binds
 import dagger.Module
@@ -53,5 +55,9 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindPlaceReportRepository(placeReportRepositoryImpl: PlaceReportRepositoryImpl) : PlaceReportRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSearchRepository(searchRepositoryImpl: SearchRepositoryImpl) : SearchRepository
 
 }

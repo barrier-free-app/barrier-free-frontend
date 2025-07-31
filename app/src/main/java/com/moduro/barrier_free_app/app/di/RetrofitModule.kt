@@ -88,9 +88,12 @@ object RetrofitModule {
     @Singleton
     @Provides
     @ModuroRetrofit
-    fun provideRetrofit(@Named("appClient") okHttpClient: OkHttpClient): Retrofit =
+    fun provideRetrofit(
+        @Named("appClient") okHttpClient: OkHttpClient,
+        json: Json
+    ): Retrofit =
         Retrofit.Builder()
-            .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .client(okHttpClient)
             .baseUrl(BuildConfig.MODURO_BASE_URL)
             .build()
