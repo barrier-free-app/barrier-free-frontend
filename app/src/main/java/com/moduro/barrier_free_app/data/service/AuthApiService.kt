@@ -5,6 +5,7 @@ import com.moduro.barrier_free_app.data.dto.request.EmailRequestDto
 import com.moduro.barrier_free_app.data.dto.request.LoginRequestDto
 import com.moduro.barrier_free_app.data.dto.request.SignUpRequestDto
 import com.moduro.barrier_free_app.data.dto.request.VerifyRequestDto
+import com.moduro.barrier_free_app.data.dto.response.LoginResponseDto
 import com.moduro.barrier_free_app.data.service.ApiKeyStorage.AUTH
 import com.moduro.barrier_free_app.data.service.ApiKeyStorage.EMAIL
 import com.moduro.barrier_free_app.data.service.ApiKeyStorage.FIND
@@ -28,7 +29,7 @@ interface AuthApiService {
     @POST("/$AUTH/$LOGIN")
     suspend fun login(
         @Body loginRequestDto: LoginRequestDto
-    ) : ModuroBaseResponse<JsonElement>
+    ) : ModuroBaseResponse<LoginResponseDto>
 
     @POST("/$AUTH/$FIND")
     suspend fun find(
