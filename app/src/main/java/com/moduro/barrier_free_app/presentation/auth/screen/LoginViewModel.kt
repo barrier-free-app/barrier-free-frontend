@@ -2,12 +2,10 @@ package com.moduro.barrier_free_app.presentation.auth.screen
 
 import android.content.SharedPreferences
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moduro.barrier_free_app.data.dto.request.LoginRequestDto
