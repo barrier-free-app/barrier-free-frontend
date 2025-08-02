@@ -3,6 +3,7 @@ package com.moduro.barrier_free_app.presentation.mypage.screen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moduro.barrier_free_app.domain.entity.FavoritePlaceEntity
+import com.moduro.barrier_free_app.domain.entity.ReviewPlaceEntity
 import com.moduro.barrier_free_app.domain.repository.MypageRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,8 +35,18 @@ class MypageViewModel @Inject constructor(
     private val _favoritePlaces = MutableStateFlow<List<FavoritePlaceEntity>>(emptyList())
     val favoritePlaces: StateFlow<List<FavoritePlaceEntity>> = _favoritePlaces
 
+    private val _reviewPlaces = MutableStateFlow<List<ReviewPlaceEntity>>(emptyList())
+    val reviewPlaces: StateFlow<List<ReviewPlaceEntity>> = _reviewPlaces
+
     private val _nicknameChangeStatus = MutableStateFlow(NicknameChangeStatus.NONE)
     val nicknameChangeStatus: StateFlow<NicknameChangeStatus> = _nicknameChangeStatus
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage
+
 
     init {
         loadUserInfo()
@@ -64,6 +75,22 @@ class MypageViewModel @Inject constructor(
             }.onFailure {
                 _favoritePlaces.value = emptyList()
             }
+        }
+    }
+
+    fun loadReviewPlaces() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _errorMessage.value = null
+
+            val result = mypageRepository.getReviewPlaces()
+            result.onSuccess { reviews ->
+                _reviewPlaces.value = reviews
+            }.onFailure { exception ->
+                _reviewPlaces.value = emptyList()
+                _errorMessage.value = "리뷰 목록을 불러오는데 실패했습니다: ${exception.message}"
+            }
+            _isLoading.value = false
         }
     }
 
