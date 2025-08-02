@@ -17,6 +17,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -24,21 +26,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.moduro.barrier_free_app.R
 import com.moduro.barrier_free_app.core_ui.component.CommonTopBar
 import com.moduro.barrier_free_app.core_ui.component.FavoriteFacilityChip
 import com.moduro.barrier_free_app.core_ui.component.FavoritePlaceCard
 import com.moduro.barrier_free_app.core_ui.theme.Background2
-import com.moduro.barrier_free_app.domain.entity.FavoritePlaceEntity
-
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun FavoritePlaceScreen(
-    favoritePlaces: List<FavoritePlaceEntity>,
-    onRemovePlace: (FavoritePlaceEntity) -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    viewModel: MypageViewModel = hiltViewModel()
 ) {
     val facilityIdToLabel = mapOf(
         1 to "🛗 승강기",
@@ -57,6 +57,9 @@ fun FavoritePlaceScreen(
     val selectedFacilities = remember { mutableStateListOf("전체") }
     val scrollState = rememberScrollState()
     val systemUiController = rememberSystemUiController()
+
+    val favoritePlaces by viewModel.favoritePlaces.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
     val filteredPlaces = remember(selectedFacilities, favoritePlaces) {
         if (selectedFacilities.contains("전체") || selectedFacilities.isEmpty()) {
@@ -150,9 +153,10 @@ fun FavoritePlaceScreen(
                 filteredPlaces.forEach { place ->
                     FavoritePlaceCard(
                         place = place,
-                        onRemoveClick = {
-                            onRemovePlace(place)
-                        }
+                        onFavoriteToggle = { selectedPlace ->
+                            viewModel.toggleFavorite(selectedPlace)
+                        },
+                        isLoading = isLoading
                     )
                 }
             }
@@ -163,29 +167,7 @@ fun FavoritePlaceScreen(
 @Preview(showBackground = true)
 @Composable
 fun FavoritePlaceScreenPreview() {
-    val dummyPlaces = listOf(
-        FavoritePlaceEntity(
-            id = 1L,
-            type = "report",
-            name = "국립현대미술관 서울 MMCA",
-            description = "배리어프리 서비스 도입 미술관",
-            facilities = listOf(3, 2),
-            imageType = 1,
-            favorite = true
-        ),
-        FavoritePlaceEntity(
-            id = 2L,
-            type = "map",
-            name = "쇼어 SHORE",
-            description = "아이와 함께 가기 좋은 실내 카페",
-            facilities = listOf(1, 4),
-            imageType = 2,
-            favorite = true
-        )
-    )
     FavoritePlaceScreen(
-        favoritePlaces = dummyPlaces,
-        onRemovePlace = {},
         onBackClick = {}
     )
 }

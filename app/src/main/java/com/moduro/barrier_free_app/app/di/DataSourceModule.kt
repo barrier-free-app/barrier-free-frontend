@@ -2,11 +2,13 @@ package com.moduro.barrier_free_app.app.di
 
 import com.moduro.barrier_free_app.data.datasource.AirKoreaDataSource
 import com.moduro.barrier_free_app.data.datasource.ExampleDataSource
+import com.moduro.barrier_free_app.data.datasource.FavoriteToggleDataSource
 import com.moduro.barrier_free_app.data.datasource.LocationNameDataSource
 import com.moduro.barrier_free_app.data.datasource.LocationTempDataSource
 import com.moduro.barrier_free_app.data.datasource.MypageDataSource
 import com.moduro.barrier_free_app.data.datasourceimpl.AirKoreaDataSourceImpl
 import com.moduro.barrier_free_app.data.datasourceimpl.ExampleDataSourceImpl
+import com.moduro.barrier_free_app.data.datasourceimpl.FavoriteToggleDataSourceImpl
 import com.moduro.barrier_free_app.data.datasourceimpl.LocationNameDataSourceImpl
 import com.moduro.barrier_free_app.data.datasourceimpl.LocationTempDataSourceImpl
 import com.moduro.barrier_free_app.data.datasourceimpl.MypageDataSourceImpl
@@ -39,5 +41,9 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindMypageDataSource(mypageDataSourceImpl: MypageDataSourceImpl): MypageDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindFavoriteToggleDataSource(favoriteToggleDataSourceImpl: FavoriteToggleDataSourceImpl): FavoriteToggleDataSource
 
 }

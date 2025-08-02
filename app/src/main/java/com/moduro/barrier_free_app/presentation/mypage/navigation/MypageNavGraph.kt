@@ -25,19 +25,11 @@ fun NavGraphBuilder.mypageNavGraph(
         )
     }
     composable("favorite_place") {
-        val viewModel: MypageViewModel = hiltViewModel()
-        val favoritePlaces = viewModel.favoritePlaces.collectAsState(initial = emptyList())
-
         FavoritePlaceScreen(
-            favoritePlaces = favoritePlaces.value,
-            onRemovePlace = { place ->
-                viewModel.removeFavoritePlace(place)
-            },
-            onBackClick = {
-                navigator.navController.popBackStack()
-            }
+            onBackClick = { navigator.navController.popBackStack() }
         )
     }
+
 
     composable("my_review") {
         MyReviewScreen(onBackClick = { navigator.navController.popBackStack() })

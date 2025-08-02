@@ -30,7 +30,8 @@ import com.moduro.barrier_free_app.domain.entity.FavoritePlaceEntity
 @Composable
 fun FavoritePlaceCard(
     place: FavoritePlaceEntity,
-    onRemoveClick: () -> Unit
+    onFavoriteToggle: (FavoritePlaceEntity) -> Unit,
+    isLoading: Boolean = false
 ) {
     val typography = LocalbarrierFreeTypographyProvider.current
     val imageRes = when (place.imageType) {
@@ -82,11 +83,11 @@ fun FavoritePlaceCard(
                         id = if (place.favorite) R.drawable.ic_heart_filled
                         else R.drawable.ic_heart_unfilled
                     ),
-                    contentDescription = null,
+                    contentDescription = "즐겨찾기 토글",
                     modifier = Modifier
                         .size(24.dp)
-                        .clickable {
-                            onRemoveClick()
+                        .clickable(enabled = !isLoading) {
+                            onFavoriteToggle(place)
                         }
                 )
             }
@@ -102,7 +103,7 @@ fun FavoritePlaceCard(
     }
 }
 
-@Preview()
+@Preview
 @Composable
 fun FavoritePlaceCardPreview() {
     FavoritePlaceCard(
@@ -115,6 +116,7 @@ fun FavoritePlaceCardPreview() {
             imageType = 2,
             favorite = true
         ),
-        onRemoveClick = {}
+        onFavoriteToggle = {},
+        isLoading = false
     )
 }

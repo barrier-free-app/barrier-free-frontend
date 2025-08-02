@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moduro.barrier_free_app.domain.entity.FavoritePlaceEntity
 import com.moduro.barrier_free_app.domain.entity.ReviewPlaceEntity
+import com.moduro.barrier_free_app.domain.repository.FavoriteToggleRepository
 import com.moduro.barrier_free_app.domain.repository.MypageRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +27,8 @@ enum class NicknameChangeStatus {
 
 @HiltViewModel
 class MypageViewModel @Inject constructor(
-    private val mypageRepository: MypageRepository
+    private val mypageRepository: MypageRepository,
+    private val favoriteToggleRepository: FavoriteToggleRepository
 ) : ViewModel() {
 
     private val _userInfo = MutableStateFlow<UserInfo?>(null)
@@ -94,11 +96,40 @@ class MypageViewModel @Inject constructor(
         }
     }
 
-    fun removeFavoritePlace(place: FavoritePlaceEntity) {
+    fun toggleFavorite(place: FavoritePlaceEntity) {
         viewModelScope.launch {
-            // TODO: 서버에 좋아요 해제 API 호출 필요
-            _favoritePlaces.value = _favoritePlaces.value.filter { it.id != place.id }
+            _isLoading.value = true
+
+            favoriteToggleRepository.toggleFavorite(place.id, place.type)
+                .onSuccess { isNowFavorite ->
+                    val updatedPlaces = _favoritePlaces.value.map { favoritePlace ->
+                        if (favoritePlace.id == place.id) {
+                            favoritePlace.copy(favorite = isNowFavorite)
+                        } else {
+                            favoritePlace
+                        }
+                    }
+
+                    _favoritePlaces.value = if (isNowFavorite) {
+                        updatedPlaces
+                    } else {
+                        updatedPlaces.filter { it.id != place.id }
+                    }
+                }
+                .onFailure { exception ->
+                    _errorMessage.value = "즐겨찾기 변경에 실패했습니다: ${exception.message}"
+                }
+
+            _isLoading.value = false
         }
+    }
+
+    fun removeFavoritePlace(place: FavoritePlaceEntity) {
+        toggleFavorite(place)
+    }
+
+    fun refreshFavoritePlaces() {
+        loadFavoritePlaces()
     }
 
     fun onLogoutClick() {
