@@ -2,6 +2,8 @@ package com.moduro.barrier_free_app.presentation.mypage.screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moduro.barrier_free_app.domain.entity.FavoritePlaceEntity
+import com.moduro.barrier_free_app.domain.repository.MypageRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,19 +22,28 @@ data class UserInfo(
 enum class NicknameChangeStatus {
     NONE, SUCCESS, DUPLICATE, LIMIT_EXCEEDED
 }
+
 @HiltViewModel
-class MypageViewModel @Inject constructor() : ViewModel() {
+class MypageViewModel @Inject constructor(
+    private val mypageRepository: MypageRepository
+) : ViewModel() {
 
     private val _userInfo = MutableStateFlow<UserInfo?>(null)
     val userInfo: StateFlow<UserInfo?> = _userInfo
 
+    private val _favoritePlaces = MutableStateFlow<List<FavoritePlaceEntity>>(emptyList())
+    val favoritePlaces: StateFlow<List<FavoritePlaceEntity>> = _favoritePlaces
+
+    private val _nicknameChangeStatus = MutableStateFlow(NicknameChangeStatus.NONE)
+    val nicknameChangeStatus: StateFlow<NicknameChangeStatus> = _nicknameChangeStatus
+
     init {
         loadUserInfo()
+        loadFavoritePlaces()
     }
 
     private fun loadUserInfo() {
         viewModelScope.launch {
-            // 예시 더미 데이터
             val dummyUser = UserInfo(
                 userId = 123,
                 nickName = "버블티먹는코끼리",
@@ -45,6 +56,24 @@ class MypageViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    private fun loadFavoritePlaces() {
+        viewModelScope.launch {
+            val result = mypageRepository.getFavoritePlaces()
+            result.onSuccess { places ->
+                _favoritePlaces.value = places
+            }.onFailure {
+                _favoritePlaces.value = emptyList()
+            }
+        }
+    }
+
+    fun removeFavoritePlace(place: FavoritePlaceEntity) {
+        viewModelScope.launch {
+            // TODO: 서버에 좋아요 해제 API 호출 필요
+            _favoritePlaces.value = _favoritePlaces.value.filter { it.id != place.id }
+        }
+    }
+
     fun onLogoutClick() {
         // 로그아웃 처리
     }
@@ -52,11 +81,6 @@ class MypageViewModel @Inject constructor() : ViewModel() {
     fun onReviewClick() {
         // 내가 쓴 리뷰 화면 이동 처리
     }
-
-
-    //닉네임 변경 처리, 아직 API 연동은 하지 않았습니다 !!!
-    private val _nicknameChangeStatus = MutableStateFlow(NicknameChangeStatus.NONE)
-    val nicknameChangeStatus: StateFlow<NicknameChangeStatus> = _nicknameChangeStatus
 
     fun changeNickname(newNickname: String) {
         viewModelScope.launch {
@@ -70,5 +94,4 @@ class MypageViewModel @Inject constructor() : ViewModel() {
             }
         }
     }
-
 }

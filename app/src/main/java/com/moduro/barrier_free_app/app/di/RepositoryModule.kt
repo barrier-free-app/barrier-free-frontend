@@ -5,10 +5,12 @@ import com.moduro.barrier_free_app.data.repositoryimpl.AirKoreaRepositoryImpl
 import com.moduro.barrier_free_app.data.repositoryimpl.ExampleRepositoryImpl
 import com.moduro.barrier_free_app.data.repositoryimpl.LocationNameRepositoryImpl
 import com.moduro.barrier_free_app.data.repositoryimpl.LocationTempRepositoryImpl
+import com.moduro.barrier_free_app.data.repositoryimpl.MypageRepositoryImpl
 import com.moduro.barrier_free_app.domain.repository.AirKoreaRepository
 import com.moduro.barrier_free_app.domain.repository.ExampleRepository
 import com.moduro.barrier_free_app.domain.repository.LocationNameRepository
 import com.moduro.barrier_free_app.domain.repository.LocationTempRepository
+import com.moduro.barrier_free_app.domain.repository.MypageRepository
 
 import dagger.Binds
 import dagger.Module
@@ -26,14 +28,18 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindAirKoreaRepository(airKoreaRepositoryImpl : AirKoreaRepositoryImpl): AirKoreaRepository
+    abstract fun bindAirKoreaRepository(airKoreaRepositoryImpl: AirKoreaRepositoryImpl): AirKoreaRepository
 
     @Binds
     @Singleton
-    abstract fun bindLocationTempRepository(locationTempRepositoryImpl : LocationTempRepositoryImpl): LocationTempRepository
+    abstract fun bindLocationTempRepository(locationTempRepositoryImpl: LocationTempRepositoryImpl): LocationTempRepository
 
     @Binds
     @Singleton
-    abstract fun bindLocationNameRepository(locationNameRepositoryImpl: LocationNameRepositoryImpl) : LocationNameRepository
+    abstract fun bindLocationNameRepository(locationNameRepositoryImpl: LocationNameRepositoryImpl): LocationNameRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindMypageRepository(mypageRepositoryImpl: MypageRepositoryImpl): MypageRepository
 
 }

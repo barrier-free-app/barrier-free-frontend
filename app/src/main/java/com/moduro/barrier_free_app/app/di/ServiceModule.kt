@@ -4,6 +4,7 @@ import com.moduro.barrier_free_app.data.service.AirKoreaApiService
 import com.moduro.barrier_free_app.data.service.ExampleApiService
 import com.moduro.barrier_free_app.data.service.LocationNameApiService
 import com.moduro.barrier_free_app.data.service.LocationTempApiService
+import com.moduro.barrier_free_app.data.service.MypageApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,4 +40,9 @@ object ServiceModule {
         @LocationNameRetrofit retrofit: Retrofit
     ) : LocationNameApiService = retrofit.create(LocationNameApiService::class.java)
 
+    @Provides
+    @Singleton
+    fun provideMypageApiService(
+        @ModuroRetrofit retrofit: Retrofit
+    ): MypageApiService = retrofit.create(MypageApiService::class.java)
 }

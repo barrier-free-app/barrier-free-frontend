@@ -30,56 +30,47 @@ import com.moduro.barrier_free_app.core_ui.component.CommonTopBar
 import com.moduro.barrier_free_app.core_ui.component.FavoriteFacilityChip
 import com.moduro.barrier_free_app.core_ui.component.FavoritePlaceCard
 import com.moduro.barrier_free_app.core_ui.theme.Background2
+import com.moduro.barrier_free_app.domain.entity.FavoritePlaceEntity
 
-
-data class FavoritePlace(
-    val name: String,
-    val description: String,
-    val imageRes: Int?,
-    val categories: List<String>,
-    val type: String,
-    val isImage: Boolean = true,
-    var isLiked: Boolean = true
-)
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun FavoritePlaceScreen(
+    favoritePlaces: List<FavoritePlaceEntity>,
+    onRemovePlace: (FavoritePlaceEntity) -> Unit,
     onBackClick: () -> Unit
 ) {
-    val favoritePlaces = remember {
-        mutableStateListOf(
-            FavoritePlace(
-                name = "국립현대미술관 서울 MMCA",
-                description = "배리어프리 서비스 도입 미술관",
-                imageRes = R.drawable.place,
-                categories = listOf("🛗 승강기", "♿ 장애인화장실"),
-                type = "CULTURE",
-                isImage = true
-            ),
-            FavoritePlace(
-                name = "쇼어 SHORE",
-                description = "아이와 함께 가기 좋은 실내 카페",
-                imageRes = null,
-                categories = listOf("👶 영유아동반", "🛁 수유실"),
-                type = "RESTAURANT",
-                isImage = false
-            )
-        )
-    }
+    val facilityIdToLabel = mapOf(
+        1 to "🛗 승강기",
+        2 to "♿ 장애인화장실",
+        3 to "👶 영유아동반",
+        4 to "🛁 수유실",
+        5 to "🧑‍🦽 경사로"
+    )
+    val labelToFacilityId = facilityIdToLabel.entries.associate { (k, v) -> v to k }
 
-    val selectedFacilities = remember { mutableStateListOf<String>() }
+    val filterLabels = listOf(
+        "전체", "🛗 승강기", "♿ 장애인화장실", "👶 영유아동반",
+        "🛁 수유실", "🧑‍🦽 경사로"
+    )
+
+    val selectedFacilities = remember { mutableStateListOf("전체") }
     val scrollState = rememberScrollState()
     val systemUiController = rememberSystemUiController()
 
-    val filteredPlaces = if (selectedFacilities.isEmpty() || selectedFacilities.contains("전체")) {
-        favoritePlaces
-    } else {
-        favoritePlaces.filter { place ->
-            place.categories.any { it in selectedFacilities }
+    val filteredPlaces = remember(selectedFacilities, favoritePlaces) {
+        if (selectedFacilities.contains("전체") || selectedFacilities.isEmpty()) {
+            favoritePlaces
+        } else {
+            val selectedFacilityIds = selectedFacilities
+                .filter { it != "전체" }
+                .mapNotNull { labelToFacilityId[it] }
+
+            favoritePlaces.filter { place ->
+                place.facilities.any { facilityId -> facilityId in selectedFacilityIds }
+            }
         }
     }
-
 
     SideEffect {
         systemUiController.setSystemBarsColor(
@@ -103,15 +94,11 @@ fun FavoritePlaceScreen(
             horizontalArrangement = Arrangement.spacedBy(3.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            listOf(
-                "전체", "🛗 승강기", "♿ 장애인화장실", "👶 영유아동반",
-                "🛁 수유실", "🧑‍🦽 경사로"
-            ).forEach { label ->
+            filterLabels.forEach { label ->
                 FavoriteFacilityChip(
                     label = label,
                     isSelected = selectedFacilities.contains(label) ||
-                            (selectedFacilities.contains("전체") && label != "전체")
-                    ,
+                            (selectedFacilities.contains("전체") && label != "전체"),
                     onClick = {
                         if (label == "전체") {
                             selectedFacilities.clear()
@@ -126,9 +113,12 @@ fun FavoritePlaceScreen(
                             } else {
                                 selectedFacilities.add(label)
                             }
+
+                            if (selectedFacilities.isEmpty()) {
+                                selectedFacilities.add("전체")
+                            }
                         }
                     }
-
                 )
             }
         }
@@ -161,21 +151,41 @@ fun FavoritePlaceScreen(
                     FavoritePlaceCard(
                         place = place,
                         onRemoveClick = {
-                            place.isLiked = false
-                            favoritePlaces.remove(place)
+                            onRemovePlace(place)
                         }
                     )
                 }
             }
         }
-
     }
 }
 
-@Composable
 @Preview(showBackground = true)
+@Composable
 fun FavoritePlaceScreenPreview() {
+    val dummyPlaces = listOf(
+        FavoritePlaceEntity(
+            id = 1L,
+            type = "report",
+            name = "국립현대미술관 서울 MMCA",
+            description = "배리어프리 서비스 도입 미술관",
+            facilities = listOf(3, 2),
+            imageType = 1,
+            favorite = true
+        ),
+        FavoritePlaceEntity(
+            id = 2L,
+            type = "map",
+            name = "쇼어 SHORE",
+            description = "아이와 함께 가기 좋은 실내 카페",
+            facilities = listOf(1, 4),
+            imageType = 2,
+            favorite = true
+        )
+    )
     FavoritePlaceScreen(
+        favoritePlaces = dummyPlaces,
+        onRemovePlace = {},
         onBackClick = {}
     )
 }
