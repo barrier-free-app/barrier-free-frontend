@@ -65,6 +65,7 @@ fun ProfileSettingScreen(
     val userInfo by viewModel.userInfo.collectAsState()
     val nicknameChangeStatus by viewModel.nicknameChangeStatus.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
     var nicknameInput by remember { mutableStateOf("") }
     var isNicknameChanged by remember { mutableStateOf(false) }
@@ -79,15 +80,37 @@ fun ProfileSettingScreen(
         }
     }
 
-    val selectedUserTypes = remember {
-        mutableStateListOf<String>().apply {
-            userInfo?.userType?.let { add(it) }
+    // 사용자 타입 라디오 버튼 (단일 선택)
+    var selectedUserType by remember { mutableStateOf("전체") }
+
+    // userInfo가 로드되면 초기값 설정
+    LaunchedEffect(userInfo) {
+        userInfo?.let { info ->
+            selectedUserType = when (info.userType.uppercase()) {
+                "ALL" -> "전체"
+                "DISABLED" -> "장애인"
+                "PREGNANT" -> "임산부 및 영유아 동반"
+                else -> "전체"
+            }
         }
     }
+
     val selectedFacilities = remember {
         mutableStateListOf<String>().apply {
             userInfo?.userFacilities?.forEach { id -> add(id.toString()) }
         }
+    }
+
+    // 유저 타입이 변경되었는지 확인
+    fun isUserTypeChanged(): Boolean {
+        val currentUserType = userInfo?.userType?.uppercase() ?: "ALL"
+        val newUserType = when (selectedUserType) {
+            "전체" -> "ALL"
+            "장애인" -> "DISABLED"
+            "임산부 및 영유아 동반" -> "PREGNANT"
+            else -> "ALL"
+        }
+        return currentUserType != newUserType
     }
 
     Column(
@@ -205,26 +228,12 @@ fun ProfileSettingScreen(
                 modifier = Modifier.padding(top = 28.dp, bottom = 8.dp)
             )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf("전체", "휠체어 사용자", "영유아 동반").forEach { label ->
+                listOf("전체", "장애인", "임산부 및 영유아 동반").forEach { label ->
                     ProfileFacilityChip(
                         label = label,
-                        isSelected = selectedUserTypes.contains(label) ||
-                                (selectedUserTypes.contains("전체") && label != "전체"),
+                        isSelected = selectedUserType == label,
                         onClick = {
-                            if (label == "전체") {
-                                selectedUserTypes.clear()
-                                selectedUserTypes.add("전체")
-                            } else {
-                                if (selectedUserTypes.contains("전체")) {
-                                    selectedUserTypes.remove("전체")
-                                }
-
-                                if (selectedUserTypes.contains(label)) {
-                                    selectedUserTypes.remove(label)
-                                } else {
-                                    selectedUserTypes.add(label)
-                                }
-                            }
+                            selectedUserType = label
                         }
                     )
                 }
@@ -272,15 +281,29 @@ fun ProfileSettingScreen(
 
             Button(
                 onClick = {
-                    // 닉네임이 변경되었거나 다른 설정이 변경된 경우에만 저장
-                    if (isNicknameChanged) {
-                        onNavigateToMypage()
-                    } else if (nicknameInput.isNotBlank()) {
-                        // 닉네임 입력이 있다면 변경 시도
-                        viewModel.changeNickname(nicknameInput)
-                    } else {
-                        // 다른 설정만 저장하는 경우
-                        onNavigateToMypage()
+                    val hasNicknameToChange = nicknameInput.isNotBlank()
+                    val hasUserTypeToChange = isUserTypeChanged()
+
+                    when {
+                        hasNicknameToChange -> {
+                            viewModel.changeNickname(nicknameInput)
+                        }
+                        hasUserTypeToChange -> {
+                            val serverUserType = when (selectedUserType) {
+                                "전체" -> "ALL"
+                                "장애인" -> "DISABLED"
+                                "임산부 및 영유아 동반" -> "PREGNANT"
+                                else -> "ALL"
+                            }
+                            viewModel.updateUserType(serverUserType)
+                            onNavigateToMypage()
+                        }
+                        isNicknameChanged -> {
+                            onNavigateToMypage()
+                        }
+                        else -> {
+                            onNavigateToMypage()
+                        }
                     }
                 },
                 shape = RoundedCornerShape(10.dp),
@@ -288,12 +311,12 @@ fun ProfileSettingScreen(
                     containerColor = Text5,
                     contentColor = Background1
                 ),
-                enabled = nicknameChangeStatus != NicknameChangeStatus.LOADING,
+                enabled = !isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(54.dp)
             ) {
-                if (nicknameChangeStatus == NicknameChangeStatus.LOADING) {
+                if (isLoading) {
                     CircularProgressIndicator(
                         modifier = Modifier
                             .width(20.dp)

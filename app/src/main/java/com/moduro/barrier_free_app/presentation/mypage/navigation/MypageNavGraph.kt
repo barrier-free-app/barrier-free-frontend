@@ -1,6 +1,7 @@
 package com.moduro.barrier_free_app.presentation.mypage.navigation
 
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable

@@ -9,6 +9,7 @@ import com.moduro.barrier_free_app.data.dto.response.ResponseUserDto
 interface MypageDataSource {
     suspend fun getUserInfo(): ModuroBaseResponse<ResponseUserDto>
     suspend fun changeNickname(nickname: String): ModuroBaseResponse<ResponseNicknameChange>
+    suspend fun updateUserType(userType: String): ModuroBaseResponse<String>
     suspend fun getFavoritePlaces(): ModuroBaseResponse<ResponseFavoritePlacesResultDto>
     suspend fun getReviewPlaces(): ModuroBaseResponse<ResponseReviewListDto>
 }

@@ -2,6 +2,7 @@ package com.moduro.barrier_free_app.data.service
 
 import com.moduro.barrier_free_app.data.dto.ModuroBaseResponse
 import com.moduro.barrier_free_app.data.dto.request.RequestNicknameChange
+import com.moduro.barrier_free_app.data.dto.request.RequestUserTypeUpdate
 import com.moduro.barrier_free_app.data.dto.response.ResponseFavoritePlacesResultDto
 import com.moduro.barrier_free_app.data.dto.response.ResponseNicknameChange
 import com.moduro.barrier_free_app.data.dto.response.ResponseReviewListDto
@@ -22,6 +23,11 @@ interface MypageApiService {
     suspend fun changeNickname(
         @Body request: RequestNicknameChange
     ): ModuroBaseResponse<ResponseNicknameChange>
+
+    @PUT("/$USERS/my-type")
+    suspend fun updateUserType(
+        @Body request: RequestUserTypeUpdate
+    ): ModuroBaseResponse<String>
 
 
     @GET("/$USERS/favorites")

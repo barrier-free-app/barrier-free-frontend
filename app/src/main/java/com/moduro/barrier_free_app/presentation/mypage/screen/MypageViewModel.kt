@@ -167,6 +167,22 @@ class MypageViewModel @Inject constructor(
         }
     }
 
+    fun updateUserType(userType: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _errorMessage.value = null
+
+            val result = mypageRepository.updateUserType(userType)
+            result.onSuccess { message ->
+                // 성공 시 유저 정보 새로고침
+                loadUserInfo()
+            }.onFailure { throwable ->
+                _errorMessage.value = throwable.message ?: "유저 타입 변경에 실패했습니다."
+            }
+
+            _isLoading.value = false
+        }
+    }
 
     fun resetNicknameChangeStatus() {
         _nicknameChangeStatus.value = NicknameChangeStatus.NONE
@@ -183,4 +199,9 @@ class MypageViewModel @Inject constructor(
     fun onReviewClick() {
         // 내가 쓴 리뷰 화면 이동 처리
     }
+
+    fun refreshUserInfo() {
+        loadUserInfo()
+    }
+
 }

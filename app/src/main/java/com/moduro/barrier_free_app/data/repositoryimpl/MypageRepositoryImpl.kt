@@ -81,6 +81,24 @@ class MypageRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun updateUserType(userType: String): Result<String> {
+        return try {
+            val response = mypageDataSource.updateUserType(userType)
+            if (response.isSuccess && response.result != null) {
+                Result.success(response.result)
+            } else {
+                Result.failure(Exception(response.message ?: "유저 타입 변경 실패"))
+            }
+        } catch (e: retrofit2.HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorMessage = parseErrorMessage(errorBody)
+            Result.failure(Exception(errorMessage ?: "유저 타입 변경 실패 (HTTP ${e.code()})"))
+        } catch (e: Exception) {
+            Result.failure(Exception("유저 타입 변경 실패: ${e.message}"))
+        }
+    }
+
+
 
 
     override suspend fun getUserInfo(): Result<UserEntity> {
