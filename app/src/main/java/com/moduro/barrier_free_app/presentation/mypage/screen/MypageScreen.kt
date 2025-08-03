@@ -73,9 +73,9 @@ fun MypageRoute(
 
 @Composable
 fun MypageScreen(
-    userName: String = "버블티먹는코끼리",
-    userEmail: String = "aaa@naver.com",
-    userFacilities: List<Int> = listOf(1, 3, 4),
+    userName: String,
+    userEmail: String,
+    userFacilities: List<Int>,
     onLogoutClick: () -> Unit = {},
     onReviewClick: () -> Unit = {},
     onFavoritePlaceClick: () -> Unit = {},
@@ -352,6 +352,7 @@ fun MypageMenuItem(
 fun MypageScreenPreview() {
     MypageScreen(
         userName = "버블티먹는코끼리",
-        userEmail = "aaa@naver.com"
+        userEmail = "aaa@naver.com",
+        userFacilities = listOf(1, 3, 4)
     )
 }

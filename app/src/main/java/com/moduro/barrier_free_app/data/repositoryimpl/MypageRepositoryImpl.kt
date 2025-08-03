@@ -1,8 +1,10 @@
 package com.moduro.barrier_free_app.data.repositoryimpl
 
 import com.moduro.barrier_free_app.data.datasource.MypageDataSource
+import com.moduro.barrier_free_app.domain.entity.FacilityEntity
 import com.moduro.barrier_free_app.domain.entity.FavoritePlaceEntity
 import com.moduro.barrier_free_app.domain.entity.ReviewPlaceEntity
+import com.moduro.barrier_free_app.domain.entity.UserEntity
 import com.moduro.barrier_free_app.domain.repository.MypageRepository
 import javax.inject.Inject
 
@@ -48,4 +50,26 @@ class MypageRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun getUserInfo(): Result<UserEntity> {
+        return runCatching {
+            val response = mypageDataSource.getUserInfo()
+            val result = response.result ?: throw Exception("User result is null")
+
+            UserEntity(
+                userId = result.userId,
+                email = result.email,
+                nickname = result.nickname,
+                userType = result.userType,
+                socialType = result.socialType,
+                userFacilities = result.userFacilities.map { facilityDto ->
+                    FacilityEntity(
+                        facilityId = facilityDto.facilityId,
+                        facilityName = facilityDto.facilityName
+                    )
+                }
+            )
+        }
+    }
+
 }

@@ -2,8 +2,10 @@ package com.moduro.barrier_free_app.domain.repository
 
 import com.moduro.barrier_free_app.domain.entity.FavoritePlaceEntity
 import com.moduro.barrier_free_app.domain.entity.ReviewPlaceEntity
+import com.moduro.barrier_free_app.domain.entity.UserEntity
 
 interface MypageRepository{
+    suspend fun getUserInfo() : Result<UserEntity>
     suspend fun getFavoritePlaces() : Result<List<FavoritePlaceEntity>>
     suspend fun getReviewPlaces() : Result<List<ReviewPlaceEntity>>
 }

@@ -57,17 +57,27 @@ class MypageViewModel @Inject constructor(
 
     private fun loadUserInfo() {
         viewModelScope.launch {
-            val dummyUser = UserInfo(
-                userId = 123,
-                nickName = "버블티먹는코끼리",
-                userType = "DISABLED",
-                userFacilities = listOf(1, 3, 4),
-                socialType = "GENERAL",
-                email = "aaa@naver.com"
-            )
-            _userInfo.value = dummyUser
+            _isLoading.value = true
+            _errorMessage.value = null
+
+            val result = mypageRepository.getUserInfo()
+            result.onSuccess { entity ->
+                _userInfo.value = UserInfo(
+                    userId = entity.userId.toInt(),
+                    nickName = entity.nickname,
+                    userType = entity.userType,
+                    userFacilities = entity.userFacilities.map { it.facilityId },
+                    socialType = entity.socialType,
+                    email = entity.email
+                )
+            }.onFailure { e ->
+                _errorMessage.value = "유저 정보를 불러오는데 실패했습니다: ${e.message}"
+            }
+
+            _isLoading.value = false
         }
     }
+
 
     private fun loadFavoritePlaces() {
         viewModelScope.launch {
