@@ -9,6 +9,7 @@ import com.moduro.barrier_free_app.domain.repository.MypageRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,7 +23,7 @@ data class UserInfo(
 )
 
 enum class NicknameChangeStatus {
-    NONE, SUCCESS, DUPLICATE, LIMIT_EXCEEDED
+    NONE, SUCCESS, DUPLICATE, LIMIT_EXCEEDED, ERROR, LOADING
 }
 
 @HiltViewModel
@@ -32,23 +33,22 @@ class MypageViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _userInfo = MutableStateFlow<UserInfo?>(null)
-    val userInfo: StateFlow<UserInfo?> = _userInfo
+    val userInfo: StateFlow<UserInfo?> = _userInfo.asStateFlow()
 
     private val _favoritePlaces = MutableStateFlow<List<FavoritePlaceEntity>>(emptyList())
-    val favoritePlaces: StateFlow<List<FavoritePlaceEntity>> = _favoritePlaces
+    val favoritePlaces: StateFlow<List<FavoritePlaceEntity>> = _favoritePlaces.asStateFlow()
 
     private val _reviewPlaces = MutableStateFlow<List<ReviewPlaceEntity>>(emptyList())
-    val reviewPlaces: StateFlow<List<ReviewPlaceEntity>> = _reviewPlaces
+    val reviewPlaces: StateFlow<List<ReviewPlaceEntity>> = _reviewPlaces.asStateFlow()
 
     private val _nicknameChangeStatus = MutableStateFlow(NicknameChangeStatus.NONE)
-    val nicknameChangeStatus: StateFlow<NicknameChangeStatus> = _nicknameChangeStatus
+    val nicknameChangeStatus: StateFlow<NicknameChangeStatus> = _nicknameChangeStatus.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     private val _errorMessage = MutableStateFlow<String?>(null)
-    val errorMessage: StateFlow<String?> = _errorMessage
-
+    val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
     init {
         loadUserInfo()
@@ -77,7 +77,6 @@ class MypageViewModel @Inject constructor(
             _isLoading.value = false
         }
     }
-
 
     private fun loadFavoritePlaces() {
         viewModelScope.launch {
@@ -142,24 +141,46 @@ class MypageViewModel @Inject constructor(
         loadFavoritePlaces()
     }
 
+    fun changeNickname(newNickname: String) {
+        if (newNickname.isBlank()) {
+            _errorMessage.value = "닉네임을 입력해주세요."
+            return
+        }
+
+        if (newNickname.length < 2 || newNickname.length > 10) {
+            _errorMessage.value = "닉네임은 2~10자 사이로 입력해주세요."
+            return
+        }
+
+        viewModelScope.launch {
+            _nicknameChangeStatus.value = NicknameChangeStatus.LOADING
+            _errorMessage.value = null
+
+            val result = mypageRepository.changeNickname(newNickname)
+            result.onSuccess {
+                _userInfo.value = _userInfo.value?.copy(nickName = newNickname)
+                _nicknameChangeStatus.value = NicknameChangeStatus.SUCCESS
+            }.onFailure { throwable ->
+                _nicknameChangeStatus.value = NicknameChangeStatus.ERROR
+                _errorMessage.value = throwable.message ?: "닉네임 변경에 실패했습니다."
+            }
+        }
+    }
+
+
+    fun resetNicknameChangeStatus() {
+        _nicknameChangeStatus.value = NicknameChangeStatus.NONE
+    }
+
+    fun clearErrorMessage() {
+        _errorMessage.value = null
+    }
+
     fun onLogoutClick() {
         // 로그아웃 처리
     }
 
     fun onReviewClick() {
         // 내가 쓴 리뷰 화면 이동 처리
-    }
-
-    fun changeNickname(newNickname: String) {
-        viewModelScope.launch {
-            if (newNickname == "버블티먹는코끼리") {
-                _nicknameChangeStatus.value = NicknameChangeStatus.DUPLICATE
-            } else if (newNickname == "한달초과시도") {
-                _nicknameChangeStatus.value = NicknameChangeStatus.LIMIT_EXCEEDED
-            } else {
-                _userInfo.value = _userInfo.value?.copy(nickName = newNickname)
-                _nicknameChangeStatus.value = NicknameChangeStatus.SUCCESS
-            }
-        }
     }
 }

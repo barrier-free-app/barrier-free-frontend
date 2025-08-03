@@ -2,7 +2,9 @@ package com.moduro.barrier_free_app.data.datasourceimpl
 
 import com.moduro.barrier_free_app.data.datasource.MypageDataSource
 import com.moduro.barrier_free_app.data.dto.ModuroBaseResponse
+import com.moduro.barrier_free_app.data.dto.request.RequestNicknameChange
 import com.moduro.barrier_free_app.data.dto.response.ResponseFavoritePlacesResultDto
+import com.moduro.barrier_free_app.data.dto.response.ResponseNicknameChange
 import com.moduro.barrier_free_app.data.dto.response.ResponseReviewListDto
 import com.moduro.barrier_free_app.data.dto.response.ResponseUserDto
 import com.moduro.barrier_free_app.data.service.MypageApiService
@@ -14,6 +16,12 @@ class MypageDataSourceImpl @Inject constructor(
     override suspend fun getUserInfo(): ModuroBaseResponse<ResponseUserDto> {
         return mypageApiService.getUserInfo()
     }
+
+    override suspend fun changeNickname(nickname: String): ModuroBaseResponse<ResponseNicknameChange> {
+        val request = RequestNicknameChange(nickname = nickname)
+        return mypageApiService.changeNickname(request)
+    }
+
     override suspend fun getFavoritePlaces(): ModuroBaseResponse<ResponseFavoritePlacesResultDto> {
         return mypageApiService.getFavoritePlaces()
     }
