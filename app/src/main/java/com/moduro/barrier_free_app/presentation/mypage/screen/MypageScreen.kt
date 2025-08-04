@@ -15,8 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -63,26 +61,23 @@ fun MypageRoute(
     val accountDeleteStatus = viewModel.accountDeleteStatus.collectAsState().value
     val errorMessage = viewModel.errorMessage.collectAsState().value
 
-
-    LaunchedEffect(accountDeleteStatus) {
-        if (accountDeleteStatus == AccountDeleteStatus.SUCCESS) {
-            // 로그인 화면으로 이동하거나 앱 재시작 등의 처리
-        }
-    }
-
     userInfo?.let { user ->
         MypageScreen(
             userName = user.nickName,
             userEmail = user.email,
             userType = user.userType,
             userFacilities = user.userFacilities,
-            onLogoutClick = { viewModel.onLogoutClick() },
+            onLogoutClick = {
+                viewModel.onLogoutClick()
+                navigator.navigateToSignIn()
+            },
             onReviewClick = { navigator.navigateToMyReview() },
             onFavoritePlaceClick = { navigator.navigateToFavoritePlace() },
             onEditProfileClick = { navigator.navigateToProfileSetting() },
             onReportPlaceClick = { navigator.navigateToPlaceReport() },
             onWithdrawClick = { reason ->
                 viewModel.deleteAccount(reason)
+                navigator.navigateToSignIn()
             },
             accountDeleteStatus = accountDeleteStatus,
             errorMessage = errorMessage,
@@ -137,12 +132,14 @@ fun MypageScreen(
                 showWithdrawSheet = false
                 showWithdrawReasons = false
             }
+
             AccountDeleteStatus.ERROR -> {
                 // 에러 시 바텀시트들 닫기
                 showWithdrawSheet = false
                 showWithdrawReasons = false
             }
-            else -> { }
+
+            else -> {}
         }
     }
 
@@ -304,6 +301,7 @@ fun MypageScreen(
                 onCancel = { showLogoutSheet = false },
                 onConfirm = {
                     showLogoutSheet = false
+                    onLogoutClick()
                 },
                 showWithdrawReasons = false
             )

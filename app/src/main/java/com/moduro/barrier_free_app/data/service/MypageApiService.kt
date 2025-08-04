@@ -10,6 +10,7 @@ import com.moduro.barrier_free_app.data.dto.response.ResponseDeleteAccountDto
 import com.moduro.barrier_free_app.data.dto.response.ResponseFavoritePlacesResultDto
 import com.moduro.barrier_free_app.data.dto.response.ResponseNicknameChange
 import com.moduro.barrier_free_app.data.dto.response.ResponseReviewListDto
+import com.moduro.barrier_free_app.data.dto.response.ResponseSignOutDto
 import com.moduro.barrier_free_app.data.dto.response.ResponseUpadatePasswordDto
 import com.moduro.barrier_free_app.data.dto.response.ResponseUpdateFacilityDto
 import com.moduro.barrier_free_app.data.dto.response.ResponseUserDto
@@ -19,6 +20,7 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PATCH
+import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Query
 
@@ -61,4 +63,7 @@ interface MypageApiService {
     suspend fun deleteAccount(
         @Body request: RequestDeleteAccountDto
     ): ModuroBaseResponse<ResponseDeleteAccountDto>
+
+    @POST("/$USERS/logout")
+    suspend fun signOut(): ModuroBaseResponse<ResponseSignOutDto>
 }

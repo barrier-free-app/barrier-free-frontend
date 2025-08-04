@@ -4,17 +4,20 @@ import androidx.navigation.NavController
 
 class MypageNavigator(
     val navController: NavController
-){
+) {
     fun navigateToProfileSetting() {
         navController.navigate("profile_setting")
     }
+
     fun navigateToMypage() {
         navController.navigate("mypage")
     }
+
     fun navigateToFavoritePlace() {
         navController.navigate("favorite_place")
     }
-    fun navigateToMyReview(){
+
+    fun navigateToMyReview() {
         navController.navigate("my_review")
     }
 
@@ -22,8 +25,14 @@ class MypageNavigator(
         navController.popBackStack()
     }
 
-    fun navigateToPlaceReport(){
+    fun navigateToPlaceReport() {
         navController.navigate("place_report")
+    }
+
+    fun navigateToSignIn() {
+        navController.navigate("login") {
+            launchSingleTop = true
+        }
     }
 
 }

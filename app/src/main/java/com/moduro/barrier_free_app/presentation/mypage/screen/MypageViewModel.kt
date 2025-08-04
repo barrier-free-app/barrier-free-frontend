@@ -45,7 +45,7 @@ enum class AccountDeleteStatus {
 @HiltViewModel
 class MypageViewModel @Inject constructor(
     private val mypageRepository: MypageRepository,
-    private val favoriteToggleRepository: FavoriteToggleRepository
+    private val favoriteToggleRepository: FavoriteToggleRepository,
 ) : ViewModel() {
 
     private val _userInfo = MutableStateFlow<UserInfo?>(null)
@@ -71,6 +71,9 @@ class MypageViewModel @Inject constructor(
 
     private val _accountDeleteStatus = MutableStateFlow(AccountDeleteStatus.NONE)
     val accountDeleteStatus: StateFlow<AccountDeleteStatus> = _accountDeleteStatus.asStateFlow()
+
+    private val _logoutState = MutableStateFlow<Result<String>?>(null)
+    val logoutState: StateFlow<Result<String>?> = _logoutState
 
 
     private val _isLoading = MutableStateFlow(false)
@@ -160,14 +163,6 @@ class MypageViewModel @Inject constructor(
 
             _isLoading.value = false
         }
-    }
-
-    fun removeFavoritePlace(place: FavoritePlaceEntity) {
-        toggleFavorite(place)
-    }
-
-    fun refreshFavoritePlaces() {
-        loadFavoritePlaces()
     }
 
     fun changeNickname(newNickname: String) {
@@ -317,11 +312,10 @@ class MypageViewModel @Inject constructor(
     }
 
     fun onLogoutClick() {
-        // 로그아웃 처리
-    }
-
-    fun onReviewClick() {
-        // 내가 쓴 리뷰 화면 이동 처리
+        viewModelScope.launch {
+            val result = mypageRepository.signOut()
+            _logoutState.value = result
+        }
     }
 
     fun refreshUserInfo() {

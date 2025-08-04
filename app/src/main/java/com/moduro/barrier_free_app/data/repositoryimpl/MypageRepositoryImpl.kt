@@ -170,5 +170,12 @@ class MypageRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun signOut(): Result<String> {
+        return runCatching {
+            val response = mypageDataSource.signOut()
+            val result = response.result?.result ?: throw Exception("로그아웃 결과가 null입니다.")
+            result
+        }
+    }
 
 }

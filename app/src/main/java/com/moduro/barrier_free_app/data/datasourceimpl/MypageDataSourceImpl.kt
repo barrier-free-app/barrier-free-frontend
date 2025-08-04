@@ -11,6 +11,7 @@ import com.moduro.barrier_free_app.data.dto.response.ResponseDeleteAccountDto
 import com.moduro.barrier_free_app.data.dto.response.ResponseFavoritePlacesResultDto
 import com.moduro.barrier_free_app.data.dto.response.ResponseNicknameChange
 import com.moduro.barrier_free_app.data.dto.response.ResponseReviewListDto
+import com.moduro.barrier_free_app.data.dto.response.ResponseSignOutDto
 import com.moduro.barrier_free_app.data.dto.response.ResponseUpadatePasswordDto
 import com.moduro.barrier_free_app.data.dto.response.ResponseUpdateFacilityDto
 import com.moduro.barrier_free_app.data.dto.response.ResponseUserDto
@@ -58,6 +59,10 @@ class MypageDataSourceImpl @Inject constructor(
     override suspend fun deleteAccount(reason: String): ModuroBaseResponse<ResponseDeleteAccountDto> {
         val request = RequestDeleteAccountDto(reason = reason)
         return mypageApiService.deleteAccount(request)
+    }
+
+    override suspend fun signOut(): ModuroBaseResponse<ResponseSignOutDto> {
+        return mypageApiService.signOut()
     }
 
 

@@ -13,4 +13,5 @@ interface MypageRepository{
     suspend fun getFavoritePlaces() : Result<List<FavoritePlaceEntity>>
     suspend fun getReviewPlaces() : Result<List<ReviewPlaceEntity>>
     suspend fun deleteAccount(reason: String): Result<String>
+    suspend fun signOut(): Result<String>
 }
