@@ -37,15 +37,16 @@ import com.moduro.barrier_free_app.core_ui.theme.Text5
 fun ProfilePasswordField(
     hint: String,
     iconRes: Int,
+    text: String,
+    onValueChange: (String) -> Unit,
     isVisible: Boolean,
     onVisibilityToggle: () -> Unit
 ) {
     val typography = LocalbarrierFreeTypographyProvider.current
-    var password by remember { mutableStateOf("") }
 
     TextField(
-        value = password,
-        onValueChange = { password = it },
+        value = text,
+        onValueChange = onValueChange,
         placeholder = {
             Text(text = hint, style = typography.H6_M, color = Text2)
         },

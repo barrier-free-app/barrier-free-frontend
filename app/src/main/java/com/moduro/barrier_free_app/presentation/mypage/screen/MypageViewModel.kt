@@ -34,7 +34,9 @@ enum class UserTypeUpdateStatus {
     NONE, SUCCESS, ERROR, LOADING
 }
 
-
+enum class PasswordUpdateStatus {
+    NONE, SUCCESS, ERROR, LOADING
+}
 
 @HiltViewModel
 class MypageViewModel @Inject constructor(
@@ -59,6 +61,9 @@ class MypageViewModel @Inject constructor(
 
     private val _facilityUpdateStatus = MutableStateFlow(FacilityUpdateStatus.NONE)
     val facilityUpdateStatus: StateFlow<FacilityUpdateStatus> = _facilityUpdateStatus.asStateFlow()
+
+    private val _passwordUpdateStatus = MutableStateFlow(PasswordUpdateStatus.NONE)
+    val passwordUpdateStatus: StateFlow<PasswordUpdateStatus> = _passwordUpdateStatus.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -183,6 +188,40 @@ class MypageViewModel @Inject constructor(
         }
     }
 
+    private fun validatePassword(password: String, verifyPassword: String): String? {
+        return when {
+            password.isBlank() || verifyPassword.isBlank() -> "비밀번호를 입력해주세요."
+            password != verifyPassword -> "비밀번호가 일치하지 않습니다."
+            password.length < 8 -> "비밀번호는 8자 이상이어야 합니다."
+            else -> null
+        }
+    }
+
+    fun updatePassword(password: String, verifyPassword: String) {
+        val validationError = validatePassword(password, verifyPassword)
+        if (validationError != null) {
+            _errorMessage.value = validationError
+            _passwordUpdateStatus.value = PasswordUpdateStatus.ERROR
+            return
+        }
+
+        viewModelScope.launch {
+            _passwordUpdateStatus.value = PasswordUpdateStatus.LOADING
+            _isLoading.value = true
+            _errorMessage.value = null
+
+            val result = mypageRepository.updatePassword(password, verifyPassword)
+            result.onSuccess {
+                _passwordUpdateStatus.value = PasswordUpdateStatus.SUCCESS
+            }.onFailure { throwable ->
+                _passwordUpdateStatus.value = PasswordUpdateStatus.ERROR
+                _errorMessage.value = throwable.message ?: "비밀번호 변경에 실패했습니다."
+            }
+
+            _isLoading.value = false
+        }
+    }
+
     fun updateUserType(userType: String) {
         viewModelScope.launch {
             _userTypeUpdateStatus.value = UserTypeUpdateStatus.LOADING
@@ -228,12 +267,21 @@ class MypageViewModel @Inject constructor(
     fun resetFacilityUpdateStatus() {
         _facilityUpdateStatus.value = FacilityUpdateStatus.NONE
     }
+
     fun resetUserTypeUpdateStatus() {
         _userTypeUpdateStatus.value = UserTypeUpdateStatus.NONE
     }
 
+    fun resetPasswordUpdateStatus() {
+        _passwordUpdateStatus.value = PasswordUpdateStatus.NONE
+    }
+
     fun clearErrorMessage() {
         _errorMessage.value = null
+    }
+
+    fun setErrorMessage(message: String) {
+        _errorMessage.value = message
     }
 
     fun onLogoutClick() {

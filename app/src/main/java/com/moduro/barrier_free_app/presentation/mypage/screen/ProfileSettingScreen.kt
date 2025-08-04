@@ -65,12 +65,15 @@ fun ProfileSettingScreen(
     val userInfo by viewModel.userInfo.collectAsState()
     val nicknameChangeStatus by viewModel.nicknameChangeStatus.collectAsState()
     val facilityUpdateStatus by viewModel.facilityUpdateStatus.collectAsState()
+    val userTypeUpdateStatus by viewModel.userTypeUpdateStatus.collectAsState()
+    val passwordUpdateStatus by viewModel.passwordUpdateStatus.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
     var nicknameInput by remember { mutableStateOf("") }
     var isNicknameChanged by remember { mutableStateOf(false) }
-    val userTypeUpdateStatus by viewModel.userTypeUpdateStatus.collectAsState()
+    var passwordInput by remember { mutableStateOf("") }
+    var confirmPasswordInput by remember { mutableStateOf("") }
 
     // 편의시설 ID 매핑
     val facilityMapping = mapOf(
@@ -89,6 +92,13 @@ fun ProfileSettingScreen(
         5 to "# 경사로"
     )
 
+    // 사용자 타입 라디오 버튼 (단일 선택)
+    var selectedUserType by remember { mutableStateOf("전체") }
+
+    // 선택된 편의시설을 라벨로 관리
+    val selectedFacilities = remember { mutableStateListOf<String>() }
+
+    // LaunchedEffect들
     LaunchedEffect(userTypeUpdateStatus) {
         when (userTypeUpdateStatus) {
             UserTypeUpdateStatus.SUCCESS -> {
@@ -119,22 +129,18 @@ fun ProfileSettingScreen(
         }
     }
 
-    // 편의시설 업데이트 성공 시 처리
-    LaunchedEffect(facilityUpdateStatus) {
-        when (facilityUpdateStatus) {
-            FacilityUpdateStatus.SUCCESS -> {
+    // 비밀번호 업데이트 상태 처리
+    LaunchedEffect(passwordUpdateStatus) {
+        when (passwordUpdateStatus) {
+            PasswordUpdateStatus.SUCCESS -> {
+                passwordInput = ""
+                confirmPasswordInput = ""
                 onNavigateToMypage()
-                viewModel.resetFacilityUpdateStatus()
+                viewModel.resetPasswordUpdateStatus()
             }
             else -> {}
         }
     }
-
-    // 사용자 타입 라디오 버튼 (단일 선택)
-    var selectedUserType by remember { mutableStateOf("전체") }
-
-    // 선택된 편의시설을 라벨로 관리
-    val selectedFacilities = remember { mutableStateListOf<String>() }
 
     // userInfo가 로드되면 초기값 설정
     LaunchedEffect(userInfo) {
@@ -238,10 +244,11 @@ fun ProfileSettingScreen(
             Spacer(modifier = Modifier.height(10.dp))
 
             errorMessage?.let { message ->
-                // 닉네임 변경 중이 아니고, 편의시설 업데이트 중이 아니고, 유저 타입 업데이트 중이 아닐 때만 표시
+                // 닉네임 변경 에러일 때만 표시
                 if (nicknameChangeStatus == NicknameChangeStatus.ERROR &&
                     facilityUpdateStatus == FacilityUpdateStatus.NONE &&
-                    userTypeUpdateStatus == UserTypeUpdateStatus.NONE) {
+                    userTypeUpdateStatus == UserTypeUpdateStatus.NONE &&
+                    passwordUpdateStatus == PasswordUpdateStatus.NONE) {
                     Text(
                         text = message,
                         color = Color(0xFFF00000),
@@ -282,15 +289,32 @@ fun ProfileSettingScreen(
                 hint = "새로운 비밀번호를 입력해주세요.",
                 iconRes = if (passwordVisible) R.drawable.ic_eye_on else R.drawable.ic_eye_off,
                 isVisible = passwordVisible,
+                text = passwordInput,
+                onValueChange = {
+                    passwordInput = it
+                    if (errorMessage != null) {
+                        viewModel.clearErrorMessage()
+                    }
+                },
                 onVisibilityToggle = { passwordVisible = !passwordVisible }
             )
+
             Spacer(modifier = Modifier.height(20.dp))
+
             ProfilePasswordField(
                 hint = "새로운 비밀번호를 다시 입력해주세요.",
                 iconRes = if (confirmPasswordVisible) R.drawable.ic_eye_on else R.drawable.ic_eye_off,
                 isVisible = confirmPasswordVisible,
+                text = confirmPasswordInput,
+                onValueChange = {
+                    confirmPasswordInput = it
+                    if (errorMessage != null) {
+                        viewModel.clearErrorMessage()
+                    }
+                },
                 onVisibilityToggle = { confirmPasswordVisible = !confirmPasswordVisible }
             )
+
 
             Text(
                 text = "사용자 유형 설정",
@@ -362,10 +386,14 @@ fun ProfileSettingScreen(
                     val hasNicknameToChange = nicknameInput.isNotBlank()
                     val hasUserTypeToChange = isUserTypeChanged()
                     val hasFacilityToChange = isFacilityChanged()
+                    val hasPasswordToChange = passwordInput.isNotBlank() && confirmPasswordInput.isNotBlank()
 
                     when {
                         hasNicknameToChange -> {
                             viewModel.changeNickname(nicknameInput)
+                        }
+                        hasPasswordToChange -> {
+                            viewModel.updatePassword(passwordInput, confirmPasswordInput)
                         }
                         hasUserTypeToChange -> {
                             val serverUserType = when (selectedUserType) {
@@ -383,7 +411,6 @@ fun ProfileSettingScreen(
                                 selectedFacilities.mapNotNull { facilityMapping[it] }
                             }
                             viewModel.updateFacilities(facilityIds)
-                            onNavigateToMypage()
                         }
                         isNicknameChanged -> {
                             onNavigateToMypage()
