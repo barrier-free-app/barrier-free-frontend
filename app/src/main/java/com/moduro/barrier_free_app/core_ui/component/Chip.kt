@@ -32,7 +32,6 @@ fun FacilityChip(
         shape = RoundedCornerShape(10.dp),
         color = Button1,
         modifier = Modifier
-            .fillMaxWidth()
             .padding(end = 8.dp)
     ) {
         Row(
@@ -57,7 +56,6 @@ fun MypageFacilityChip(
         shape = RoundedCornerShape(10.dp),
         color = Background1,
         modifier = Modifier
-            .fillMaxWidth()
             .padding(end = 8.dp)
     ) {
         Row(
@@ -129,7 +127,7 @@ fun FavoriteFacilityChip(
 }
 
 
-@Preview(showBackground = true)
+@Preview()
 @Composable
 fun FacilityChipPreview() {
     FacilityChip(

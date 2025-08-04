@@ -17,6 +17,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -24,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.moduro.barrier_free_app.R
 import com.moduro.barrier_free_app.core_ui.component.CommonTopBar
@@ -31,55 +34,46 @@ import com.moduro.barrier_free_app.core_ui.component.FavoriteFacilityChip
 import com.moduro.barrier_free_app.core_ui.component.FavoritePlaceCard
 import com.moduro.barrier_free_app.core_ui.theme.Background2
 
-
-data class FavoritePlace(
-    val name: String,
-    val description: String,
-    val imageRes: Int?,
-    val categories: List<String>,
-    val type: String,
-    val isImage: Boolean = true,
-    var isLiked: Boolean = true
-)
-
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun FavoritePlaceScreen(
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    viewModel: MypageViewModel = hiltViewModel()
 ) {
-    val favoritePlaces = remember {
-        mutableStateListOf(
-            FavoritePlace(
-                name = "국립현대미술관 서울 MMCA",
-                description = "배리어프리 서비스 도입 미술관",
-                imageRes = R.drawable.place,
-                categories = listOf("🛗 승강기", "♿ 장애인화장실"),
-                type = "CULTURE",
-                isImage = true
-            ),
-            FavoritePlace(
-                name = "쇼어 SHORE",
-                description = "아이와 함께 가기 좋은 실내 카페",
-                imageRes = null,
-                categories = listOf("👶 영유아동반", "🛁 수유실"),
-                type = "RESTAURANT",
-                isImage = false
-            )
-        )
-    }
+    val facilityIdToLabel = mapOf(
+        1 to "🛗 승강기",
+        2 to "♿ 장애인화장실",
+        3 to "👶 영유아동반",
+        4 to "🛁 수유실",
+        5 to "🧑‍🦽 경사로"
+    )
+    val labelToFacilityId = facilityIdToLabel.entries.associate { (k, v) -> v to k }
 
-    val selectedFacilities = remember { mutableStateListOf<String>() }
+    val filterLabels = listOf(
+        "전체", "🛗 승강기", "♿ 장애인화장실", "👶 영유아동반",
+        "🛁 수유실", "🧑‍🦽 경사로"
+    )
+
+    val selectedFacilities = remember { mutableStateListOf("전체") }
     val scrollState = rememberScrollState()
     val systemUiController = rememberSystemUiController()
 
-    val filteredPlaces = if (selectedFacilities.isEmpty() || selectedFacilities.contains("전체")) {
-        favoritePlaces
-    } else {
-        favoritePlaces.filter { place ->
-            place.categories.any { it in selectedFacilities }
+    val favoritePlaces by viewModel.favoritePlaces.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+
+    val filteredPlaces = remember(selectedFacilities, favoritePlaces) {
+        if (selectedFacilities.contains("전체") || selectedFacilities.isEmpty()) {
+            favoritePlaces
+        } else {
+            val selectedFacilityIds = selectedFacilities
+                .filter { it != "전체" }
+                .mapNotNull { labelToFacilityId[it] }
+
+            favoritePlaces.filter { place ->
+                place.facilities.any { facilityId -> facilityId in selectedFacilityIds }
+            }
         }
     }
-
 
     SideEffect {
         systemUiController.setSystemBarsColor(
@@ -103,15 +97,11 @@ fun FavoritePlaceScreen(
             horizontalArrangement = Arrangement.spacedBy(3.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            listOf(
-                "전체", "🛗 승강기", "♿ 장애인화장실", "👶 영유아동반",
-                "🛁 수유실", "🧑‍🦽 경사로"
-            ).forEach { label ->
+            filterLabels.forEach { label ->
                 FavoriteFacilityChip(
                     label = label,
                     isSelected = selectedFacilities.contains(label) ||
-                            (selectedFacilities.contains("전체") && label != "전체")
-                    ,
+                            (selectedFacilities.contains("전체") && label != "전체"),
                     onClick = {
                         if (label == "전체") {
                             selectedFacilities.clear()
@@ -126,9 +116,12 @@ fun FavoritePlaceScreen(
                             } else {
                                 selectedFacilities.add(label)
                             }
+
+                            if (selectedFacilities.isEmpty()) {
+                                selectedFacilities.add("전체")
+                            }
                         }
                     }
-
                 )
             }
         }
@@ -160,20 +153,19 @@ fun FavoritePlaceScreen(
                 filteredPlaces.forEach { place ->
                     FavoritePlaceCard(
                         place = place,
-                        onRemoveClick = {
-                            place.isLiked = false
-                            favoritePlaces.remove(place)
-                        }
+                        onFavoriteToggle = { selectedPlace ->
+                            viewModel.toggleFavorite(selectedPlace)
+                        },
+                        isLoading = isLoading
                     )
                 }
             }
         }
-
     }
 }
 
-@Composable
 @Preview(showBackground = true)
+@Composable
 fun FavoritePlaceScreenPreview() {
     FavoritePlaceScreen(
         onBackClick = {}

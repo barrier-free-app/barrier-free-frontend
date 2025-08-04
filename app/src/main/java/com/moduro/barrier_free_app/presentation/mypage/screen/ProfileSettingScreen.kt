@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,10 +27,12 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.moduro.barrier_free_app.R
 import com.moduro.barrier_free_app.core_ui.component.CommonTopBar
@@ -43,14 +46,13 @@ import com.moduro.barrier_free_app.core_ui.theme.LocalbarrierFreeTypographyProvi
 import com.moduro.barrier_free_app.core_ui.theme.Text4
 import com.moduro.barrier_free_app.core_ui.theme.Text5
 
-
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ProfileSettingScreen(
     isEmailUser: Boolean,
     onBackClick: () -> Unit,
     onNavigateToMypage: () -> Unit,
-    viewModel: MypageViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    viewModel: MypageViewModel = hiltViewModel()
 ) {
 
     val systemUiController = rememberSystemUiController()
@@ -60,21 +62,56 @@ fun ProfileSettingScreen(
 
     val typography = LocalbarrierFreeTypographyProvider.current
 
-    val userInfo = viewModel.userInfo.collectAsState().value
+    val userInfo by viewModel.userInfo.collectAsState()
+    val nicknameChangeStatus by viewModel.nicknameChangeStatus.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
-    val selectedUserTypes = remember {
-        mutableStateListOf<String>().apply {
-            userInfo?.userType?.let { add(it) }
+    var nicknameInput by remember { mutableStateOf("") }
+    var isNicknameChanged by remember { mutableStateOf(false) }
+
+    LaunchedEffect(nicknameChangeStatus) {
+        when (nicknameChangeStatus) {
+            NicknameChangeStatus.SUCCESS -> {
+                isNicknameChanged = true
+                nicknameInput = ""
+            }
+            else -> {}
         }
     }
+
+    // 사용자 타입 라디오 버튼 (단일 선택)
+    var selectedUserType by remember { mutableStateOf("전체") }
+
+    // userInfo가 로드되면 초기값 설정
+    LaunchedEffect(userInfo) {
+        userInfo?.let { info ->
+            selectedUserType = when (info.userType.uppercase()) {
+                "ALL" -> "전체"
+                "DISABLED" -> "장애인"
+                "PREGNANT" -> "임산부 및 영유아 동반"
+                else -> "전체"
+            }
+        }
+    }
+
     val selectedFacilities = remember {
         mutableStateListOf<String>().apply {
             userInfo?.userFacilities?.forEach { id -> add(id.toString()) }
         }
     }
-    val nicknameChangeStatus by viewModel.nicknameChangeStatus.collectAsState()
-    var nicknameInput by remember { mutableStateOf("") }
 
+    // 유저 타입이 변경되었는지 확인
+    fun isUserTypeChanged(): Boolean {
+        val currentUserType = userInfo?.userType?.uppercase() ?: "ALL"
+        val newUserType = when (selectedUserType) {
+            "전체" -> "ALL"
+            "장애인" -> "DISABLED"
+            "임산부 및 영유아 동반" -> "PREGNANT"
+            else -> "ALL"
+        }
+        return currentUserType != newUserType
+    }
 
     Column(
         modifier = Modifier
@@ -91,48 +128,57 @@ fun ProfileSettingScreen(
                 color = Text4,
                 modifier = Modifier.padding(top = 20.dp, bottom = 8.dp)
             )
-            ProfileNicknameField(
-                hint = "현재 닉네임은 ${userInfo?.nickName} 입니다.",
-                text = nicknameInput,
-                onValueChange = { nicknameInput = it },
-                onCheckDuplicateClick = {
-                    viewModel.changeNickname(nicknameInput)
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                ProfileNicknameField(
+                    hint = "현재 닉네임은 ${userInfo?.nickName} 입니다.",
+                    text = nicknameInput,
+                    onValueChange = {
+                        nicknameInput = it
+                        if (nicknameChangeStatus != NicknameChangeStatus.NONE) {
+                            viewModel.resetNicknameChangeStatus()
+                        }
+                        if (errorMessage != null) {
+                            viewModel.clearErrorMessage()
+                        }
+                    },
+                    onCheckDuplicateClick = {
+                        if (nicknameInput.isNotBlank()) {
+                            viewModel.changeNickname(nicknameInput)
+                        }
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+
+                // 로딩 상태 표시
+                if (nicknameChangeStatus == NicknameChangeStatus.LOADING) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .padding(start = 8.dp)
+                            .width(20.dp)
+                            .height(20.dp),
+                        strokeWidth = 2.dp,
+                        color = Text5
+                    )
                 }
-            )
+            }
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            when (nicknameChangeStatus) {
-                NicknameChangeStatus.SUCCESS -> {
+            // 일반 에러 메시지 (닉네임 유효성 검사 등)
+            errorMessage?.let { message ->
+                if (nicknameChangeStatus == NicknameChangeStatus.NONE) {
                     Text(
-                        text = "닉네임이 변경되었습니다.",
-                        color = Color(0xFF023DFF),
-                        style = typography.H7_M_5,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                }
-
-                NicknameChangeStatus.DUPLICATE -> {
-                    Text(
-                        text = "이미 존재하는 닉네임 입니다",
-                        color =  Color(0xFFF00000),
-                        style = typography.H7_M_5,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                }
-
-                NicknameChangeStatus.LIMIT_EXCEEDED -> {
-                    Text(
-                        text = "닉네임 변경은 1개월에 1번 가능합니다.",
+                        text = message,
                         color = Color(0xFFF00000),
                         style = typography.H7_M_5,
                         modifier = Modifier.padding(top = 4.dp)
                     )
                 }
-
-                else -> {}
             }
-
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -182,31 +228,16 @@ fun ProfileSettingScreen(
                 modifier = Modifier.padding(top = 28.dp, bottom = 8.dp)
             )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf("전체", "휠체어 사용자", "영유아 동반").forEach { label ->
+                listOf("전체", "장애인", "임산부 및 영유아 동반").forEach { label ->
                     ProfileFacilityChip(
                         label = label,
-                        isSelected = selectedUserTypes.contains(label) ||
-                                (selectedUserTypes.contains("전체") && label != "전체"),
+                        isSelected = selectedUserType == label,
                         onClick = {
-                            if (label == "전체") {
-                                selectedUserTypes.clear()
-                                selectedUserTypes.add("전체")
-                            } else {
-                                if (selectedUserTypes.contains("전체")) {
-                                    selectedUserTypes.remove("전체")
-                                }
-
-                                if (selectedUserTypes.contains(label)) {
-                                    selectedUserTypes.remove(label)
-                                } else {
-                                    selectedUserTypes.add(label)
-                                }
-                            }
+                            selectedUserType = label
                         }
                     )
                 }
             }
-
 
             Text(
                 text = "편의정보 선택",
@@ -249,17 +280,53 @@ fun ProfileSettingScreen(
             Spacer(modifier = Modifier.height(70.dp))
 
             Button(
-                onClick = { onNavigateToMypage() },
+                onClick = {
+                    val hasNicknameToChange = nicknameInput.isNotBlank()
+                    val hasUserTypeToChange = isUserTypeChanged()
+
+                    when {
+                        hasNicknameToChange -> {
+                            viewModel.changeNickname(nicknameInput)
+                        }
+                        hasUserTypeToChange -> {
+                            val serverUserType = when (selectedUserType) {
+                                "전체" -> "ALL"
+                                "장애인" -> "DISABLED"
+                                "임산부 및 영유아 동반" -> "PREGNANT"
+                                else -> "ALL"
+                            }
+                            viewModel.updateUserType(serverUserType)
+                            onNavigateToMypage()
+                        }
+                        isNicknameChanged -> {
+                            onNavigateToMypage()
+                        }
+                        else -> {
+                            onNavigateToMypage()
+                        }
+                    }
+                },
                 shape = RoundedCornerShape(10.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Text5,
                     contentColor = Background1
                 ),
+                enabled = !isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(54.dp)
             ) {
-                Text("저장 하기", style = typography.H4_SB)
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .width(20.dp)
+                            .height(20.dp),
+                        strokeWidth = 2.dp,
+                        color = Background1
+                    )
+                } else {
+                    Text("저장 하기", style = typography.H4_SB)
+                }
             }
         }
     }
