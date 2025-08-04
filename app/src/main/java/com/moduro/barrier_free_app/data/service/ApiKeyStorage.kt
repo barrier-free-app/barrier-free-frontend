@@ -12,4 +12,5 @@ object ApiKeyStorage {
     const val FAVORITES = "favorites"
     const val REPORTS = "reports"
     const val SEARCH = "search"
+    const val RECOMMENDATIONS = "recommendations"
 }

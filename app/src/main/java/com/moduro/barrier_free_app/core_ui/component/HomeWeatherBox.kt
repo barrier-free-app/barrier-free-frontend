@@ -35,9 +35,9 @@ fun HomeWeatherBox(
     val typography = LocalbarrierFreeTypographyProvider.current
 
     var weatherText = when (weatherType) {
-        1 -> "맑고 "
+        1 -> "비가 오고 "
         2 -> "흐리고 "
-        else -> "비가 오고 "
+        else -> "맑고 "
     }
 
     var dustText = when (dustType) {

@@ -96,8 +96,7 @@ fun HomeScreen(
     onPlaceClick: (Long) -> Unit
 ) {
     val hotPlaceList by homeViewModel.hotPlaceList.observeAsState(emptyList())
-
-    val weatherPlace = homeViewModel.dummyWeatherPlaces
+    val recommendPlaceList by homeViewModel.recommendPlaceList.observeAsState(emptyList())
 
     val context = LocalContext.current
 
@@ -146,10 +145,10 @@ fun HomeScreen(
     val rain by locationViewModel.rain.collectAsState()
     val sky by locationViewModel.sky.collectAsState()
 
-    var weathertype = 1
+    var weathertype = 3
 
     if (rain != "강수없음") {
-        weathertype = 3
+        weathertype = 1
     } else {
         if (sky != "1") {
             weathertype = 2
@@ -164,6 +163,7 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         airKoreaViewModel.fetchPm10Average()
         homeViewModel.getHotPlaces()
+        homeViewModel.getRecommendPlaces(null, null)
     }
 
 
@@ -193,7 +193,16 @@ fun HomeScreen(
             onDismiss = { showFilterSheet = false },
             onConfirm = { single: String, multi: List<Int> ->
                 showFilterSheet = false
-                println("선택된 알고리즘: $single, 선택된 카테고리: $multi")
+
+                val type = when (single) {
+                    "가까운 거리의 장소를 추천받고 싶어요" -> "distance"
+                    "날씨에 어울리는 장소를 추천받고 싶어요" -> "weather"
+                    else -> null
+                }
+
+                val facilities = if (multi.contains(0)) emptyList() else multi
+
+                homeViewModel.getRecommendPlaces(type, facilities)
             }
         )
     }
@@ -221,7 +230,7 @@ fun HomeScreen(
                     val toggleIconRes = if (isLargeTextMode) {
                         R.drawable.large_word_selected  // 큰 글자 모드 ON
                     } else {
-                        R.drawable.large_word_selected  // 큰 글자 모드 OFF
+                        R.drawable.large_word_unselected  // 큰 글자 모드 OFF
                     }
 
                     Image(
@@ -313,15 +322,30 @@ fun HomeScreen(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
+                recommendPlaceList.getOrNull(0)?.let { place ->
+                    HomePlaceBox(place = place) { placeId ->
+                        onPlaceClick(placeId)
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+
+                recommendPlaceList.getOrNull(1)?.let { place ->
+                    HomePlaceBox(place = place) { placeId ->
+                        onPlaceClick(placeId)
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+
+                recommendPlaceList.getOrNull(2)?.let { place ->
+                    HomePlaceBox(place = place) { placeId ->
+                        onPlaceClick(placeId)
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+
             }
         }
 
-        items(weatherPlace) { place ->
-            HomePlaceBox(place = place) { placeId ->
-                onPlaceClick(placeId)
-            }
-            Spacer(modifier = Modifier.height(10.dp))
-        }
 
     }
 

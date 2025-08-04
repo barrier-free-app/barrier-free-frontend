@@ -20,6 +20,9 @@ class HomeViewModel @Inject constructor(
     private val _hotPlaceList = MutableLiveData<List<HomePlaceEntity>>()
     val hotPlaceList: LiveData<List<HomePlaceEntity>> = _hotPlaceList
 
+    private val _recommendPlaceList = MutableLiveData<List<HomePlaceEntity>>()
+    val recommendPlaceList: LiveData<List<HomePlaceEntity>> = _recommendPlaceList
+
     // 로딩 상태 추가 (UX 향상에 도움)
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
@@ -41,38 +44,24 @@ class HomeViewModel @Inject constructor(
     }
 
 
-    val dummyWeatherPlaces = listOf(
-        HomePlaceEntity(
-            placeId = 1,
-            placeType = "map",
-            name = "종로 맛집",
-            region = "종로구",
-            description = "종로구의 유명한 맛집",
-            facility = listOf(1, 2, 3),
-            imageType = 1
+    fun getRecommendPlaces(
+        type : String?,
+        facilities : List<Int>?
+    ) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            val result = homeRepository.getRecommendPlaces(type, facilities)
 
-        ),
-        HomePlaceEntity(
-            placeId = 1,
-            placeType = "report",
-            name = "종로 맛집",
-            region = "종로구",
-            description = "종로구의 유명한 맛집",
-            facility = listOf(2, 4),
-            imageType = 1
+            result.onSuccess { places ->
+                _recommendPlaceList.value = places
 
-        ),
-        HomePlaceEntity(
-            placeId = 1,
-            placeType = "report",
-            name = "종로 맛집",
-            region = "종로구",
-            description = "종로구의 유명한 맛집",
-            facility = listOf(1, 2, 3),
-            imageType = 1
+            }.onFailure { exception ->
+                Log.e("HomeViewModel", "Fail", exception)
+            }
+            _isLoading.value = false
+        }
+    }
 
-        )
-    )
 
 
 }
