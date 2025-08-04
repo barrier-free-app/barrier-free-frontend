@@ -38,6 +38,10 @@ enum class PasswordUpdateStatus {
     NONE, SUCCESS, ERROR, LOADING
 }
 
+enum class AccountDeleteStatus {
+    NONE, SUCCESS, ERROR, LOADING
+}
+
 @HiltViewModel
 class MypageViewModel @Inject constructor(
     private val mypageRepository: MypageRepository,
@@ -64,6 +68,10 @@ class MypageViewModel @Inject constructor(
 
     private val _passwordUpdateStatus = MutableStateFlow(PasswordUpdateStatus.NONE)
     val passwordUpdateStatus: StateFlow<PasswordUpdateStatus> = _passwordUpdateStatus.asStateFlow()
+
+    private val _accountDeleteStatus = MutableStateFlow(AccountDeleteStatus.NONE)
+    val accountDeleteStatus: StateFlow<AccountDeleteStatus> = _accountDeleteStatus.asStateFlow()
+
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -274,6 +282,30 @@ class MypageViewModel @Inject constructor(
 
     fun resetPasswordUpdateStatus() {
         _passwordUpdateStatus.value = PasswordUpdateStatus.NONE
+    }
+
+    fun deleteAccount(reason: String) {
+        if (reason.isBlank()) {
+            _errorMessage.value = "탈퇴 사유를 입력해주세요."
+            _accountDeleteStatus.value = AccountDeleteStatus.ERROR
+            return
+        }
+
+        viewModelScope.launch {
+            _accountDeleteStatus.value = AccountDeleteStatus.LOADING
+            _isLoading.value = true
+            _errorMessage.value = null
+
+            val result = mypageRepository.deleteAccount(reason)
+            result.onSuccess {
+                _accountDeleteStatus.value = AccountDeleteStatus.SUCCESS
+            }.onFailure { throwable ->
+                _accountDeleteStatus.value = AccountDeleteStatus.ERROR
+                _errorMessage.value = throwable.message ?: "회원 탈퇴에 실패했습니다."
+            }
+
+            _isLoading.value = false
+        }
     }
 
     fun clearErrorMessage() {

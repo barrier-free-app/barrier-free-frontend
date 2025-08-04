@@ -1,6 +1,7 @@
 package com.moduro.barrier_free_app.data.datasource
 
 import com.moduro.barrier_free_app.data.dto.ModuroBaseResponse
+import com.moduro.barrier_free_app.data.dto.response.ResponseDeleteAccountDto
 import com.moduro.barrier_free_app.data.dto.response.ResponseFavoritePlacesResultDto
 import com.moduro.barrier_free_app.data.dto.response.ResponseNicknameChange
 import com.moduro.barrier_free_app.data.dto.response.ResponseReviewListDto
@@ -16,4 +17,5 @@ interface MypageDataSource {
     suspend fun updateFacilities(facilityIds: List<Int>): ModuroBaseResponse<ResponseUpdateFacilityDto>
     suspend fun getFavoritePlaces(): ModuroBaseResponse<ResponseFavoritePlacesResultDto>
     suspend fun getReviewPlaces(): ModuroBaseResponse<ResponseReviewListDto>
+    suspend fun deleteAccount(reason: String): ModuroBaseResponse<ResponseDeleteAccountDto>
 }

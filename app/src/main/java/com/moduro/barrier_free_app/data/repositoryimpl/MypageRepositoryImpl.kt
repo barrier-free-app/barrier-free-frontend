@@ -153,4 +153,22 @@ class MypageRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun deleteAccount(reason: String): Result<String> {
+        return try {
+            val response = mypageDataSource.deleteAccount(reason)
+            if (response.isSuccess && response.result != null) {
+                Result.success(response.result.result)
+            } else {
+                Result.failure(Exception(response.message ?: "회원 탈퇴 실패"))
+            }
+        } catch (e: retrofit2.HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorMessage = parseErrorMessage(errorBody)
+            Result.failure(Exception(errorMessage ?: "회원 탈퇴 실패 (HTTP ${e.code()})"))
+        } catch (e: Exception) {
+            Result.failure(Exception("회원 탈퇴 실패: ${e.message}"))
+        }
+    }
+
+
 }

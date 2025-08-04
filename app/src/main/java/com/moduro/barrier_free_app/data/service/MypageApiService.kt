@@ -1,10 +1,12 @@
 package com.moduro.barrier_free_app.data.service
 
 import com.moduro.barrier_free_app.data.dto.ModuroBaseResponse
+import com.moduro.barrier_free_app.data.dto.request.RequestDeleteAccountDto
 import com.moduro.barrier_free_app.data.dto.request.RequestNicknameChange
 import com.moduro.barrier_free_app.data.dto.request.RequestUpdateFacilityDto
 import com.moduro.barrier_free_app.data.dto.request.RequestUpdatePasswordDto
 import com.moduro.barrier_free_app.data.dto.request.RequestUserTypeUpdate
+import com.moduro.barrier_free_app.data.dto.response.ResponseDeleteAccountDto
 import com.moduro.barrier_free_app.data.dto.response.ResponseFavoritePlacesResultDto
 import com.moduro.barrier_free_app.data.dto.response.ResponseNicknameChange
 import com.moduro.barrier_free_app.data.dto.response.ResponseReviewListDto
@@ -14,6 +16,7 @@ import com.moduro.barrier_free_app.data.dto.response.ResponseUserDto
 import com.moduro.barrier_free_app.data.service.ApiKeyStorage.ME
 import com.moduro.barrier_free_app.data.service.ApiKeyStorage.USERS
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.PUT
@@ -53,4 +56,9 @@ interface MypageApiService {
         @Query("size") size: Int = 10,
         @Query("sort") sort: String = "createdAt,DESC"
     ): ModuroBaseResponse<ResponseReviewListDto>
+
+    @DELETE("/$USERS/delete")
+    suspend fun deleteAccount(
+        @Body request: RequestDeleteAccountDto
+    ): ModuroBaseResponse<ResponseDeleteAccountDto>
 }

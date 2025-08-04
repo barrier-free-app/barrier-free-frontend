@@ -2,10 +2,12 @@ package com.moduro.barrier_free_app.data.datasourceimpl
 
 import com.moduro.barrier_free_app.data.datasource.MypageDataSource
 import com.moduro.barrier_free_app.data.dto.ModuroBaseResponse
+import com.moduro.barrier_free_app.data.dto.request.RequestDeleteAccountDto
 import com.moduro.barrier_free_app.data.dto.request.RequestNicknameChange
 import com.moduro.barrier_free_app.data.dto.request.RequestUpdateFacilityDto
 import com.moduro.barrier_free_app.data.dto.request.RequestUpdatePasswordDto
 import com.moduro.barrier_free_app.data.dto.request.RequestUserTypeUpdate
+import com.moduro.barrier_free_app.data.dto.response.ResponseDeleteAccountDto
 import com.moduro.barrier_free_app.data.dto.response.ResponseFavoritePlacesResultDto
 import com.moduro.barrier_free_app.data.dto.response.ResponseNicknameChange
 import com.moduro.barrier_free_app.data.dto.response.ResponseReviewListDto
@@ -51,6 +53,11 @@ class MypageDataSourceImpl @Inject constructor(
 
     override suspend fun getReviewPlaces(): ModuroBaseResponse<ResponseReviewListDto> {
         return mypageApiService.getReviewPlaces()
+    }
+
+    override suspend fun deleteAccount(reason: String): ModuroBaseResponse<ResponseDeleteAccountDto> {
+        val request = RequestDeleteAccountDto(reason = reason)
+        return mypageApiService.deleteAccount(request)
     }
 
 
