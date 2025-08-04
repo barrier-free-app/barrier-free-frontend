@@ -64,11 +64,50 @@ fun ProfileSettingScreen(
 
     val userInfo by viewModel.userInfo.collectAsState()
     val nicknameChangeStatus by viewModel.nicknameChangeStatus.collectAsState()
+    val facilityUpdateStatus by viewModel.facilityUpdateStatus.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
     var nicknameInput by remember { mutableStateOf("") }
     var isNicknameChanged by remember { mutableStateOf(false) }
+    val userTypeUpdateStatus by viewModel.userTypeUpdateStatus.collectAsState()
+
+    // 편의시설 ID 매핑
+    val facilityMapping = mapOf(
+        "🛗 승강기" to 1,
+        "♿ 장애인화장실" to 2,
+        "👶 영유아동반" to 3,
+        "🛁 수유실" to 4,
+        "# 경사로" to 5
+    )
+
+    val facilityIdToLabel = mapOf(
+        1 to "🛗 승강기",
+        2 to "♿ 장애인화장실",
+        3 to "👶 영유아동반",
+        4 to "🛁 수유실",
+        5 to "# 경사로"
+    )
+
+    LaunchedEffect(userTypeUpdateStatus) {
+        when (userTypeUpdateStatus) {
+            UserTypeUpdateStatus.SUCCESS -> {
+                onNavigateToMypage()
+                viewModel.resetUserTypeUpdateStatus()
+            }
+            else -> {}
+        }
+    }
+
+    LaunchedEffect(facilityUpdateStatus) {
+        when (facilityUpdateStatus) {
+            FacilityUpdateStatus.SUCCESS -> {
+                onNavigateToMypage()
+                viewModel.resetFacilityUpdateStatus()
+            }
+            else -> {}
+        }
+    }
 
     LaunchedEffect(nicknameChangeStatus) {
         when (nicknameChangeStatus) {
@@ -80,8 +119,22 @@ fun ProfileSettingScreen(
         }
     }
 
+    // 편의시설 업데이트 성공 시 처리
+    LaunchedEffect(facilityUpdateStatus) {
+        when (facilityUpdateStatus) {
+            FacilityUpdateStatus.SUCCESS -> {
+                onNavigateToMypage()
+                viewModel.resetFacilityUpdateStatus()
+            }
+            else -> {}
+        }
+    }
+
     // 사용자 타입 라디오 버튼 (단일 선택)
     var selectedUserType by remember { mutableStateOf("전체") }
+
+    // 선택된 편의시설을 라벨로 관리
+    val selectedFacilities = remember { mutableStateListOf<String>() }
 
     // userInfo가 로드되면 초기값 설정
     LaunchedEffect(userInfo) {
@@ -92,12 +145,17 @@ fun ProfileSettingScreen(
                 "PREGNANT" -> "임산부 및 영유아 동반"
                 else -> "전체"
             }
-        }
-    }
 
-    val selectedFacilities = remember {
-        mutableStateListOf<String>().apply {
-            userInfo?.userFacilities?.forEach { id -> add(id.toString()) }
+            selectedFacilities.clear()
+            if (info.userFacilities.isEmpty()) {
+                selectedFacilities.add("전체")
+            } else {
+                info.userFacilities.forEach { facilityId ->
+                    facilityIdToLabel[facilityId]?.let { label ->
+                        selectedFacilities.add(label)
+                    }
+                }
+            }
         }
     }
 
@@ -111,6 +169,17 @@ fun ProfileSettingScreen(
             else -> "ALL"
         }
         return currentUserType != newUserType
+    }
+
+    // 편의시설이 변경되었는지 확인
+    fun isFacilityChanged(): Boolean {
+        val currentFacilityIds = userInfo?.userFacilities?.toSet() ?: emptySet()
+        val newFacilityIds = if (selectedFacilities.contains("전체")) {
+            emptySet()
+        } else {
+            selectedFacilities.mapNotNull { facilityMapping[it] }.toSet()
+        }
+        return currentFacilityIds != newFacilityIds
     }
 
     Column(
@@ -168,9 +237,11 @@ fun ProfileSettingScreen(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // 일반 에러 메시지 (닉네임 유효성 검사 등)
             errorMessage?.let { message ->
-                if (nicknameChangeStatus == NicknameChangeStatus.NONE) {
+                // 닉네임 변경 중이 아니고, 편의시설 업데이트 중이 아니고, 유저 타입 업데이트 중이 아닐 때만 표시
+                if (nicknameChangeStatus == NicknameChangeStatus.ERROR &&
+                    facilityUpdateStatus == FacilityUpdateStatus.NONE &&
+                    userTypeUpdateStatus == UserTypeUpdateStatus.NONE) {
                     Text(
                         text = message,
                         color = Color(0xFFF00000),
@@ -268,9 +339,16 @@ fun ProfileSettingScreen(
 
                                 if (selectedFacilities.contains(label)) {
                                     selectedFacilities.remove(label)
+                                    if (selectedFacilities.isEmpty()) {
+                                        selectedFacilities.add("전체")
+                                    }
                                 } else {
                                     selectedFacilities.add(label)
                                 }
+                            }
+
+                            if (errorMessage != null) {
+                                viewModel.clearErrorMessage()
                             }
                         }
                     )
@@ -283,6 +361,7 @@ fun ProfileSettingScreen(
                 onClick = {
                     val hasNicknameToChange = nicknameInput.isNotBlank()
                     val hasUserTypeToChange = isUserTypeChanged()
+                    val hasFacilityToChange = isFacilityChanged()
 
                     when {
                         hasNicknameToChange -> {
@@ -296,6 +375,14 @@ fun ProfileSettingScreen(
                                 else -> "ALL"
                             }
                             viewModel.updateUserType(serverUserType)
+                        }
+                        hasFacilityToChange -> {
+                            val facilityIds = if (selectedFacilities.contains("전체")) {
+                                emptyList()
+                            } else {
+                                selectedFacilities.mapNotNull { facilityMapping[it] }
+                            }
+                            viewModel.updateFacilities(facilityIds)
                             onNavigateToMypage()
                         }
                         isNicknameChanged -> {

@@ -2,10 +2,12 @@ package com.moduro.barrier_free_app.data.service
 
 import com.moduro.barrier_free_app.data.dto.ModuroBaseResponse
 import com.moduro.barrier_free_app.data.dto.request.RequestNicknameChange
+import com.moduro.barrier_free_app.data.dto.request.RequestUpdateFacilityDto
 import com.moduro.barrier_free_app.data.dto.request.RequestUserTypeUpdate
 import com.moduro.barrier_free_app.data.dto.response.ResponseFavoritePlacesResultDto
 import com.moduro.barrier_free_app.data.dto.response.ResponseNicknameChange
 import com.moduro.barrier_free_app.data.dto.response.ResponseReviewListDto
+import com.moduro.barrier_free_app.data.dto.response.ResponseUpdateFacilityDto
 import com.moduro.barrier_free_app.data.dto.response.ResponseUserDto
 import com.moduro.barrier_free_app.data.service.ApiKeyStorage.ME
 import com.moduro.barrier_free_app.data.service.ApiKeyStorage.USERS
@@ -28,6 +30,11 @@ interface MypageApiService {
     suspend fun updateUserType(
         @Body request: RequestUserTypeUpdate
     ): ModuroBaseResponse<String>
+
+    @PUT("/$USERS/my-facilities")
+    suspend fun updateFacilities(
+        @Body request: RequestUpdateFacilityDto
+    ): ModuroBaseResponse<ResponseUpdateFacilityDto>
 
 
     @GET("/$USERS/favorites")

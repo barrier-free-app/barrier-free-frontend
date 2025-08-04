@@ -98,8 +98,22 @@ class MypageRepositoryImpl @Inject constructor(
         }
     }
 
-
-
+    override suspend fun updateFacilities(facilityIds: List<Int>): Result<String> {
+        return try {
+            val response = mypageDataSource.updateFacilities(facilityIds)
+            if (response.isSuccess && response.result != null) {
+                Result.success(response.result.result)
+            } else {
+                Result.failure(Exception(response.message ?: "시설 정보 업데이트 실패"))
+            }
+        } catch (e: retrofit2.HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorMessage = parseErrorMessage(errorBody)
+            Result.failure(Exception(errorMessage ?: "시설 정보 업데이트 실패 (HTTP ${e.code()})"))
+        } catch (e: Exception) {
+            Result.failure(Exception("시설 정보 업데이트 실패: ${e.message}"))
+        }
+    }
 
     override suspend fun getUserInfo(): Result<UserEntity> {
         return runCatching {

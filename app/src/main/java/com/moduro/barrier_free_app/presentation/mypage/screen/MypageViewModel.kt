@@ -26,6 +26,16 @@ enum class NicknameChangeStatus {
     NONE, SUCCESS, DUPLICATE, LIMIT_EXCEEDED, ERROR, LOADING
 }
 
+enum class FacilityUpdateStatus {
+    NONE, SUCCESS, ERROR, LOADING
+}
+
+enum class UserTypeUpdateStatus {
+    NONE, SUCCESS, ERROR, LOADING
+}
+
+
+
 @HiltViewModel
 class MypageViewModel @Inject constructor(
     private val mypageRepository: MypageRepository,
@@ -43,6 +53,12 @@ class MypageViewModel @Inject constructor(
 
     private val _nicknameChangeStatus = MutableStateFlow(NicknameChangeStatus.NONE)
     val nicknameChangeStatus: StateFlow<NicknameChangeStatus> = _nicknameChangeStatus.asStateFlow()
+
+    private val _userTypeUpdateStatus = MutableStateFlow(UserTypeUpdateStatus.NONE)
+    val userTypeUpdateStatus: StateFlow<UserTypeUpdateStatus> = _userTypeUpdateStatus.asStateFlow()
+
+    private val _facilityUpdateStatus = MutableStateFlow(FacilityUpdateStatus.NONE)
+    val facilityUpdateStatus: StateFlow<FacilityUpdateStatus> = _facilityUpdateStatus.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -169,15 +185,36 @@ class MypageViewModel @Inject constructor(
 
     fun updateUserType(userType: String) {
         viewModelScope.launch {
+            _userTypeUpdateStatus.value = UserTypeUpdateStatus.LOADING
             _isLoading.value = true
             _errorMessage.value = null
 
             val result = mypageRepository.updateUserType(userType)
             result.onSuccess { message ->
-                // 성공 시 유저 정보 새로고침
+                _userTypeUpdateStatus.value = UserTypeUpdateStatus.SUCCESS
                 loadUserInfo()
             }.onFailure { throwable ->
+                _userTypeUpdateStatus.value = UserTypeUpdateStatus.ERROR
                 _errorMessage.value = throwable.message ?: "유저 타입 변경에 실패했습니다."
+            }
+
+            _isLoading.value = false
+        }
+    }
+
+    fun updateFacilities(facilityIds: List<Int>) {
+        viewModelScope.launch {
+            _facilityUpdateStatus.value = FacilityUpdateStatus.LOADING
+            _isLoading.value = true
+            _errorMessage.value = null
+
+            val result = mypageRepository.updateFacilities(facilityIds)
+            result.onSuccess { message ->
+                _facilityUpdateStatus.value = FacilityUpdateStatus.SUCCESS
+                loadUserInfo()
+            }.onFailure { throwable ->
+                _facilityUpdateStatus.value = FacilityUpdateStatus.ERROR
+                _errorMessage.value = throwable.message ?: "편의시설 정보 변경에 실패했습니다."
             }
 
             _isLoading.value = false
@@ -186,6 +223,13 @@ class MypageViewModel @Inject constructor(
 
     fun resetNicknameChangeStatus() {
         _nicknameChangeStatus.value = NicknameChangeStatus.NONE
+    }
+
+    fun resetFacilityUpdateStatus() {
+        _facilityUpdateStatus.value = FacilityUpdateStatus.NONE
+    }
+    fun resetUserTypeUpdateStatus() {
+        _userTypeUpdateStatus.value = UserTypeUpdateStatus.NONE
     }
 
     fun clearErrorMessage() {
@@ -203,5 +247,4 @@ class MypageViewModel @Inject constructor(
     fun refreshUserInfo() {
         loadUserInfo()
     }
-
 }
