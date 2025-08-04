@@ -1,6 +1,7 @@
 package com.moduro.barrier_free_app.app.di
 
 import com.moduro.barrier_free_app.data.service.AirKoreaApiService
+import com.moduro.barrier_free_app.data.service.AuthApiService
 import com.moduro.barrier_free_app.data.service.ExampleApiService
 import com.moduro.barrier_free_app.data.service.LocationNameApiService
 import com.moduro.barrier_free_app.data.service.LocationTempApiService
@@ -39,4 +40,9 @@ object ServiceModule {
         @LocationNameRetrofit retrofit: Retrofit
     ) : LocationNameApiService = retrofit.create(LocationNameApiService::class.java)
 
+    @Provides
+    @Singleton
+    fun provideAuthService(
+        @ModuroRetrofit retrofit: Retrofit
+    ) : AuthApiService = retrofit.create(AuthApiService::class.java)
 }

@@ -1,5 +1,6 @@
 package com.moduro.barrier_free_app.presentation.auth.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,9 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.moduro.barrier_free_app.core_ui.component.CommonTopBar
 import com.moduro.barrier_free_app.core_ui.component.SignUpTextField
 import com.moduro.barrier_free_app.core_ui.component.StartButton
@@ -23,12 +24,12 @@ import com.moduro.barrier_free_app.presentation.auth.navigation.AuthNavigator
 @Composable
 fun SignUpRoute(
     navigator: AuthNavigator,
-    viewModel: SignUpViewModel = viewModel()
+    viewModel: SignUpViewModel = hiltViewModel()
 ) {
     SignUpScreen(
         onBackClick = { navigator.navController.popBackStack() },
         viewModel = viewModel,
-        onSignUpSuccess = { navigator.navigateToSignUpSetting() }
+        onSignUpSuccess = { navigator.navigateToSignUpSetting(viewModel.inputEmail) }
     )
 }
 
@@ -39,6 +40,7 @@ fun SignUpScreen(
     onSignUpSuccess: () -> Unit
 ) {
     val typography = LocalbarrierFreeTypographyProvider.current
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -61,9 +63,9 @@ fun SignUpScreen(
             SignUpTextField(
                 label = "이메일 주소",
                 hint = "아이디 또는 이메일 주소",
-                text = viewModel.email,
+                text = viewModel.inputEmail,
                 onValueChange = {
-                    viewModel.email = it
+                    viewModel.inputEmail = it
                 },
                 enabled = true
             )
@@ -74,7 +76,10 @@ fun SignUpScreen(
                 value = "인증번호 요청하기",
                 enabled = viewModel.isSignUpEnabled,
                 onClick = {
-                    viewModel.currentStep = 2
+                    viewModel.sendVerificationCode(
+                        onSuccess = { viewModel.currentStep = 2 },
+                        onFailure = { message -> Toast.makeText(context, message, Toast.LENGTH_SHORT).show()}
+                    )
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -104,9 +109,9 @@ fun SignUpScreen(
             SignUpTextField(
                 label = "이메일 주소",
                 hint = "아이디 또는 이메일 주소",
-                text = viewModel.email,
+                text = viewModel.inputEmail,
                 onValueChange = {
-                    viewModel.email = it
+                    viewModel.inputEmail = it
                 },
                 enabled = false
             )
@@ -129,8 +134,10 @@ fun SignUpScreen(
                 value = "다음",
                 enabled = viewModel.isSignUpEnabled,
                 onClick = {
-                    // 인증번호 확인
-                    viewModel.signUp(onSignUpSuccess)
+                    viewModel.verifyVerificationCode(
+                        onSuccess = onSignUpSuccess,
+                        onFailure = { message -> Toast.makeText(context, message, Toast.LENGTH_SHORT).show() }
+                    )
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -138,14 +145,4 @@ fun SignUpScreen(
             )
         }
     }
-}
-
-@Composable
-@Preview
-fun SignUpPreview() {
-    SignUpScreen(
-        onBackClick = {},
-        viewModel = viewModel(),
-        onSignUpSuccess = {}
-    )
 }
