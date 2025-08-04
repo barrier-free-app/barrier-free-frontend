@@ -1,6 +1,7 @@
 package com.moduro.barrier_free_app.app.di
 
 import com.moduro.barrier_free_app.data.service.AirKoreaApiService
+import com.moduro.barrier_free_app.data.service.AuthApiService
 import com.moduro.barrier_free_app.data.service.ExampleApiService
 import com.moduro.barrier_free_app.data.service.FavoriteToggleApiService
 import com.moduro.barrier_free_app.data.service.LocationNameApiService
@@ -52,4 +53,10 @@ object ServiceModule {
     fun provideFavoriteToggleApiService(
         @ModuroRetrofit retrofit: Retrofit
     ): FavoriteToggleApiService = retrofit.create(FavoriteToggleApiService::class.java)
+ 
+    @Provides
+    @Singleton
+    fun provideAuthService(
+        @ModuroRetrofit retrofit: Retrofit
+    ) : AuthApiService = retrofit.create(AuthApiService::class.java)
 }

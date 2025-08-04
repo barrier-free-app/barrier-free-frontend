@@ -25,7 +25,7 @@ class AuthNavigator(
         navController.navigate("find-account") {
         }
     }
-    fun navigateToSignUpSetting() {
-        navController.navigate("signup-info")
+    fun navigateToSignUpSetting(email: String) {
+        navController.navigate("signup-info/$email")
     }
 }

@@ -20,7 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.moduro.barrier_free_app.core_ui.component.CommonTopBar
 import com.moduro.barrier_free_app.core_ui.component.SignUpTextField
 import com.moduro.barrier_free_app.core_ui.component.StartButton
@@ -35,7 +35,7 @@ import com.moduro.barrier_free_app.presentation.auth.navigation.AuthNavigator
 @Composable
 fun FindAccountRoute(
     navigator: AuthNavigator,
-    viewModel: FindAccountViewModel = viewModel()
+    viewModel: FindAccountViewModel = hiltViewModel()
 ) {
     FindAccountScreen(
         onBackClick = { navigator.navController.popBackStack() },
@@ -125,6 +125,7 @@ fun FindAccountScreen(
             enabled = viewModel.isEmailEntered,
             onClick = {
                 viewModel.onSubmit {
+
                     Toast.makeText(context,"전송이 완료되었어요!", Toast.LENGTH_SHORT).show()
                     onNavigateToLogin()
                 }

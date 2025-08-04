@@ -2,12 +2,14 @@ package com.moduro.barrier_free_app.app.di
 
 
 import com.moduro.barrier_free_app.data.repositoryimpl.AirKoreaRepositoryImpl
+import com.moduro.barrier_free_app.data.repositoryimpl.AuthRepositoryImpl
 import com.moduro.barrier_free_app.data.repositoryimpl.ExampleRepositoryImpl
 import com.moduro.barrier_free_app.data.repositoryimpl.FavoriteToggleRepositoryImpl
 import com.moduro.barrier_free_app.data.repositoryimpl.LocationNameRepositoryImpl
 import com.moduro.barrier_free_app.data.repositoryimpl.LocationTempRepositoryImpl
 import com.moduro.barrier_free_app.data.repositoryimpl.MypageRepositoryImpl
 import com.moduro.barrier_free_app.domain.repository.AirKoreaRepository
+import com.moduro.barrier_free_app.domain.repository.AuthRepository
 import com.moduro.barrier_free_app.domain.repository.ExampleRepository
 import com.moduro.barrier_free_app.domain.repository.FavoriteToggleRepository
 import com.moduro.barrier_free_app.domain.repository.LocationNameRepository
@@ -48,4 +50,7 @@ abstract class RepositoryModule {
     @Singleton
     abstract fun bindFavoriteToggleRepository(favoriteToggleRepositoryImpl: FavoriteToggleRepositoryImpl): FavoriteToggleRepository
 
+    @Binds
+    @Singleton
+    abstract fun bindAuthRepository(authRepositoryImpl: AuthRepositoryImpl) : AuthRepository
 }
