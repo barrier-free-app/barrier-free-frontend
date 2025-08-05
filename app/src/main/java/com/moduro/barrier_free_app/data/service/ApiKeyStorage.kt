@@ -13,4 +13,10 @@ object ApiKeyStorage {
     const val REPORTS = "reports"
     const val SEARCH = "search"
     const val RECOMMENDATIONS = "recommendations"
+    const val SIGNUP = "signup"
+    const val LOGIN = "login"
+    const val FIND = "find"
+    const val EMAIL = "email"
+    const val VERIFY = "verify"
+    const val SEND = "send"
 }

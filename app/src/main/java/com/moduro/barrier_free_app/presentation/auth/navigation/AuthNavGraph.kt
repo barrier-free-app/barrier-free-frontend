@@ -24,7 +24,8 @@ fun NavGraphBuilder.authNavGraph(
     composable(route = "find-account") {
         FindAccountRoute(navigator = navigator)
     }
-    composable(route = "signup-info") {
-        SignUpSettingRoute(navigator = navigator)
+    composable(route = "signup-info/{email}") { backStackEntry ->
+        val email = backStackEntry.arguments?.getString("email") ?: ""
+        SignUpSettingRoute(navigator = navigator, email = email)
     }
 }

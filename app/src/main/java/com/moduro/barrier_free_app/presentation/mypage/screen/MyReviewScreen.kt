@@ -20,8 +20,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -29,9 +29,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.moduro.barrier_free_app.R
 import com.moduro.barrier_free_app.core_ui.component.CommonBottomSheet
@@ -41,112 +44,20 @@ import com.moduro.barrier_free_app.core_ui.theme.Button1
 import com.moduro.barrier_free_app.core_ui.theme.LocalbarrierFreeTypographyProvider
 import com.moduro.barrier_free_app.core_ui.theme.Text3
 import com.moduro.barrier_free_app.core_ui.theme.Text4
-
-data class ReviewPlace(
-    val placeName: String,
-    val subDescription: String,
-    val reviewText: String,
-    val rating: Int,
-    val userName: String,
-    val imageRes: Int?,
-    val isImage: Boolean,
-    val type: String,
-    val categories: List<String>,
-    val onDetailClick: () -> Unit
-)
-
-enum class PlaceType(
-    val reviewPlaceholderResId: Int,
-    val savedPlaceholderResId: Int
-) {
-    PARKING(
-        R.drawable.review_placeholder_parking,
-        R.drawable.saved_placeholder_parking
-    ),
-    CULTURE(
-        R.drawable.review_placeholder_culture,
-        R.drawable.saved_placeholder_culture
-    ),
-    RESTAURANT(
-        R.drawable.review_placeholder_restaurant,
-        R.drawable.saved_placeholder_restaurant
-    ),
-    ELEVATOR(
-        R.drawable.review_placeholder_elevator,
-        R.drawable.saved_placeholder_elevator
-    ),
-    NURSING_ROOM(
-        R.drawable.review_placeholder_nursing_room,
-        R.drawable.saved_placeholder_nursing_room
-    ),
-    TOILET(
-        R.drawable.review_placeholder_toilet,
-        R.drawable.saved_placeholder_toilet
-    );
-
-    fun getPlaceholderResId(context: PlaceholderContext): Int = when (context) {
-        PlaceholderContext.REVIEW -> reviewPlaceholderResId
-        PlaceholderContext.SAVED -> savedPlaceholderResId
-    }
-
-    companion object {
-        fun from(type: String): PlaceType? =
-            entries.find { it.name.equals(type, ignoreCase = true) }
-    }
-}
-
-enum class PlaceholderContext {
-    REVIEW, SAVED
-}
+import com.moduro.barrier_free_app.domain.entity.ReviewPlaceEntity
 
 @Composable
 fun MyReviewScreen(
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    viewModel: MypageViewModel = hiltViewModel()
 ) {
-    val reviewPlaces = remember {
-        mutableStateListOf(
-            ReviewPlace(
-                placeName = "국립현대미술관 서울 MMCA",
-                subDescription = "배리어프리 서비스 도입 미술관",
-                reviewText = "시설이 전반적으로 이동하는 데 어려움이 크진 않아 좋았던 것 같아요. 다른 미술관보다 배리어프리 신경 쓴 게 더 느껴지는 것 같네요!",
-                rating = 5,
-                userName = "나현",
-                imageRes = R.drawable.place,
-                categories = listOf("🛗 승강기", "♿ 장애인화장실"),
-                onDetailClick = {},
-                isImage = true,
-                type = "CULTURE",
-            ),
-            ReviewPlace(
-                placeName = "국립현대미술관 서울 MMCA",
-                subDescription = "배리어프리 서비스 도입 미술관",
-                reviewText = "시설이 전반적으로 이동하는 데 어려움이 크진 않아 좋았던 것 같아요.",
-                rating = 5,
-                userName = "나현",
-                imageRes = null,
-                isImage = false,
-                type = "CULTURE",
-                categories = listOf("🛗 승강기", "♿ 장애인화장실"),
-                onDetailClick = {}
-            )
-
-        )
-    }
-
-    val selectedFacilities = remember { mutableStateListOf<String>() }
+    val reviewPlaces by viewModel.reviewPlaces.collectAsState()
     val scrollState = rememberScrollState()
     val systemUiController = rememberSystemUiController()
 
-    val filteredPlaces = if (selectedFacilities.isEmpty() || selectedFacilities.contains("전체")) {
-        reviewPlaces
-    } else {
-        reviewPlaces.filter { place ->
-            place.categories.any { it in selectedFacilities }
-        }
-    }
-
     SideEffect {
         systemUiController.setSystemBarsColor(color = Background2)
+        viewModel.loadReviewPlaces()
     }
 
     Column(
@@ -159,7 +70,7 @@ fun MyReviewScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        if (filteredPlaces.isEmpty()) {
+        if (reviewPlaces.isEmpty()) {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
@@ -181,16 +92,13 @@ fun MyReviewScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
             ) {
-                filteredPlaces.forEach { place ->
+                reviewPlaces.forEach { reviewPlace ->
                     ReviewCard(
-                        placeName = place.placeName,
-                        subDescription = place.subDescription,
-                        reviewText = place.reviewText,
-                        rating = place.rating,
-                        imageRes = place.imageRes,
-                        isImage = place.isImage,
-                        type = place.type,
-                        onDetailClick = place.onDetailClick
+                        reviewPlaceEntity = reviewPlace,
+                        onDetailClick = {
+                            // 상세 화면으로 이동
+                            // navController.navigate("review_detail/${reviewPlace.placeId}")
+                        }
                     )
                 }
             }
@@ -200,22 +108,19 @@ fun MyReviewScreen(
 
 @Composable
 fun ReviewCard(
-    placeName: String,
-    subDescription: String,
-    reviewText: String,
-    rating: Int,
-    imageRes: Int?,
-    isImage: Boolean,
-    type: String,
+    reviewPlaceEntity: ReviewPlaceEntity,
     onDetailClick: () -> Unit
 ) {
     var showDeleteSheet by remember { mutableStateOf(false) }
     val typography = LocalbarrierFreeTypographyProvider.current
-    val imagePainter = if (isImage && imageRes != null) {
-        painterResource(id = imageRes)
-    } else {
-        val placeholderId = PlaceType.from(type)!!.getPlaceholderResId(PlaceholderContext.REVIEW)
-        painterResource(id = placeholderId)
+
+    val placeholderImageRes = when (reviewPlaceEntity.imageType) {
+        0 -> R.drawable.review_placeholder_parking
+        1 -> R.drawable.review_placeholder_culture
+        2 -> R.drawable.review_placeholder_restaurant
+        3 -> R.drawable.review_placeholder_elevator
+        4 -> R.drawable.review_placeholder_nursing_room
+        else -> R.drawable.review_placeholder_toilet
     }
 
     Column(
@@ -225,14 +130,29 @@ fun ReviewCard(
             .padding(18.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = imagePainter,
-                contentDescription = null,
-                modifier = Modifier
-                    .width(90.dp)
-                    .height(90.dp)
-                    .clip(RoundedCornerShape(8.dp))
-            )
+            if (reviewPlaceEntity.reviewImageUrls.isNotEmpty()) {
+                AsyncImage(
+                    model = reviewPlaceEntity.reviewImageUrls.first(),
+                    contentDescription = null,
+                    placeholder = painterResource(id = placeholderImageRes),
+                    error = painterResource(id = placeholderImageRes),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .width(90.dp)
+                        .height(90.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = placeholderImageRes),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .width(120.dp)
+                        .height(90.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                )
+            }
 
             Spacer(modifier = Modifier.width(12.dp))
 
@@ -245,7 +165,7 @@ fun ReviewCard(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = placeName,
+                        text = reviewPlaceEntity.placeName,
                         style = typography.H7_M_5,
                         color = Text4,
                         modifier = Modifier.weight(1f)
@@ -258,6 +178,7 @@ fun ReviewCard(
                             .size(20.dp)
                             .clickable { showDeleteSheet = true }
                     )
+
                     // 삭제시
                     if (showDeleteSheet) {
                         CommonBottomSheet(
@@ -270,6 +191,8 @@ fun ReviewCard(
                             onCancel = { showDeleteSheet = false },
                             onConfirm = {
                                 showDeleteSheet = false
+                                // TODO: 실제 삭제 API 호출
+                                // viewModel.deleteReview(reviewPlaceEntity.placeId)
                             },
                             showWithdrawReasons = false
                         )
@@ -278,22 +201,23 @@ fun ReviewCard(
                 Spacer(modifier = Modifier.height(5.dp))
 
                 Text(
-                    text = subDescription,
+                    text = reviewPlaceEntity.placeType,
                     style = typography.H8_SB,
                     color = Text3
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
 
+                val ratingInt = reviewPlaceEntity.rating.toInt()
                 Row {
-                    repeat(rating) {
+                    repeat(ratingInt) {
                         Image(
                             painter = painterResource(id = R.drawable.ic_star_selected),
                             contentDescription = null,
                             modifier = Modifier.size(16.dp)
                         )
                     }
-                    repeat(5 - rating) {
+                    repeat(5 - ratingInt) {
                         Image(
                             painter = painterResource(id = R.drawable.ic_star_unselected),
                             contentDescription = null,
@@ -307,7 +231,7 @@ fun ReviewCard(
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = reviewText,
+            text = reviewPlaceEntity.content,
             style = typography.H8_SB,
             color = Text4,
             maxLines = 3,
@@ -335,9 +259,20 @@ fun ReviewCard(
 }
 
 @Composable
-@Preview(showBackground = true)
-fun MyReviewScreenPreview() {
-    MyReviewScreen(
-        onBackClick = {}
+@Preview()
+fun ReviewCardPreview() {
+    ReviewCard(
+        reviewPlaceEntity = ReviewPlaceEntity(
+            placeId = 1L,
+            placeName = "예술의전당",
+            placeType = "문화시설",
+            imageType = 1,
+            content = "장애인 접근성이 아주 잘 되어있어요. 안내도 친절했고 휠체어 대여도 가능했습니다.",
+            rating = 4.5,
+            reviewImageUrls = listOf(
+                "https://via.placeholder.com/150"
+            )
+        ),
+        onDetailClick = {}
     )
 }

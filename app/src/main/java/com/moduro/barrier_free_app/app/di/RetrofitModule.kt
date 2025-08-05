@@ -1,5 +1,7 @@
 package com.moduro.barrier_free_app.app.di
 
+import android.content.Context
+import android.content.SharedPreferences
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.moduro.barrier_free_app.BuildConfig
 import com.moduro.barrier_free_app.app.interceptor.LocationNameTokenInterceptor
@@ -7,6 +9,7 @@ import com.moduro.barrier_free_app.app.interceptor.TokenInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -27,6 +30,15 @@ object RetrofitModule {
         return HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
+    }
+
+    // Shared Preferences 제공
+    @Provides
+    @Singleton
+    fun provideSharedPreferences(
+        @ApplicationContext context: Context
+    ): SharedPreferences {
+        return context.getSharedPreferences("MODURO_PREFS", Context.MODE_PRIVATE)
     }
 
     @Provides
