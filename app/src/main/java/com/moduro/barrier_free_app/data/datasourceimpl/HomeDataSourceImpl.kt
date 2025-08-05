@@ -14,7 +14,7 @@ class HomeDataSourceImpl @Inject constructor(
     }
 
     override suspend fun getRecommendPlaces(
-        type : String?,
+        type : String,
         facilities : List<Int>?
     ) : ModuroBaseResponse<List<ResponseHomeHotPlaceDto>> {
         return homeApiService.getRecommendPlaces(type, facilities)

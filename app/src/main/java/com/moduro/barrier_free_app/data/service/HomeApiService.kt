@@ -14,7 +14,7 @@ interface HomeApiService {
 
     @GET("$RECOMMENDATIONS")
     suspend fun getRecommendPlaces(
-        @Query("type") type : String?,
+        @Query("type") type : String,
         @Query("facilities") facilities : List<Int>?,
     ) : ModuroBaseResponse<List<ResponseHomeHotPlaceDto>>
 }

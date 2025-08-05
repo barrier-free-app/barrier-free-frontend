@@ -11,22 +11,26 @@ class MapRepositoryImpl @Inject constructor(
     private val mapDataSource: MapDataSource
 ) : MapRepository {
     override suspend fun getMapPlaces(
-        facilities : List<Int>?
+        facilities: List<Int>?
     ): Result<List<MapPlaceEntity>> {
         return runCatching {
             val response = mapDataSource.getMapPlaces(facilities)
 
             val result = response.result ?: throw Exception("Result is null")
 
-            result.map { place ->
-                MapPlaceEntity(
-                    id = place.id,
-                    name = place.name,
-                    latitude = place.latitude,
-                    longitude = place.longitude,
-                    region = place.region,
-                    placeType = place.placeType,
-                )
+            result.mapNotNull { place ->
+                if (place.region == null) {
+                    null
+                } else {
+                    MapPlaceEntity(
+                        id = place.id,
+                        name = place.name,
+                        latitude = place.latitude,
+                        longitude = place.longitude,
+                        region = place.region,
+                        placeType = place.placeType,
+                    )
+                }
 
             }
         }
@@ -43,8 +47,8 @@ class MapRepositoryImpl @Inject constructor(
 
             MapPlaceSummEntity(
                 name = result.name,
-                description = result.description,
-                address = result.address,
+                description = result.description ?: "미상",
+                address = result.address ?: "미상",
                 facilities = result.facilities,
                 placeType = result.placeType,
                 imageType = result.imageType,

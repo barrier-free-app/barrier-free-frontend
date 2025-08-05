@@ -45,7 +45,7 @@ class HomeViewModel @Inject constructor(
 
 
     fun getRecommendPlaces(
-        type : String?,
+        type : String,
         facilities : List<Int>?
     ) {
         viewModelScope.launch {

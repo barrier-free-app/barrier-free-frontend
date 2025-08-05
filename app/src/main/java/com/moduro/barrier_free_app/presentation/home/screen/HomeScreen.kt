@@ -156,6 +156,8 @@ fun HomeScreen(
     }
 
 
+    var recommendationType by remember { mutableStateOf("weather") }
+
     val locationError by locationViewModel.error.collectAsState()
 
     val locationName by locationNameViewModel.locationName.collectAsState()
@@ -163,13 +165,14 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         airKoreaViewModel.fetchPm10Average()
         homeViewModel.getHotPlaces()
-        homeViewModel.getRecommendPlaces(null, null)
+        homeViewModel.getRecommendPlaces(recommendationType, null)
     }
 
 
     val pm10Average by airKoreaViewModel.pm10Average.collectAsState()
     val pm10Grade by airKoreaViewModel.pm10Grade.collectAsState()
     val error by airKoreaViewModel.error.collectAsState()
+
 
 
     // 상태값 변화 로그
@@ -198,6 +201,10 @@ fun HomeScreen(
                     "가까운 거리의 장소를 추천받고 싶어요" -> "distance"
                     "날씨에 어울리는 장소를 추천받고 싶어요" -> "weather"
                     else -> null
+                }
+
+                if (type != null) {
+                    recommendationType = type
                 }
 
                 val facilities = if (multi.contains(0)) emptyList() else multi
@@ -312,12 +319,20 @@ fun HomeScreen(
 
                 Text(
                     text = buildAnnotatedString {
-                        withStyle(style = typography.H9_B.toSpanStyle().copy(color = Text4)) {
-                            append("오늘 날씨에 어울리는 ")
+                        if (recommendationType == "weather") {
+                            withStyle(style = typography.H9_B.toSpanStyle().copy(color = Text4)) {
+                                append("오늘 날씨에 어울리는 ")
+                            }
+                            append("장소를 추천해 드릴게요.")
+                        } else {
+                            withStyle(style = typography.H9_B.toSpanStyle().copy(color = Text4)) {
+                                append("현재 위치에 적합한 ")
+                            }
+                            append("장소를 추천해 드릴게요.")
                         }
-                        append("장소를 추천해 드릴게요.")
                     },
-                    style = typography.H9_M, color = Text4
+                    style = typography.H9_M,
+                    color = Text4
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))

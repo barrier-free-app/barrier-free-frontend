@@ -8,8 +8,8 @@ data class ResponseHomeHotPlaceDto (
     @SerialName("placeId") val placeId : Long,
     @SerialName("placeType") val placeType : String,
     @SerialName("name") val name : String,
-    @SerialName("region") val region : String,
-    @SerialName("description") val description : String,
+    @SerialName("region") val region : String?,
+    @SerialName("description") val description : String?,
     @SerialName("facility") val facility : List<Int>,
     @SerialName("imageType") val imageType : Int,
 

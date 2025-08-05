@@ -26,7 +26,7 @@ class SearchRepositoryImpl @Inject constructor(
                         placeId = dto.placeId,
                         placeType = dto.placeType,
                         facilities = dto.facilities,
-                        region = dto.region,
+                        region = dto.region ?: "미상",
                         name = dto.name,
                         imageType = dto.imageType
                     )

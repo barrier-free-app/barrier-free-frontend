@@ -7,7 +7,7 @@ interface HomeRepository{
     suspend fun getHotPlaces() : Result<List<HomePlaceEntity>>
 
     suspend fun getRecommendPlaces(
-        type : String?,
+        type : String,
         facilities : List<Int>?
     ) : Result<List<HomePlaceEntity>>
 }

@@ -8,7 +8,8 @@ data class ResponsePlaceSearchDto (
     @SerialName("placeId") val placeId : Long,
     @SerialName("placeType") val placeType : String,
     @SerialName("facilities") val facilities : List<Int>,
-    @SerialName("region") val region : String,
+    @SerialName("region") val region : String?,
+    @SerialName("description") val description : String?,
     @SerialName("name") val name : String,
     @SerialName("imageType") val imageType : Int
 )

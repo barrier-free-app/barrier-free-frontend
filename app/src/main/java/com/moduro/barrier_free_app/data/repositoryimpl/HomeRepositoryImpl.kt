@@ -20,8 +20,8 @@ class HomeRepositoryImpl @Inject constructor(
                     placeId = place.placeId,
                     placeType = place.placeType,
                     name = place.name,
-                    region = place.region,
-                    description = place.description,
+                    region = place.region ?: "미상",
+                    description = place.description ?: "미상",
                     facility = place.facility,
                     imageType = place.imageType
                 )
@@ -31,7 +31,7 @@ class HomeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getRecommendPlaces(
-        type : String?,
+        type : String,
         facilities : List<Int>?,
     ): Result<List<HomePlaceEntity>> {
         return runCatching {
@@ -44,8 +44,8 @@ class HomeRepositoryImpl @Inject constructor(
                     placeId = place.placeId,
                     placeType = place.placeType,
                     name = place.name,
-                    region = place.region,
-                    description = place.description,
+                    region = place.region ?: "미상",
+                    description = place.description ?: "미상",
                     facility = place.facility,
                     imageType = place.imageType
                 )

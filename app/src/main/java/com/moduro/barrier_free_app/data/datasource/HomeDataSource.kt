@@ -7,7 +7,7 @@ interface HomeDataSource {
     suspend fun getHotPlaces() : ModuroBaseResponse<List<ResponseHomeHotPlaceDto>>
 
     suspend fun getRecommendPlaces(
-        type : String?,
+        type : String,
         facilities : List<Int>?
     ) : ModuroBaseResponse<List<ResponseHomeHotPlaceDto>>
 
