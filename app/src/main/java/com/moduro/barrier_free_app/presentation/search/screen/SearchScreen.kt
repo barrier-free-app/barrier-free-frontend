@@ -149,7 +149,7 @@ fun SearchScreen(
                     name = place.name,
                     region = place.region,
                     facility = place.facilities,
-                    description = "임시 설명입니다",
+                    description = place.description,
                     imageType = place.imageType
                 ),
                 onClick = { placeId -> onDetailClick(placeId) }

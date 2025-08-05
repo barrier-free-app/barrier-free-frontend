@@ -4,6 +4,7 @@ data class SearchPlaceEntity(
     val placeId: Long,
     val placeType: String,
     val facilities: List<Int>,
+    val description : String,
     val region: String,
     val name: String,
     val imageType: Int
