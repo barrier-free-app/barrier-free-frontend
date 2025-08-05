@@ -209,7 +209,7 @@ fun HomeScreen(
 
                 val facilities = if (multi.contains(0)) emptyList() else multi
 
-                homeViewModel.getRecommendPlaces(type, facilities)
+                homeViewModel.getRecommendPlaces(recommendationType, facilities)
             }
         )
     }

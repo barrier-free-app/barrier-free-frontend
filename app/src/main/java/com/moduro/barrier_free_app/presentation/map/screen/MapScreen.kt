@@ -101,6 +101,8 @@ fun MapScreen(
     val typography = LocalbarrierFreeTypographyProvider.current
     val context = LocalContext.current
 
+    var userLat by remember { mutableStateOf<Double?>(null) }
+    var userLon by remember { mutableStateOf<Double?>(null) }
 
     val placeList by mapViewModel.mapPlaceList.observeAsState(emptyList())
     val placeSumm by mapViewModel.mapPlaceSumm.observeAsState()
@@ -157,10 +159,10 @@ fun MapScreen(
 
             fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
                 .addOnSuccessListener { location ->
-                    val lat = 37.5  // 테스트용 서울 위도
-                    val lon = 127.0 // 테스트용 서울 경도
+                    userLat = 37.5  // 테스트용 서울 위도
+                    userLon = 127.0 // 테스트용 서울 경도
 
-                    Log.d("MapScreen", "현재 위치 latitude: $lat, longitude: $lon (테스트용 서울 좌표 고정)")
+                    Log.d("MapScreen", "현재 위치 latitude: $userLat, longitude: $userLon (테스트용 서울 좌표 고정)")
 
                 }
         }
@@ -394,7 +396,7 @@ fun MapScreen(
                     val placeLon = place.longitude
 
                     val distance = if (userLat != null && userLon != null && placeLat != null && placeLon != null) {
-                        val d = calculateDistanceInKm(userLat, userLon, 37.5 , 127.0) //테스트용, placeLat이랑 placeLon으로 수정
+                        val d = calculateDistanceInKm(placeLat, placeLon, 37.5 , 127.0) //테스트용, userLat이랑 userLon으로 수정
                         String.format("%.1f", d) // 소수점 1자리까지 포맷 (예: "3.8")
                     } else {
                         ""
