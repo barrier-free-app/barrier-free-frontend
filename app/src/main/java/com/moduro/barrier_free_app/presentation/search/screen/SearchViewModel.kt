@@ -1,98 +1,61 @@
 package com.moduro.barrier_free_app.presentation.search.screen
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.moduro.barrier_free_app.domain.entity.HomePlaceEntity
+import com.moduro.barrier_free_app.domain.entity.SearchPlaceEntity
+import com.moduro.barrier_free_app.domain.repository.SearchRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SearchViewModel @Inject constructor() : ViewModel() {
+class SearchViewModel @Inject constructor(
+    private val searchRepository: SearchRepository
+) : ViewModel() {
 
-    val dummySearchPlaces = listOf(
-        HomePlaceEntity(
-            id = 2,
-            type = 1,
-            name = "서울역사박물관",
-            location = "서울 종로구",
-            description = "배리어프리 서비스 도입 미술관",
-            facilities = listOf("승강기", "장애인 화장실"),
-            isReported = true
-        ),
-        HomePlaceEntity(
-            id = 3,
-            type = 2,
-            name = "파크하얏트 서울",
-            location = "서울 강남구",
-            description = "배리어프리룸 보유 호텔",
-            facilities = listOf("수유실", "영유아 동반"),
-            isReported = false
-        ),
-        HomePlaceEntity(
-            id = 4,
-            type = 3,
-            name = "쇼어",
-            location = "서울 종로구",
-            description = "아이와 함께 가기 좋은 실내 카페",
-            facilities = listOf("장애인 화장실", "승강기", "수유실", "경사로"),
-            isReported = true
-        ),
-        HomePlaceEntity(
-            id = 5,
-            type = 4,
-            name = "서울역사박물관",
-            location = "서울 종로구",
-            description = "배리어프리 서비스 도입 미술관",
-            facilities = listOf("승강기", "장애인 화장실"),
-            isReported = true
-        ),
-        HomePlaceEntity(
-            id = 6,
-            type = 5,
-            name = "파크하얏트 서울",
-            location = "서울 강남구",
-            description = "배리어프리룸 보유 호텔",
-            facilities = listOf("수유실", "영유아 동반"),
-            isReported = false
-        ),
-        HomePlaceEntity(
-            id = 7,
-            type = 6,
-            name = "쇼어",
-            location = "서울 종로구",
-            description = "아이와 함께 가기 좋은 실내 카페",
-            facilities = listOf("장애인 화장실", "승강기", "수유실", "경사로"),
-            isReported = false
-        ),
-        HomePlaceEntity(
-            id = 8,
-            type = 1,
-            name = "서울역사박물관",
-            location = "서울 종로구",
-            description = "배리어프리 서비스 도입 미술관",
-            facilities = listOf("승강기", "장애인 화장실"),
-            isReported = true
-        ),
-        HomePlaceEntity(
-            id = 9,
-            type = 3,
-            name = "파크하얏트 서울",
-            location = "서울 강남구",
-            description = "배리어프리룸 보유 호텔",
-            facilities = listOf("수유실", "영유아 동반"),
-            isReported = false
-        ),
-        HomePlaceEntity(
-            id = 10,
-            type = 4,
-            name = "쇼어",
-            location = "서울 종로구",
-            description = "아이와 함께 가기 좋은 실내 카페",
-            facilities = listOf("장애인 화장실", "승강기", "수유실", "경사로"),
-            isReported = false
-        )
+    private val _placeList = MutableLiveData<List<SearchPlaceEntity>>(emptyList())
+    val placeList: LiveData<List<SearchPlaceEntity>> = _placeList
 
-    )
+    private val _page = MutableLiveData(0)
+    val page: LiveData<Int> = _page
 
+    private val _hasNext = MutableLiveData(true)
+    val hasNext: LiveData<Boolean> = _hasNext
 
+    private val _isLoading = MutableLiveData(false)
+    val isLoading: LiveData<Boolean> = _isLoading
 
+    fun fetchPlaces(
+        keyword: String? = null,
+        facilities: List<Int>? = null
+    ) {
+        if (_isLoading.value == true || _hasNext.value == false) return
+
+        viewModelScope.launch {
+            _isLoading.value = true
+            val currentPage = _page.value ?: 0
+
+            val result = searchRepository.getSearchPlaces(keyword, facilities, currentPage)
+            result.onSuccess { data ->
+                val currentList = _placeList.value ?: emptyList()
+                _placeList.value = currentList + data.placeSearchResponses
+                _hasNext.value = data.hasNext
+                _page.value = currentPage + 1
+            }
+            _isLoading.value = false
+        }
+    }
+
+    fun resetSearch() {
+        _placeList.value = emptyList()
+        _page.value = 0
+        _hasNext.value = true
+    }
 }
+

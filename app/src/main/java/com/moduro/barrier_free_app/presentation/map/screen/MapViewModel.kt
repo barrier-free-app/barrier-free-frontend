@@ -1,59 +1,74 @@
 package com.moduro.barrier_free_app.presentation.map.screen
 
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.moduro.barrier_free_app.domain.entity.HomePlaceEntity
 import com.moduro.barrier_free_app.domain.entity.MapPlaceEntity
 import com.moduro.barrier_free_app.domain.entity.MapPlaceSummEntity
+import com.moduro.barrier_free_app.domain.repository.MapRepository
 import com.moduro.barrier_free_app.util.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MapViewModel @Inject constructor() : ViewModel() {
+class MapViewModel @Inject constructor(
+    private val mapRepository: MapRepository
+) : ViewModel() {
+
+    private val _mapPlaceList = MutableLiveData<List<MapPlaceEntity>>()
+    val mapPlaceList: LiveData<List<MapPlaceEntity>> = _mapPlaceList
+
+    private val _mapPlaceSumm = MutableLiveData<MapPlaceSummEntity>()
+    val mapPlaceSumm: LiveData<MapPlaceSummEntity> = _mapPlaceSumm
+
+    private val _isLike = MutableLiveData<Boolean>()
+    val isLike : MutableLiveData<Boolean> = _isLike
 
 
+    fun getMapPlaces(
+        facilities : List<Int>? = null
+    ) {
+        viewModelScope.launch {
+            val result = mapRepository.getMapPlaces(facilities)
 
-    // 전체 장소 리스트 (마커용)
-    private val _placeList = MutableStateFlow<List<MapPlaceEntity>>(emptyList())
-    val placeList: StateFlow<List<MapPlaceEntity>> = _placeList
+            result.onSuccess { places ->
+                _mapPlaceList.value = places
 
-    // 상세 정보 (마커 클릭 후)
-    private val _placeDetail = MutableStateFlow<MapPlaceSummEntity?>(null)
-    val placeDetail: StateFlow<MapPlaceSummEntity?> = _placeDetail
-
-    init {
-        // 더미 마커 데이터 세팅
-        _placeList.value = listOf(
-            MapPlaceEntity(1, "국립현대미술관",1,"용산구", listOf("영유아 동반", "승강기"), 37.5374729285246, 126.965664771338),
-            MapPlaceEntity(2, "서울아산병원",2, "송파구", listOf("장애인 화장실", "수유실"), 37.5054870414361, 127.083121066144),
-            MapPlaceEntity(3, "숙명여자대학교",1,"용산구", listOf("경사로", "장애인 화장실", "수유실", "영유아 동반"), 37.5429793370245, 126.971946055378),
-            MapPlaceEntity(4, "국립현대미술관",1, "용산구", listOf("장애인 화장실", "수유실"), 37.5425431587763, 126.973487034748),
-            MapPlaceEntity(5, "서울아산병원",1, "마포구", listOf("경사로", "장애인 화장실", "수유실", "영유아 동반"),37.5456041859389, 126.955194223342),
-            MapPlaceEntity(6, "숙명여자대학교",2, "관악구", listOf("장애인 화장실", "수유실"), 37.475339578085, 126.981089942431),
-            MapPlaceEntity(7, "국립현대미술관",2, "마포구", listOf("경사로", "장애인 화장실", "수유실", "영유아 동반"), 37.5549789202685, 126.930036332426),
-            MapPlaceEntity(8, "서울아산병원",2, "관악구",  listOf("장애인 화장실", "수유실"), 37.474629606862, 126.952599252174),
-            MapPlaceEntity(9, "숙명여자대학교",2, "강서구", listOf("경사로", "장애인 화장실", "수유실", "영유아 동반"), 37.555567479084, 126.854371723846),
-            MapPlaceEntity(10, "국립현대미술관",2, "강서구", listOf("장애인 화장실", "수유실"), 37.555567479085, 126.854371723847),
-            MapPlaceEntity(11, "서울아산병원",2, "송파구", listOf("경사로", "장애인 화장실", "수유실", "영유아 동반"), 337.5054870414361, 127.083121066144),
-        )
+            }.onFailure { exception ->
+                Log.e("MapViewModel - getMapPlaces", "Fail", exception)
+            }
+        }
     }
 
-    fun loadPlaceDetail(id: Long) {
-        // 더미 상세 정보
-        _placeDetail.value = when (id) {
-            1L -> MapPlaceSummEntity(1, "국립현대미술관", "서울 종로구 삼청로 30", 1, isLike = true )
-            2L -> MapPlaceSummEntity(2, "서울아산병원", "서울 송파구", 2, isLike = true)
-            3L -> MapPlaceSummEntity(3, "숙명여자대학교", "서울 용산구 청파로", 3, isLike = true)
-            4L -> MapPlaceSummEntity(4, "국립현대미술관", "서울 종로구 삼청로 30", 4, isLike = true )
-            5L -> MapPlaceSummEntity(5, "서울아산병원", "서울 송파구", 5,isLike = true )
-            6L -> MapPlaceSummEntity(6, "숙명여자대학교", "서울 용산구 청파로", 6, isLike = false)
-            7L -> MapPlaceSummEntity(7, "국립현대미술관", "서울 종로구 삼청로 30", 1,isLike = false )
-            8L -> MapPlaceSummEntity(8, "서울아산병원", "서울 송파구", 2, isLike = false)
-            9L -> MapPlaceSummEntity(9, "숙명여자대학교", "서울 용산구 청파로", 3, isLike = false)
-            10L -> MapPlaceSummEntity(10, "국립현대미술관", "서울 종로구 삼청로 30", 4,isLike = false)
-            11L -> MapPlaceSummEntity(11, "서울아산병원", "서울 송파구", 5,isLike = false )
-            else -> null
+
+    fun getMapPlaceSumm(placeId : Int, placeType : String) {
+        viewModelScope.launch {
+            val result = mapRepository.getMapPlaceSumm(placeId, placeType)
+
+            result.onSuccess { placeSumm ->
+                _mapPlaceSumm.value = placeSumm
+
+            }.onFailure { exception ->
+                Log.e("MapViewModel - getMapPlaceSumm", "Fail", exception)
+            }
+        }
+    }
+
+    fun postMapLike(placeId : Long, type : String){
+        viewModelScope.launch {
+            val result = mapRepository.postMapLike(placeId, type)
+
+            result.onSuccess { like ->
+                _isLike.value = like
+            }.onFailure { exception ->
+                Log.e("MapViewModel - postMapLike", "Fail", exception )
+            }
         }
     }
 }

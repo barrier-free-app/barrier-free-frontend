@@ -1,9 +1,11 @@
 package com.moduro.barrier_free_app.domain.entity
 
 data class MapPlaceSummEntity (
-    val id: Int,
     val name: String,
+    val description : String,
     val address: String,
-    val type : Int,
-    val isLike : Boolean
-)
+    val facilities : List<Int>,
+    val placeType : String,
+    val imageType : Int,
+    val favorite : Boolean,
+    )

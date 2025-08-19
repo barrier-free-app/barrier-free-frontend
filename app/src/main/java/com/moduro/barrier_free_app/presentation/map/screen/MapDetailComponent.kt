@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.moduro.barrier_free_app.core_ui.theme.Background1
 import com.moduro.barrier_free_app.core_ui.theme.Button1
+import com.moduro.barrier_free_app.core_ui.theme.Text2
 import com.moduro.barrier_free_app.core_ui.theme.Text3
 import com.moduro.barrier_free_app.domain.entity.HomePlaceEntity
 import com.moduro.barrier_free_app.domain.entity.MapPlaceSummEntity
@@ -40,15 +41,15 @@ import com.moduro.barrier_free_app.domain.entity.MapPlaceSummEntity
 fun MapDetailComponent(
     place : MapPlaceSummEntity,
     distance : String,
-    facilities : List<String>,
-    onClick: (Int) -> Unit,
+    facilities : List<Int>,
+    onClick: () -> Unit,
     isHeartClicked: Boolean,
     onHeartClickChanged: (Boolean) -> Unit
 ) {
     val typography = LocalbarrierFreeTypographyProvider.current
 
 
-    var imageResource = when (place.type) {
+    var imageResource = when (place.imageType) {
         1 -> R.drawable.place_icon_parking
         2 -> R.drawable.place_icon_cultural
         3 -> R.drawable.place_icon_resturant
@@ -64,7 +65,7 @@ fun MapDetailComponent(
             .fillMaxWidth()
             .wrapContentHeight()
             .background(color = Background1, shape = RoundedCornerShape(10.dp))
-            .clickable { onClick(place.id) }
+            //.clickable { onClick(id) }
     ) {
 
         Column (
@@ -108,7 +109,11 @@ fun MapDetailComponent(
                         )
 
                     }
-                    Spacer(modifier = Modifier.height(7.dp))
+                    Spacer(modifier = Modifier.height(5.dp))
+
+                    Text(place.description , style = typography.H8_SB, color = Text2 )
+
+                    Spacer(modifier = Modifier.height(15.dp))
 
 
                     Text("${place.address} · 거리 ${distance}km ", style = typography.H8_SB, color = Text4)
@@ -139,7 +144,7 @@ fun MapDetailComponent(
                     .fillMaxWidth()
                     .background(color = Button1, shape = RoundedCornerShape(10.dp))
                     .clickable {
-                        onClick(place.id)
+                        onClick()
                     },
                 contentAlignment = Alignment.Center
             ) {
@@ -165,14 +170,16 @@ fun MapDetailComponent(
 fun HomePlaceBoxPreview(){
     MapDetailComponent(
         MapPlaceSummEntity(
-            id = 1,
-            type = 1,
+            imageType = 1,
             name = "루트205",
             address = "서울 종로구 삼청로 30",
-            isLike = true
+            favorite = true,
+            description = "배리어프리 시설이 있는 호텔",
+            facilities = listOf(1,2),
+            placeType = "map"
         ),
         distance = "3.8",
-        facilities = listOf("영유아 동반", "승강기"),
+        facilities = listOf(1,2),
         {},
         true, {}
     )

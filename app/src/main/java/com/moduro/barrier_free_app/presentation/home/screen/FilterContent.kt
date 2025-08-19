@@ -13,12 +13,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -32,23 +28,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.moduro.barrier_free_app.core_ui.theme.Button1
 import com.moduro.barrier_free_app.core_ui.theme.LocalbarrierFreeTypographyProvider
-import com.moduro.barrier_free_app.core_ui.theme.MainYellow
 import com.moduro.barrier_free_app.core_ui.theme.Text2
-import com.moduro.barrier_free_app.core_ui.theme.Text4
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun FilterContent(
     onDismiss: () -> Unit,
-    onConfirm: (String, List<String>) -> Unit
+    onConfirm: (String, List<Int>) -> Unit
 ) {
 
     val typography = LocalbarrierFreeTypographyProvider.current
 
     var singleSelected by remember { mutableStateOf("가까운 거리의 장소를 추천받고 싶어요") }
 
-    val multiOptions = listOf("전체", "승강기", "장애인 화장실", "영유아 동반", "수유실", "경사로")
-    val multiSelected = remember { mutableStateListOf<String>("전체") }
+    val multiOptions = listOf(0, 1, 2, 3, 4, 5)
+    val multiSelected = remember { mutableStateListOf<Int>() }
 
     Column(
         modifier = Modifier
@@ -89,26 +83,25 @@ fun FilterContent(
         ) {
             multiOptions.forEach { option ->
                 MultiSelectChip(
-                    text = option,
+                    type = option,
                     selected = multiSelected.contains(option),
                     onClick = {
-                        if (option == "전체") {
-                            // 전체 선택 시, 다른 건 모두 해제하고 전체만 선택
+                        if (option == 0) {
                             multiSelected.clear()
-                            multiSelected.add("전체")
+                            multiSelected.add(0)
                         } else {
                             if (multiSelected.contains(option)) {
                                 multiSelected.remove(option)
                             } else {
                                 multiSelected.add(option)
                             }
-                            // '전체' 선택 상태 해제
-                            if (multiSelected.contains("전체")) {
-                                multiSelected.remove("전체")
+                            // '전체' 선택 해제
+                            if (multiSelected.contains(0)) {
+                                multiSelected.remove(0)
                             }
-                            // 아무것도 선택 안 됐으면 '전체' 자동 선택
+                            // 아무것도 없으면 다시 전체
                             if (multiSelected.isEmpty()) {
-                                multiSelected.add("전체")
+                                multiSelected.add(0)
                             }
                         }
                     }

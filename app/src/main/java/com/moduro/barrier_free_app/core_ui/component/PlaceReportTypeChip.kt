@@ -26,7 +26,7 @@ import com.moduro.barrier_free_app.core_ui.theme.Text4
 
 @Composable
 fun PlaceReportTypeChip(
-    text: String,
+    type : Int,
     selected: Boolean,
     onClick: () -> Unit
 ) {
@@ -34,13 +34,22 @@ fun PlaceReportTypeChip(
     val typography = LocalbarrierFreeTypographyProvider.current
 
 
-    var imageResource = when (text) {
-        "주차장" -> R.drawable.place_report_parking
-        "문화시설" -> R.drawable.place_report_culture2
-        "식당" -> R.drawable.place_report_restaurant
-        "승강기" -> R.drawable.place_report_elevator
-        "수유실" -> R.drawable.place_report_mom
+    var imageResource = when (type) {
+        0 -> R.drawable.place_report_parking
+        1 -> R.drawable.place_report_culture2
+        2 -> R.drawable.place_report_restaurant
+        3 -> R.drawable.place_report_elevator
+        4 -> R.drawable.place_report_mom
         else -> R.drawable.place_report_toilet
+    }
+
+    var text = when (type){
+        0 -> "주차장"
+        1 -> "문화시설"
+        2 -> "식당"
+        3 -> "엘레베이터"
+        4 -> "수유실"
+        else -> "화장실"
     }
 
     var bgColor = if (selected) MainYellow else Button1
@@ -78,7 +87,7 @@ fun PlaceReportTypeChip(
 @Composable
 fun PreviewChip() {
     PlaceReportTypeChip(
-        text = "문화시설",
+        type = 1,
         selected = false,
         onClick = {}
     )

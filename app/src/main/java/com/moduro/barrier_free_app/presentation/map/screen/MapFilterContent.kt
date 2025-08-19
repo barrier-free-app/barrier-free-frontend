@@ -37,13 +37,13 @@ import com.moduro.barrier_free_app.presentation.home.screen.SingleSelectChip
 @Composable
 fun MapFilterContent(
     onDismiss: () -> Unit,
-    onConfirm: (List<String>) -> Unit
+    onConfirm: (List<Int>) -> Unit
 ) {
 
     val typography = LocalbarrierFreeTypographyProvider.current
 
-    val multiOptions = listOf("전체", "승강기", "장애인 화장실", "영유아 동반", "수유실", "경사로")
-    val multiSelected = remember { mutableStateListOf<String>("전체") }
+    val multiOptions = listOf(0, 1, 2, 3, 4, 5)
+    val multiSelected = remember { mutableStateListOf<Int>() }
 
     Column(
         modifier = Modifier
@@ -68,26 +68,25 @@ fun MapFilterContent(
         ) {
             multiOptions.forEach { option ->
                 MultiSelectChip(
-                    text = option,
+                    type = option,
                     selected = multiSelected.contains(option),
                     onClick = {
-                        if (option == "전체") {
-                            // 전체 선택 시, 다른 건 모두 해제하고 전체만 선택
+                        if (option == 0) {
                             multiSelected.clear()
-                            multiSelected.add("전체")
+                            multiSelected.add(0)
                         } else {
                             if (multiSelected.contains(option)) {
                                 multiSelected.remove(option)
                             } else {
                                 multiSelected.add(option)
                             }
-                            // '전체' 선택 상태 해제
-                            if (multiSelected.contains("전체")) {
-                                multiSelected.remove("전체")
+                            // '전체' 선택 해제
+                            if (multiSelected.contains(0)) {
+                                multiSelected.remove(0)
                             }
-                            // 아무것도 선택 안 됐으면 '전체' 자동 선택
+                            // 아무것도 없으면 다시 전체
                             if (multiSelected.isEmpty()) {
-                                multiSelected.add("전체")
+                                multiSelected.add(0)
                             }
                         }
                     }

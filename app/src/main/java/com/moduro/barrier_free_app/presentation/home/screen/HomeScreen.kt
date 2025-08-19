@@ -24,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -37,6 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
@@ -91,12 +93,13 @@ fun HomeScreen(
     locationNameViewModel: LocationNameViewModel,
     isLargeTextMode: Boolean,
     onToggleTextMode: () -> Unit,
-    onPlaceClick: (Int) -> Unit
+    onPlaceClick: (Long) -> Unit
 ) {
-    val hotPlace = homeViewModel.dummyHotPlace
-    val weatherPlace = homeViewModel.dummyWeatherPlaces
+    val hotPlaceList by homeViewModel.hotPlaceList.observeAsState(emptyList())
+    val recommendPlaceList by homeViewModel.recommendPlaceList.observeAsState(emptyList())
 
     val context = LocalContext.current
+
 
     // 권한 상태 관리
     var hasLocationPermission by remember {
@@ -142,10 +145,10 @@ fun HomeScreen(
     val rain by locationViewModel.rain.collectAsState()
     val sky by locationViewModel.sky.collectAsState()
 
-    var weathertype = 1
+    var weathertype = 3
 
     if (rain != "강수없음") {
-        weathertype = 3
+        weathertype = 1
     } else {
         if (sky != "1") {
             weathertype = 2
@@ -153,6 +156,7 @@ fun HomeScreen(
     }
 
 
+    var recommendationType by remember { mutableStateOf("weather") }
 
     val locationError by locationViewModel.error.collectAsState()
 
@@ -160,12 +164,15 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) {
         airKoreaViewModel.fetchPm10Average()
+        homeViewModel.getHotPlaces()
+        homeViewModel.getRecommendPlaces(recommendationType, null)
     }
 
 
     val pm10Average by airKoreaViewModel.pm10Average.collectAsState()
     val pm10Grade by airKoreaViewModel.pm10Grade.collectAsState()
     val error by airKoreaViewModel.error.collectAsState()
+
 
 
     // 상태값 변화 로그
@@ -187,9 +194,22 @@ fun HomeScreen(
         HomeBottomSheet(
             showSheet = showFilterSheet,
             onDismiss = { showFilterSheet = false },
-            onConfirm = { single: String, multi: List<String> ->
+            onConfirm = { single: String, multi: List<Int> ->
                 showFilterSheet = false
-                println("선택된 알고리즘: $single, 선택된 카테고리: $multi")
+
+                val type = when (single) {
+                    "가까운 거리의 장소를 추천받고 싶어요" -> "distance"
+                    "날씨에 어울리는 장소를 추천받고 싶어요" -> "weather"
+                    else -> null
+                }
+
+                if (type != null) {
+                    recommendationType = type
+                }
+
+                val facilities = if (multi.contains(0)) emptyList() else multi
+
+                homeViewModel.getRecommendPlaces(recommendationType, facilities)
             }
         )
     }
@@ -217,7 +237,7 @@ fun HomeScreen(
                     val toggleIconRes = if (isLargeTextMode) {
                         R.drawable.large_word_selected  // 큰 글자 모드 ON
                     } else {
-                        R.drawable.large_word_selected  // 큰 글자 모드 OFF
+                        R.drawable.large_word_unselected  // 큰 글자 모드 OFF
                     }
 
                     Image(
@@ -273,33 +293,74 @@ fun HomeScreen(
 
                 Spacer(modifier = Modifier.height(11.dp))
 
-                HomePlaceBox(place = hotPlace) { placeId ->
-                    onPlaceClick(placeId)
+                hotPlaceList.getOrNull(0)?.let { place ->
+                    HomePlaceBox(place = place) { placeId ->
+                        onPlaceClick(placeId)
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
                 }
+
+                hotPlaceList.getOrNull(1)?.let { place ->
+                    HomePlaceBox(place = place) { placeId ->
+                        onPlaceClick(placeId)
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+
+                hotPlaceList.getOrNull(2)?.let { place ->
+                    HomePlaceBox(place = place) { placeId ->
+                        onPlaceClick(placeId)
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+
 
                 Spacer(modifier = Modifier.height(29.dp))
 
                 Text(
                     text = buildAnnotatedString {
-                        withStyle(style = typography.H9_B.toSpanStyle().copy(color = Text4)) {
-                            append("오늘 날씨에 어울리는 ")
+                        if (recommendationType == "weather") {
+                            withStyle(style = typography.H9_B.toSpanStyle().copy(color = Text4)) {
+                                append("오늘 날씨에 어울리는 ")
+                            }
+                            append("장소를 추천해 드릴게요.")
+                        } else {
+                            withStyle(style = typography.H9_B.toSpanStyle().copy(color = Text4)) {
+                                append("현재 위치에 적합한 ")
+                            }
+                            append("장소를 추천해 드릴게요.")
                         }
-                        append("장소를 추천해 드릴게요.")
                     },
-                    style = typography.H9_M, color = Text4
+                    style = typography.H9_M,
+                    color = Text4
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
 
+                recommendPlaceList.getOrNull(0)?.let { place ->
+                    HomePlaceBox(place = place) { placeId ->
+                        onPlaceClick(placeId)
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+
+                recommendPlaceList.getOrNull(1)?.let { place ->
+                    HomePlaceBox(place = place) { placeId ->
+                        onPlaceClick(placeId)
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+
+                recommendPlaceList.getOrNull(2)?.let { place ->
+                    HomePlaceBox(place = place) { placeId ->
+                        onPlaceClick(placeId)
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+
             }
         }
 
-        items(weatherPlace) { place ->
-            HomePlaceBox(place = place) { placeId ->
-                onPlaceClick(placeId)
-            }
-            Spacer(modifier = Modifier.height(10.dp))
-        }
 
     }
 
@@ -310,8 +371,7 @@ fun HomeScreen(
 @Composable
 @Preview
 fun HomeScreenPreview() {
-    //val dummyViewModel = HomeViewModel()
-    //val dummyViewModel2 9= AirKoreaViewModel()
-
-    //HomeScreen(dummyViewModel, dummyViewModel2,false, {}, {})
+    HomeScreen(
+        viewModel(), viewModel(), viewModel(), viewModel(), true, {}, {}
+    )
 }

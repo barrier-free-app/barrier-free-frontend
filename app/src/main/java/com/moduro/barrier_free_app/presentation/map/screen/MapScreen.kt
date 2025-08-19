@@ -1,6 +1,12 @@
 package com.moduro.barrier_free_app.presentation.map.screen
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.graphics.Color
+import android.location.Location
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,11 +17,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -27,11 +35,15 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.moduro.barrier_free_app.R
 import com.moduro.barrier_free_app.core_ui.theme.LocalbarrierFreeTypographyProvider
 import com.moduro.barrier_free_app.domain.entity.MapPlaceEntity
+import com.moduro.barrier_free_app.presentation.home.screen.LocationViewModel
 import com.moduro.barrier_free_app.presentation.map.navigation.MapNavigator
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraAnimation
@@ -74,23 +86,26 @@ fun MapRoute(
     MapScreen(
         mapViewModel = mapViewModel,
         onDetailClick = { id -> navigator.navigateToPlaceDetail(id.toInt()) },
-        onSearchClick = { navigator.navigateToSearch() }
+        onSearchClick = { searchValue -> navigator.navigateToSearch(searchValue) }
     )
 }
 
 @OptIn(ExperimentalNaverMapApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
-    mapViewModel: MapViewModel = hiltViewModel(),
-    onDetailClick: (Int) -> Unit,
-    onSearchClick: () -> Unit
+    mapViewModel: MapViewModel,
+    onDetailClick: (Long) -> Unit,
+    onSearchClick: (String?) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val typography = LocalbarrierFreeTypographyProvider.current
     val context = LocalContext.current
 
-    val placeList by mapViewModel.placeList.collectAsState()
-    val placeDetail by mapViewModel.placeDetail.collectAsState()
+    var userLat by remember { mutableStateOf<Double?>(null) }
+    var userLon by remember { mutableStateOf<Double?>(null) }
+
+    val placeList by mapViewModel.mapPlaceList.observeAsState(emptyList())
+    val placeSumm by mapViewModel.mapPlaceSumm.observeAsState()
 
     var showFilterSheet by remember { mutableStateOf(false) }
     var selectedPlace by remember { mutableStateOf<MapPlaceEntity?>(null) }
@@ -108,10 +123,58 @@ fun MapScreen(
     val currentGu = placeList.find {
         abs(it.latitude - cameraCenter.latitude) < 0.01 &&
                 abs(it.longitude - cameraCenter.longitude) < 0.01
-    }?.gu
+    }?.region
 
-    val guPlaces = placeList.filter { it.gu == currentGu }
-    val facilityList = guPlaces.flatMap { it.facilities }.distinct()
+    val guPlaces = placeList.filter { it.region == currentGu }
+
+    LaunchedEffect(Unit) {
+        mapViewModel.getMapPlaces()
+    }
+
+
+    var hasLocationPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        )
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { granted -> hasLocationPermission = granted }
+    )
+
+    // 위치 상태 저장
+    var location by remember { mutableStateOf<Location?>(null) }
+
+    // 권한 요청 및 위치 가져오기
+    LaunchedEffect(hasLocationPermission) {
+        if (!hasLocationPermission) {
+            permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            Log.d("HomeScreen", "hasLocationPermission 취소")
+        } else {
+            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+
+            fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+                .addOnSuccessListener { location ->
+                    userLat = 37.5  // 테스트용 서울 위도
+                    userLon = 127.0 // 테스트용 서울 경도
+
+                    Log.d("MapScreen", "현재 위치 latitude: $userLat, longitude: $userLon (테스트용 서울 좌표 고정)")
+
+                }
+        }
+    }
+
+
+    // UI: 위치 값이 있으면 출력
+    location?.let {
+        Log.e("MapScreen","현재 위치: 위도 ${it.latitude}, 경도 ${it.longitude}")
+    } ?: run {
+    }
+
 
 
     // 필터용 바텀시트
@@ -126,7 +189,13 @@ fun MapScreen(
                 onDismiss = { showFilterSheet = false },
                 onConfirm = { multi ->
                     showFilterSheet = false
-                    // 필터 선택 처리 (필요하면 여기에 구현)
+                    val selected = if (multi == listOf(0)){
+                        listOf(1,2,3,4,5)
+                    } else multi
+
+                    mapViewModel.getMapPlaces(
+                        facilities = if (selected.isEmpty()) null else selected
+                    )
                 }
             )
         }
@@ -140,7 +209,7 @@ fun MapScreen(
         MapScreenTop(
             search = search,
             onSearchChange = { search = it },
-            onSearchClick = { onSearchClick() },
+            onSearchClick = { onSearchClick(search) },
             onFilterClick = {
                 coroutineScope.launch { showFilterSheet = true }
             }
@@ -184,7 +253,7 @@ fun MapScreen(
                                 ): Double {
                                     return if (zoom <= 9) {
                                         -1.0
-                                    } else if ((node1.tag as MapPlaceEntity).gu == (node2.tag as MapPlaceEntity).gu) {
+                                    } else if ((node1.tag as MapPlaceEntity).region == (node2.tag as MapPlaceEntity).region) {
                                         if (zoom <= 11) {
                                             -1.0
                                         } else {
@@ -203,9 +272,8 @@ fun MapScreen(
                                     MapPlaceEntity(
                                         id = -1L,
                                         name = "",
-                                        type = first.type,
-                                        gu = first.gu,
-                                        facilities = emptyList(),
+                                        placeType = first.placeType,
+                                        region = first.region,
                                         latitude = first.latitude,
                                         longitude = first.longitude
                                     )
@@ -226,7 +294,7 @@ fun MapScreen(
                                     // 구 단위 클러스터 - 커스텀 가로형 마커
                                     val tag = info.tag as? MapPlaceEntity
                                     if (tag != null) {
-                                        val bitmap = createClusterBitmap(context, size, tag.gu)
+                                        val bitmap = createClusterBitmap(context, size, tag.region)
                                         marker.icon = OverlayImage.fromBitmap(bitmap)
                                         val density = context.resources.displayMetrics.density
                                         marker.width = (86 * density).toInt()
@@ -252,8 +320,8 @@ fun MapScreen(
                             .leafMarkerUpdater { info, marker ->
                                 val tag = info.tag as MapPlaceEntity
 
-                                marker.icon = when (tag.type) {
-                                    1 -> OverlayImage.fromResource(R.drawable.ic_map_marker)
+                                marker.icon = when (tag.placeType) {
+                                    "map" -> OverlayImage.fromResource(R.drawable.ic_map_marker)
                                     else -> OverlayImage.fromResource(R.drawable.ic_map_marker_yellow)
                                 }
 
@@ -276,7 +344,10 @@ fun MapScreen(
                                     map.moveCamera(cameraUpdate)
 
                                     if (selectedPlace?.id != tag.id) {
-                                        mapViewModel.loadPlaceDetail(tag.id)
+                                        mapViewModel.getMapPlaceSumm(
+                                            (tag.id).toInt(),
+                                            tag.placeType
+                                        )
                                         selectedPlace = tag
                                     }
                                     showPlaceSheet = true
@@ -300,12 +371,13 @@ fun MapScreen(
             }
 
             val place = selectedPlace
-            var isHeartClicked by remember(placeDetail) {
-                mutableStateOf(placeDetail?.isLike == false)
+            var isHeartClicked by remember(placeSumm) {
+                mutableStateOf(placeSumm?.favorite == true)
             }
+
             // 장소 상세 바텀시트 (중복 제거)
-            if (showPlaceSheet && placeDetail != null && place != null) {
-                val data = placeDetail!!
+            if (showPlaceSheet && placeSumm != null && place != null) {
+                val data = placeSumm!!
 
                 Surface(
                     modifier = Modifier
@@ -317,16 +389,31 @@ fun MapScreen(
                     color = White,
                     shape = RoundedCornerShape(16.dp)
                 ) {
+                    val userLat = location?.latitude
+                    val userLon = location?.longitude
+
+                    val placeLat = place.latitude
+                    val placeLon = place.longitude
+
+                    val distance = if (userLat != null && userLon != null && placeLat != null && placeLon != null) {
+                        val d = calculateDistanceInKm(placeLat, placeLon, 37.5 , 127.0) //테스트용, userLat이랑 userLon으로 수정
+                        String.format("%.1f", d) // 소수점 1자리까지 포맷 (예: "3.8")
+                    } else {
+                        ""
+                    }
+
                     MapDetailComponent(
                         place = data,
-                        distance = "3.8",
-                        facilities = place.facilities,
-                        onClick = { onDetailClick(data.id) },
+                        distance = distance,
+                        facilities = data.facilities,
+                        onClick = { onDetailClick(place.id) },
                         isHeartClicked = isHeartClicked,
                         onHeartClickChanged = { newValue ->
                             isHeartClicked = newValue
-                            // viewModel로 좋아요 상태 변경 요청할때는 아래 같은 코드 추가
-                            // mapViewModel.toggleLike(data.id, newValue)
+                            mapViewModel.postMapLike(
+                                placeId = place.id,
+                                type = place.placeType
+                            )
                         }
                     )
                 }

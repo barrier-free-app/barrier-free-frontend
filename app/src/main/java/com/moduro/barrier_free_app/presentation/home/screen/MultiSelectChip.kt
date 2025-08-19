@@ -29,7 +29,7 @@ import com.moduro.barrier_free_app.core_ui.theme.Text4
 
 @Composable
 fun MultiSelectChip(
-    text: String,
+    type: Int,
     selected: Boolean,
     onClick: () -> Unit
 ) {
@@ -37,14 +37,24 @@ fun MultiSelectChip(
     val typography = LocalbarrierFreeTypographyProvider.current
 
 
-    var imageResource = when (text) {
-        "수유실" -> R.drawable.home_type_mother
-        "승강기" -> R.drawable.home_type_elevator
-        "영유아 동반" -> R.drawable.home_type_baby
-        "장애인 화장실" -> R.drawable.home_type_toilet
-        "경사로" -> R.drawable.home_type_wheelchair
+    var imageResource = when (type) {
+        4 -> R.drawable.home_type_mother
+        1 -> R.drawable.home_type_elevator
+        3 -> R.drawable.home_type_baby
+        2 -> R.drawable.home_type_toilet
+        5 -> R.drawable.home_type_wheelchair
         else -> null
-        //경사로
+
+    //경사로
+    }
+
+    var text = when (type) {
+        1 -> "승강기"
+        2 -> "장애인 화장실"
+        3 -> "영유아 동반"
+        4 -> "수유실"
+        5 -> "경사로"
+        else -> "전체"
     }
 
     var bgColor = if (selected) MainYellow else Button1
@@ -82,7 +92,7 @@ fun MultiSelectChip(
 @Composable
 fun PreviewMultiSelectChip() {
     MultiSelectChip(
-        text = "수유실",
+        type = 1,
         selected = true,
         onClick = {}
     )

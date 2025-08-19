@@ -14,7 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 fun HomeBottomSheet(
     showSheet: Boolean,
     onDismiss: () -> Unit,
-    onConfirm: (singleSelection: String, multiSelections: List<String>) -> Unit
+    onConfirm: (singleSelection: String, multiSelections: List<Int>) -> Unit
 ) {
     // 바텀시트 상태
     val sheetState = rememberModalBottomSheetState(
