@@ -307,10 +307,6 @@ class MypageViewModel @Inject constructor(
         _errorMessage.value = null
     }
 
-    fun setErrorMessage(message: String) {
-        _errorMessage.value = message
-    }
-
     fun onLogoutClick() {
         viewModelScope.launch {
             val result = mypageRepository.signOut()
