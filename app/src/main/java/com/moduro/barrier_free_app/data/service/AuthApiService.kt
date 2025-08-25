@@ -4,14 +4,18 @@ import com.moduro.barrier_free_app.data.dto.ModuroBaseResponse
 import com.moduro.barrier_free_app.data.dto.request.EmailRequestDto
 import com.moduro.barrier_free_app.data.dto.request.LoginRequestDto
 import com.moduro.barrier_free_app.data.dto.request.SignUpRequestDto
+import com.moduro.barrier_free_app.data.dto.request.TokenRequestDto
 import com.moduro.barrier_free_app.data.dto.request.VerifyRequestDto
 import com.moduro.barrier_free_app.data.dto.response.LoginResponseDto
+import com.moduro.barrier_free_app.data.dto.response.TokenResponseDto
 import com.moduro.barrier_free_app.data.service.ApiKeyStorage.AUTH
 import com.moduro.barrier_free_app.data.service.ApiKeyStorage.EMAIL
 import com.moduro.barrier_free_app.data.service.ApiKeyStorage.FIND
 import com.moduro.barrier_free_app.data.service.ApiKeyStorage.LOGIN
+import com.moduro.barrier_free_app.data.service.ApiKeyStorage.OAUTH
 import com.moduro.barrier_free_app.data.service.ApiKeyStorage.SEND
 import com.moduro.barrier_free_app.data.service.ApiKeyStorage.SIGNUP
+import com.moduro.barrier_free_app.data.service.ApiKeyStorage.TOKEN
 import com.moduro.barrier_free_app.data.service.ApiKeyStorage.VERIFY
 import kotlinx.serialization.json.JsonElement
 import retrofit2.http.Body
@@ -52,4 +56,9 @@ interface AuthApiService {
         @Query("type") type: String,
         @Query("input") input: String
     ) : ModuroBaseResponse<JsonElement>
+
+    @POST("/$OAUTH/$TOKEN")
+    suspend fun exchangeToken(
+        @Body tokenRequestDto: TokenRequestDto
+    ) : ModuroBaseResponse<TokenResponseDto>
 }

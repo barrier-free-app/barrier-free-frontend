@@ -1,7 +1,6 @@
 package com.moduro.barrier_free_app.presentation.auth.screen
 
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,7 +17,7 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val repository: AuthRepository,
     private val preferences: SharedPreferences
-): ViewModel() {
+) : ViewModel() {
     var username by mutableStateOf("")
     var password by mutableStateOf("")
 
@@ -32,7 +31,7 @@ class LoginViewModel @Inject constructor(
     val loginState: State<Boolean?> = _loginState
 
     private val _loginError = mutableStateOf<String?>(null)
-    val loginError : State<String?> = _loginError
+    val loginError: State<String?> = _loginError
 
     // TODO 에러 메시지 세분화 .. 서버 오류는 로그로만 띄우기
     fun login(onSuccess: () -> Unit) {
@@ -59,19 +58,17 @@ class LoginViewModel @Inject constructor(
                     passwordError = "서버 응답에 문제가 있어요. 다시 시도해주세요."
                 }
             }.onFailure { exception ->
-                Log.e("LoginViewModel", "로그인 실패", exception)
                 passwordError = "서버 응답에 문제가 있어요. 다시 시도해주세요."
             }
         }
     }
 
-    private fun saveToken(token : String){
+    private fun saveToken(token: String) {
         preferences.edit()
             .putString("USER_TOKEN", token)
             .commit()
 
         val savedToken = preferences.getString("USER_TOKEN", null)
-        Log.d("LoginViewModel", "Saved Token: $savedToken")
 
     }
 

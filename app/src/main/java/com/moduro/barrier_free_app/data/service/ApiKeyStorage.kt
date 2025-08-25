@@ -12,4 +12,6 @@ object ApiKeyStorage {
     const val EMAIL = "email"
     const val VERIFY = "verify"
     const val SEND = "send"
+    const val OAUTH = "oauth"
+    const val TOKEN = "token"
 }
