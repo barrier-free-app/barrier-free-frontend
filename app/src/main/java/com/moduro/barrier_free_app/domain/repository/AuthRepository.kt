@@ -1,7 +1,9 @@
 package com.moduro.barrier_free_app.domain.repository
 
 import com.moduro.barrier_free_app.data.dto.request.LoginRequestDto
+import com.moduro.barrier_free_app.data.dto.request.TokenRequestDto
 import com.moduro.barrier_free_app.data.dto.response.LoginResponseDto
+import com.moduro.barrier_free_app.data.dto.response.TokenResponseDto
 import kotlinx.serialization.json.JsonElement
 
 interface AuthRepository{
@@ -36,4 +38,6 @@ interface AuthRepository{
         type: String,
         input: String
     ) : Result<JsonElement>
+
+    suspend fun exchangeToken(dto: TokenRequestDto) : Result<TokenResponseDto>
 }

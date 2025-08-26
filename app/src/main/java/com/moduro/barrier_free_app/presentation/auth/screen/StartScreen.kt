@@ -2,6 +2,7 @@ package com.moduro.barrier_free_app.presentation.auth.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,10 +22,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.moduro.barrier_free_app.BuildConfig
 import com.moduro.barrier_free_app.R
 import com.moduro.barrier_free_app.core_ui.theme.Background1
 import com.moduro.barrier_free_app.core_ui.theme.Background2
@@ -35,20 +38,36 @@ import com.moduro.barrier_free_app.presentation.auth.navigation.AuthNavigator
 
 @Composable
 fun StartRoute(
-    navigator: AuthNavigator
+    navigator: AuthNavigator,
+    viewModel: OAuthViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+
     StartScreen(
+        viewModel = viewModel,
         onNavigateToLogin = {
             navigator.navigateToLogin()
+        },
+        onKakao = {
+            viewModel.setProvider("kakao")
+            openCustomTab(context, "${BuildConfig.MODURO_BASE_URL}oauth/kakao")
+        },
+        onNaver = {
+            viewModel.setProvider("naver")
+            openCustomTab(context, "${BuildConfig.MODURO_BASE_URL}oauth/naver")
         }
     )
 }
 
 @Composable
 fun StartScreen(
-    onNavigateToLogin: () -> Unit
+    viewModel: OAuthViewModel,
+    onNavigateToLogin: () -> Unit,
+    onKakao: () -> Unit,
+    onNaver: () -> Unit
 ) {
     val typography = LocalbarrierFreeTypographyProvider.current
+
 
     Column(
         modifier = Modifier
@@ -125,12 +144,14 @@ fun StartScreen(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // TODO 클릭 시 소셜로그인 진행 로직 구현하기
             Image(
                 painter = painterResource(id = R.drawable.ic_start_kakao),
                 contentDescription = "kakao",
                 modifier = Modifier
                     .size(50.dp)
+                    .clickable {
+                        onKakao()
+                    }
             )
             Spacer(modifier = Modifier.width(15.dp))
             Image(
@@ -138,16 +159,11 @@ fun StartScreen(
                 contentDescription = "naver",
                 modifier = Modifier
                     .size(50.dp)
+                    .clickable {
+                        onNaver()
+                    }
             )
         }
     }
 
-}
-
-@Preview
-@Composable
-fun StartPreview() {
-    StartScreen(
-        onNavigateToLogin = {}
-    )
 }

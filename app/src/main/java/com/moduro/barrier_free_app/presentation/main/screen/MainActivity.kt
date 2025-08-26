@@ -1,15 +1,19 @@
 package com.moduro.barrier_free_app.presentation.main.screen
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,9 +26,10 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.moduro.barrier_free_app.R
 import com.moduro.barrier_free_app.core_ui.theme.Barrier_free_appTheme
 import com.moduro.barrier_free_app.presentation.auth.navigation.AuthNavigator
+import com.moduro.barrier_free_app.presentation.auth.screen.OAuthUiState
+import com.moduro.barrier_free_app.presentation.auth.screen.OAuthViewModel
 import com.moduro.barrier_free_app.presentation.detail.navigation.DetailNavigator
 import com.moduro.barrier_free_app.presentation.example.navigation.ExampleNavigator
 import com.moduro.barrier_free_app.presentation.home.navigation.HomeNavigator
@@ -38,9 +43,12 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private val oauthViewModel: OAuthViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
+        intent?.data?.let { oauthViewModel.handleDeepLink(it) }
         setContent {
             Barrier_free_appTheme {
                 val context = LocalContext.current
@@ -101,7 +109,20 @@ class MainActivity : ComponentActivity() {
                                                     )
                     }
                 )
+                val uiState by oauthViewModel.uiState.collectAsState()
+                LaunchedEffect(uiState) {
+                    if (uiState is OAuthUiState.Success) {
+                        navController.navigate("main") {
+                            popUpTo(0) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    }
+                }
             }
         }
+    }
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        intent.data?.let { oauthViewModel.handleDeepLink(it) }
     }
 }

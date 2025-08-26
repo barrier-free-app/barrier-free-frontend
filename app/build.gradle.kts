@@ -163,6 +163,7 @@ dependencies {
     //실시간 경도 위도 받아오기
     implementation("com.google.android.gms:play-services-location:21.0.1")
 
+    implementation("androidx.browser:browser:1.8.0")
+    
     implementation("androidx.compose.runtime:runtime-livedata")
-
 }

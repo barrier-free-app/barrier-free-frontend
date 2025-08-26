@@ -4,8 +4,10 @@ import com.moduro.barrier_free_app.data.datasource.AuthDataSource
 import com.moduro.barrier_free_app.data.dto.request.EmailRequestDto
 import com.moduro.barrier_free_app.data.dto.request.LoginRequestDto
 import com.moduro.barrier_free_app.data.dto.request.SignUpRequestDto
+import com.moduro.barrier_free_app.data.dto.request.TokenRequestDto
 import com.moduro.barrier_free_app.data.dto.request.VerifyRequestDto
 import com.moduro.barrier_free_app.data.dto.response.LoginResponseDto
+import com.moduro.barrier_free_app.data.dto.response.TokenResponseDto
 import com.moduro.barrier_free_app.domain.repository.AuthRepository
 import kotlinx.serialization.json.JsonElement
 import javax.inject.Inject
@@ -96,6 +98,18 @@ class AuthRepositoryImpl @Inject constructor(
             val result = response.result ?: throw Exception("result is null")
 
             result
+        }
+    }
+
+    override suspend fun exchangeToken(dto: TokenRequestDto): Result<TokenResponseDto> {
+        return kotlin.runCatching {
+            val response = authDataSource.exchangeToken(dto)
+
+            if (response.isSuccess && response.result != null) {
+                response.result
+            } else {
+                throw IllegalStateException(response.message)
+            }
         }
     }
 }

@@ -5,8 +5,10 @@ import com.moduro.barrier_free_app.data.dto.ModuroBaseResponse
 import com.moduro.barrier_free_app.data.dto.request.EmailRequestDto
 import com.moduro.barrier_free_app.data.dto.request.LoginRequestDto
 import com.moduro.barrier_free_app.data.dto.request.SignUpRequestDto
+import com.moduro.barrier_free_app.data.dto.request.TokenRequestDto
 import com.moduro.barrier_free_app.data.dto.request.VerifyRequestDto
 import com.moduro.barrier_free_app.data.dto.response.LoginResponseDto
+import com.moduro.barrier_free_app.data.dto.response.TokenResponseDto
 import com.moduro.barrier_free_app.data.service.AuthApiService
 import kotlinx.serialization.json.JsonElement
 import javax.inject.Inject
@@ -36,5 +38,9 @@ class AuthDataSourceImpl @Inject constructor(
 
     override suspend fun duplicate(type: String, input: String): ModuroBaseResponse<JsonElement> {
         return authApiService.duplicate(type, input)
+    }
+
+    override suspend fun exchangeToken(tokenRequestDto: TokenRequestDto): ModuroBaseResponse<TokenResponseDto> {
+        return authApiService.exchangeToken(tokenRequestDto)
     }
 }

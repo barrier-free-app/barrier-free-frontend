@@ -4,8 +4,10 @@ import com.moduro.barrier_free_app.data.dto.ModuroBaseResponse
 import com.moduro.barrier_free_app.data.dto.request.EmailRequestDto
 import com.moduro.barrier_free_app.data.dto.request.LoginRequestDto
 import com.moduro.barrier_free_app.data.dto.request.SignUpRequestDto
+import com.moduro.barrier_free_app.data.dto.request.TokenRequestDto
 import com.moduro.barrier_free_app.data.dto.request.VerifyRequestDto
 import com.moduro.barrier_free_app.data.dto.response.LoginResponseDto
+import com.moduro.barrier_free_app.data.dto.response.TokenResponseDto
 import kotlinx.serialization.json.JsonElement
 
 interface AuthDataSource {
@@ -20,4 +22,6 @@ interface AuthDataSource {
     suspend fun verify(verifyRequestDto: VerifyRequestDto) : ModuroBaseResponse<JsonElement>
 
     suspend fun duplicate(type: String, input: String) : ModuroBaseResponse<JsonElement>
+
+    suspend fun exchangeToken(tokenRequestDto: TokenRequestDto): ModuroBaseResponse<TokenResponseDto>
 }
