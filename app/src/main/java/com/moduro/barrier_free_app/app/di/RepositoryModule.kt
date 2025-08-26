@@ -4,13 +4,25 @@ package com.moduro.barrier_free_app.app.di
 import com.moduro.barrier_free_app.data.repositoryimpl.AirKoreaRepositoryImpl
 import com.moduro.barrier_free_app.data.repositoryimpl.AuthRepositoryImpl
 import com.moduro.barrier_free_app.data.repositoryimpl.ExampleRepositoryImpl
+import com.moduro.barrier_free_app.data.repositoryimpl.HomeRepositoryImpl
+import com.moduro.barrier_free_app.data.repositoryimpl.FavoriteToggleRepositoryImpl
 import com.moduro.barrier_free_app.data.repositoryimpl.LocationNameRepositoryImpl
 import com.moduro.barrier_free_app.data.repositoryimpl.LocationTempRepositoryImpl
+import com.moduro.barrier_free_app.data.repositoryimpl.MapRepositoryImpl
+import com.moduro.barrier_free_app.data.repositoryimpl.PlaceReportRepositoryImpl
+import com.moduro.barrier_free_app.data.repositoryimpl.SearchRepositoryImpl
+import com.moduro.barrier_free_app.data.repositoryimpl.MypageRepositoryImpl
 import com.moduro.barrier_free_app.domain.repository.AirKoreaRepository
 import com.moduro.barrier_free_app.domain.repository.AuthRepository
 import com.moduro.barrier_free_app.domain.repository.ExampleRepository
+import com.moduro.barrier_free_app.domain.repository.HomeRepository
+import com.moduro.barrier_free_app.domain.repository.FavoriteToggleRepository
 import com.moduro.barrier_free_app.domain.repository.LocationNameRepository
 import com.moduro.barrier_free_app.domain.repository.LocationTempRepository
+import com.moduro.barrier_free_app.domain.repository.MapRepository
+import com.moduro.barrier_free_app.domain.repository.PlaceReportRepository
+import com.moduro.barrier_free_app.domain.repository.SearchRepository
+import com.moduro.barrier_free_app.domain.repository.MypageRepository
 
 import dagger.Binds
 import dagger.Module
@@ -28,17 +40,41 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindAirKoreaRepository(airKoreaRepositoryImpl : AirKoreaRepositoryImpl): AirKoreaRepository
+    abstract fun bindAirKoreaRepository(airKoreaRepositoryImpl: AirKoreaRepositoryImpl): AirKoreaRepository
 
     @Binds
     @Singleton
-    abstract fun bindLocationTempRepository(locationTempRepositoryImpl : LocationTempRepositoryImpl): LocationTempRepository
+    abstract fun bindLocationTempRepository(locationTempRepositoryImpl: LocationTempRepositoryImpl): LocationTempRepository
 
     @Binds
     @Singleton
-    abstract fun bindLocationNameRepository(locationNameRepositoryImpl: LocationNameRepositoryImpl) : LocationNameRepository
+    abstract fun bindLocationNameRepository(locationNameRepositoryImpl: LocationNameRepositoryImpl): LocationNameRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindMypageRepository(mypageRepositoryImpl: MypageRepositoryImpl): MypageRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindFavoriteToggleRepository(favoriteToggleRepositoryImpl: FavoriteToggleRepositoryImpl): FavoriteToggleRepository
 
     @Binds
     @Singleton
     abstract fun bindAuthRepository(authRepositoryImpl: AuthRepositoryImpl) : AuthRepository
+    @Binds
+    @Singleton
+    abstract fun bindHomeRepository(homeRepositoryImpl: HomeRepositoryImpl) : HomeRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindMapRepository(mapRepositoryImpl: MapRepositoryImpl) : MapRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindPlaceReportRepository(placeReportRepositoryImpl: PlaceReportRepositoryImpl) : PlaceReportRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSearchRepository(searchRepositoryImpl: SearchRepositoryImpl) : SearchRepository
+
 }

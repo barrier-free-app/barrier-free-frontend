@@ -9,9 +9,11 @@ class MapNavigator(
         navController.navigate("placeDetail/$placeId")
     }
 
-    fun navigateToSearch() {
-        navController.navigate("search")
+    fun navigateToSearch(searchValue : String?) {
+        val value = searchValue ?: ""
+        navController.navigate("searchScreen?searchValue=$value")
     }
+
 
     fun navigateBack() {
         navController.popBackStack()

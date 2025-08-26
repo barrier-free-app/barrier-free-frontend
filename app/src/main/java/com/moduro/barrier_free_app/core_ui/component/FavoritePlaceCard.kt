@@ -20,25 +20,27 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.moduro.barrier_free_app.R
 import com.moduro.barrier_free_app.core_ui.theme.Background1
 import com.moduro.barrier_free_app.core_ui.theme.LocalbarrierFreeTypographyProvider
-import com.moduro.barrier_free_app.presentation.mypage.screen.FavoritePlace
-import com.moduro.barrier_free_app.presentation.mypage.screen.PlaceType
-import com.moduro.barrier_free_app.presentation.mypage.screen.PlaceholderContext
+import com.moduro.barrier_free_app.domain.entity.FavoritePlaceEntity
 
 @Composable
 fun FavoritePlaceCard(
-    place: FavoritePlace,
-    onRemoveClick: () -> Unit
+    place: FavoritePlaceEntity,
+    onFavoriteToggle: (FavoritePlaceEntity) -> Unit,
+    isLoading: Boolean = false
 ) {
     val typography = LocalbarrierFreeTypographyProvider.current
-    val imagePainter = if (place.isImage && place.imageRes != null) {
-        painterResource(id = place.imageRes)
-    } else {
-        val placeholderId = PlaceType.from(place.type)!!.getPlaceholderResId(PlaceholderContext.SAVED)
-        painterResource(id = placeholderId)
+    val imageRes = when (place.imageType) {
+        0 -> R.drawable.saved_placeholder_parking
+        1 -> R.drawable.saved_placeholder_culture
+        2 -> R.drawable.saved_placeholder_restaurant
+        3 -> R.drawable.saved_placeholder_elevator
+        4 -> R.drawable.saved_placeholder_nursing_room
+        else -> R.drawable.saved_placeholder_toilet
     }
 
     Surface(
@@ -55,7 +57,7 @@ fun FavoritePlaceCard(
                 .padding(20.dp)
         ) {
             Image(
-                painter = imagePainter,
+                painter = painterResource(id = imageRes),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -78,14 +80,14 @@ fun FavoritePlaceCard(
 
                 Image(
                     painter = painterResource(
-                        id = if (place.isLiked) R.drawable.ic_heart_filled
+                        id = if (place.favorite) R.drawable.ic_heart_filled
                         else R.drawable.ic_heart_unfilled
                     ),
-                    contentDescription = "좋아요",
+                    contentDescription = "즐겨찾기 토글",
                     modifier = Modifier
                         .size(24.dp)
-                        .clickable {
-                            onRemoveClick()
+                        .clickable(enabled = !isLoading) {
+                            onFavoriteToggle(place)
                         }
                 )
             }
@@ -99,4 +101,22 @@ fun FavoritePlaceCard(
             )
         }
     }
+}
+
+@Preview
+@Composable
+fun FavoritePlaceCardPreview() {
+    FavoritePlaceCard(
+        place = FavoritePlaceEntity(
+            id = 1L,
+            type = "map",
+            name = "서울 공원",
+            description = "장애인 접근성이 좋은 공원입니다.",
+            facilities = listOf(1, 3),
+            imageType = 2,
+            favorite = true
+        ),
+        onFavoriteToggle = {},
+        isLoading = false
+    )
 }

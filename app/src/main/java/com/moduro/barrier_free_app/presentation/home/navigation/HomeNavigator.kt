@@ -5,7 +5,7 @@ import androidx.navigation.NavController
 class HomeNavigator(
     val navController: NavController
 ){
-    fun navigateToPlaceDetail(placeId: Int) {
+    fun navigateToPlaceDetail(placeId: Long) {
         navController.navigate("placeDetail/$placeId")
     }
 }

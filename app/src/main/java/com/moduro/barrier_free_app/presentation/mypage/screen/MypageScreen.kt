@@ -23,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -54,12 +55,17 @@ fun MypageRoute(
     viewModel: MypageViewModel = hiltViewModel()
 ) {
 
+    LaunchedEffect(key1 = Unit) {
+        viewModel.refreshUserInfo()
+    }
+
     val userInfo = viewModel.userInfo.collectAsState().value
 
     userInfo?.let { user ->
         MypageScreen(
             userName = user.nickName,
             userEmail = user.email,
+            userType = user.userType,
             userFacilities = user.userFacilities,
             onLogoutClick = { viewModel.onLogoutClick() },
             onReviewClick = { navigator.navigateToMyReview() },
@@ -73,9 +79,10 @@ fun MypageRoute(
 
 @Composable
 fun MypageScreen(
-    userName: String = "버블티먹는코끼리",
-    userEmail: String = "aaa@naver.com",
-    userFacilities: List<Int> = listOf(1, 3, 4),
+    userName: String,
+    userEmail: String,
+    userType: String,
+    userFacilities: List<Int>,
     onLogoutClick: () -> Unit = {},
     onReviewClick: () -> Unit = {},
     onFavoritePlaceClick: () -> Unit = {},
@@ -177,27 +184,21 @@ fun MypageScreen(
                                 style = typography.H6_M,
                                 color = Color.DarkGray
                             )
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            // 프로필 카드 내 userType 표시 부분
+                            val facilityLabels = mapOf(
+                                "ALL" to "전체",
+                                "DISABLED" to "장애인",
+                                "PREGNANT" to "임산부 및 영유아 동반"
+                            )
+
+                            val label = facilityLabels[userType.uppercase()] ?: "기타"
+
+                            MypageFacilityChip(label = label)
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    val facilityLabels = mapOf(
-                        1 to "전체",
-                        2 to "영유아동반",
-                        3 to "승강기",
-                        4 to "장애인 화장실",
-                        5 to "주차장"
-                    )
-
-                    LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.padding(start = 70.dp)
-                    ) {
-                        items(userFacilities) { facilityId ->
-                            MypageFacilityChip(label = facilityLabels[facilityId] ?: "기타")
-                        }
-                    }
                 }
 
                 Row(
@@ -352,6 +353,8 @@ fun MypageMenuItem(
 fun MypageScreenPreview() {
     MypageScreen(
         userName = "버블티먹는코끼리",
-        userEmail = "aaa@naver.com"
+        userEmail = "aaa@naver.com",
+        userType = "ALL",
+        userFacilities = listOf(1, 3, 4)
     )
 }

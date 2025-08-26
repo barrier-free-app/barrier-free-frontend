@@ -46,10 +46,10 @@ fun PlaceReportRoute(
     navigator: MypageNavigator,
 ) {
 
-    val mypageViewModel: MypageViewModel = hiltViewModel()
+    val placeReportViewModel: PlaceReportViewModel = hiltViewModel()
 
     PlaceReportScreen(
-        mypageViewModel = mypageViewModel,
+        placeReportViewModel = placeReportViewModel,
         onBackClick = { navigator.navigateBack() },
         onReportClick = { navigator.navigateBack() }
     )
@@ -60,7 +60,7 @@ fun PlaceReportRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaceReportScreen(
-    mypageViewModel : MypageViewModel,
+    placeReportViewModel: PlaceReportViewModel,
     onBackClick: () -> Unit,
     onReportClick: () -> Unit
 ) {
@@ -72,8 +72,8 @@ fun PlaceReportScreen(
     var placeLocation1 by remember { mutableStateOf("") }
     var placeLocation2 by remember { mutableStateOf("") }
 
-    var selectedMultiFilter by remember { mutableStateOf<List<String>>(listOf("전체")) }
-    var selectedSingleFilter by remember { mutableStateOf<List<String>>(emptyList()) }
+    var selectedMultiFilter by remember { mutableStateOf<List<Int>>(listOf(1)) }
+    var selectedSingleFilter by remember { mutableStateOf<Int>(1) }
 
     var placeDescription by remember { mutableStateOf("") }
     var placeHomepageURL by remember { mutableStateOf("") }
@@ -105,11 +105,11 @@ fun PlaceReportScreen(
                 .padding(bottom = 23.dp)
                 .background(color = MainYellow, shape = RoundedCornerShape(10.dp))
         ) {
-            Column (
+            Column(
                 modifier = Modifier
-                .padding(vertical = 20.dp)
-                .padding(horizontal = 20.dp)
-            ){
+                    .padding(vertical = 20.dp)
+                    .padding(horizontal = 20.dp)
+            ) {
                 Text("모두로에 없는 장소를 제보해주세요!", style = typography.H5_SB_5)
 
                 Spacer(modifier = Modifier.height(2.dp))
@@ -119,7 +119,7 @@ fun PlaceReportScreen(
                 Spacer(modifier = Modifier.weight(1f))
 
                 TextField(
-                    modifier =  Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     value = placeName,
                     onValueChange = { placeName = it },
                     placeholder = {
@@ -145,15 +145,22 @@ fun PlaceReportScreen(
 
         Spacer(modifier = Modifier.height(25.dp))
 
-        Text("장소의 위치를 알려주세요.", style = typography.H5_SB_5, color = Text4 )
+        Text("장소의 위치를 알려주세요.", style = typography.H5_SB_5, color = Text4)
 
         Spacer(modifier = Modifier.height(21.dp))
 
-        PlaceReportTextField(value = placeLocation1, onValueChange = {placeLocation1 = it} , placeHolder = "기본 주소")
+        PlaceReportTextField(
+            value = placeLocation1,
+            onValueChange = { placeLocation1 = it },
+            placeHolder = "기본 주소")
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        PlaceReportTextField(value = placeLocation2, onValueChange = {placeLocation2 = it}, placeHolder = "상세 주소를 입력해주세요." )
+        PlaceReportTextField(
+            value = placeLocation2,
+            onValueChange = { placeLocation2 = it },
+            placeHolder = "상세 주소를 입력해주세요."
+        )
 
         Spacer(modifier = Modifier.height(42.dp))
 
@@ -174,7 +181,7 @@ fun PlaceReportScreen(
 
         PlaceReportFilterContent(
             valueType = 2,
-            onValueChange = { selectedSingleFilter = it }
+            onValueChange = { selectedSingleFilter = it.firstOrNull() ?: 0 }
         )
 
         Spacer(modifier = Modifier.height(42.dp))
@@ -183,7 +190,10 @@ fun PlaceReportScreen(
 
         Spacer(modifier = Modifier.height(21.dp))
 
-        PlaceReportTextField(value = placeDescription, onValueChange = {placeDescription = it} , placeHolder = "예) 배리어프리 시설이 있는 호텔")
+        PlaceReportTextField(
+            value = placeDescription,
+            onValueChange = { placeDescription = it },
+            placeHolder = "예) 배리어프리 시설이 있는 호텔")
 
 
         Spacer(modifier = Modifier.height(42.dp))
@@ -193,21 +203,48 @@ fun PlaceReportScreen(
 
         Spacer(modifier = Modifier.height(21.dp))
 
-        PlaceReportTextField(value = placeHomepageURL, onValueChange = {placeHomepageURL = it} , placeHolder = "홈페이지 URL")
+        PlaceReportTextField(
+            value = placeHomepageURL,
+            onValueChange = { placeHomepageURL = it },
+            placeHolder = "홈페이지 URL")
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        PlaceReportTextField(value = placeBusinessHours, onValueChange = {placeBusinessHours = it} , placeHolder = "영업시간")
+        PlaceReportTextField(
+            value = placeBusinessHours,
+            onValueChange = { placeBusinessHours = it },
+            placeHolder = "영업시간")
 
         Spacer(modifier = Modifier.height(10.dp))
 
 
-        PlaceReportTextField(value = placePhoneNumber, onValueChange = {placePhoneNumber = it} , placeHolder = "장소 전화번호")
+        PlaceReportTextField(
+            value = placePhoneNumber,
+            onValueChange = { placePhoneNumber = it },
+            placeHolder = "장소 전화번호")
 
         Spacer(modifier = Modifier.height(55.dp))
 
+        val facilitiesToSend = if (selectedMultiFilter.contains(0)) {
+            listOf(1, 2, 3, 4, 5)
+        } else {
+            selectedMultiFilter
+        }
+
         Button(
-            onClick = onReportClick,
+            onClick = {
+                placeReportViewModel.postMapLike(
+                    description = placeDescription,
+                    name = placeName,
+                    address = "$placeLocation1 $placeLocation2",
+                    imageType = selectedSingleFilter,
+                    facilities = facilitiesToSend,
+                    homepage = placeHomepageURL,
+                    openingHours = placeBusinessHours,
+                    contact = placePhoneNumber
+                )
+                onReportClick()
+            },
             shape = RoundedCornerShape(10.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Text5,
