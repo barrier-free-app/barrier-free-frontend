@@ -26,9 +26,9 @@ class PlaceReportViewModel @Inject constructor(
         address : String,
         imageType : Int,
         facilities : List<Int>,
-        homepage : String,
-        openingHours : String,
-        contact : String
+        homepage : String?,
+        openingHours : String?,
+        contact : String?
     ){
         viewModelScope.launch {
             val result = placeReportRepository.postPlaceReport(

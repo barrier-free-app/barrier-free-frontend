@@ -19,6 +19,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.moduro.barrier_free_app.R
 import com.moduro.barrier_free_app.core_ui.theme.LocalbarrierFreeTypographyProvider
 import com.moduro.barrier_free_app.core_ui.theme.Text4
@@ -56,15 +57,15 @@ fun HomeWeatherBox(
 
 
     var imageResource = when (weatherType) {
-        1 -> R.drawable.weather_clean_background
+        1 -> R.drawable.weather_0clean_background
         2 -> R.drawable.weather_50clean_background
-        else -> R.drawable.weather_0clean_background
+        else -> R.drawable.weather_clean_background
     }
 
     var iconResource = when (weatherType) {
-        1 -> R.drawable.weather_sun
+        1 -> R.drawable.weather_rain
         2 -> R.drawable.weather_cloud
-        else -> R.drawable.weather_rain
+        else -> R.drawable.weather_sun
     }
 
     Box(
@@ -117,10 +118,11 @@ fun HomeWeatherBox(
                         append("이예요.")
                     }
                 },
-                style = typography.H5_SB_5, color = Text4
+                style = typography.H5_SB_5.copy(lineHeight = 24.sp),
+                color = Text4
             )
 
-            if (dustType == 1 || weatherType == 3) {
+            if (dustType == 1 || weatherType == 1) {
                 Text(
                     text = buildAnnotatedString {
                         append("가급적 실외보다 ")
@@ -134,7 +136,7 @@ fun HomeWeatherBox(
             } else {
                 Text(
                     text = "바깥 활동을 하기에 적당할 것 같네요!",
-                    style = typography.H5_SB_5,
+                    style = typography.H5_SB_5.copy(lineHeight = 24.sp),
                     color = Text4
                 )
             }
