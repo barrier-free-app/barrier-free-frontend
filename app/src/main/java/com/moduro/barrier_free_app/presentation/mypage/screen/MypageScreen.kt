@@ -15,8 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -60,6 +58,8 @@ fun MypageRoute(
     }
 
     val userInfo = viewModel.userInfo.collectAsState().value
+    val accountDeleteStatus = viewModel.accountDeleteStatus.collectAsState().value
+    val errorMessage = viewModel.errorMessage.collectAsState().value
 
     userInfo?.let { user ->
         MypageScreen(
@@ -67,11 +67,21 @@ fun MypageRoute(
             userEmail = user.email,
             userType = user.userType,
             userFacilities = user.userFacilities,
-            onLogoutClick = { viewModel.onLogoutClick() },
+            onLogoutClick = {
+                viewModel.onLogoutClick()
+                navigator.navigateToSignIn()
+            },
             onReviewClick = { navigator.navigateToMyReview() },
             onFavoritePlaceClick = { navigator.navigateToFavoritePlace() },
-            onEditProfileClick = {  navigator.navigateToProfileSetting() },
-            onReportPlaceClick = { navigator.navigateToPlaceReport() }
+            onEditProfileClick = { navigator.navigateToProfileSetting() },
+            onReportPlaceClick = { navigator.navigateToPlaceReport() },
+            onWithdrawClick = { reason ->
+                viewModel.deleteAccount(reason)
+                navigator.navigateToSignIn()
+            },
+            accountDeleteStatus = accountDeleteStatus,
+            errorMessage = errorMessage,
+            onClearError = { viewModel.clearErrorMessage() }
         )
     }
 
@@ -88,7 +98,10 @@ fun MypageScreen(
     onFavoritePlaceClick: () -> Unit = {},
     onEditProfileClick: () -> Unit = { },
     onReportPlaceClick: () -> Unit = {},
-    onWithdrawClick: () -> Unit = {}
+    onWithdrawClick: (String) -> Unit = {},
+    accountDeleteStatus: AccountDeleteStatus = AccountDeleteStatus.NONE,
+    errorMessage: String? = null,
+    onClearError: () -> Unit = {}
 ) {
 
     val typography = LocalbarrierFreeTypographyProvider.current
@@ -102,6 +115,35 @@ fun MypageScreen(
     var showLogoutSheet by remember { mutableStateOf(false) }
     var showWithdrawSheet by remember { mutableStateOf(false) }
     var showWithdrawReasons by remember { mutableStateOf(false) }
+
+    // 에러 메시지 표시
+    LaunchedEffect(errorMessage) {
+        if (!errorMessage.isNullOrBlank()) {
+            // 에러 메시지를 표시하는 로직 (예: 스낵바, 토스트 등)
+            // 여기서는 간단히 로그로 표시
+            println("Error: $errorMessage")
+        }
+    }
+
+    LaunchedEffect(accountDeleteStatus) {
+        when (accountDeleteStatus) {
+            AccountDeleteStatus.SUCCESS -> {
+                // 성공 시 바텀시트들 닫기
+                showWithdrawSheet = false
+                showWithdrawReasons = false
+            }
+
+            AccountDeleteStatus.ERROR -> {
+                // 에러 시 바텀시트들 닫기
+                showWithdrawSheet = false
+                showWithdrawReasons = false
+            }
+
+            else -> {}
+        }
+    }
+
+
 
     Column(
         modifier = Modifier
@@ -259,6 +301,7 @@ fun MypageScreen(
                 onCancel = { showLogoutSheet = false },
                 onConfirm = {
                     showLogoutSheet = false
+                    onLogoutClick()
                 },
                 showWithdrawReasons = false
             )
@@ -275,17 +318,23 @@ fun MypageScreen(
                 .clickable(onClick = { showWithdrawSheet = true })
         )
 
-        // 회원탈퇴시
+        // 회원탈퇴 첫 번째 바텀시트
         if (showWithdrawSheet) {
             CommonBottomSheet(
                 showSheet = showWithdrawSheet,
-                onDismissRequest = { showWithdrawSheet = false },
+                onDismissRequest = {
+                    showWithdrawSheet = false
+                    onClearError()
+                },
                 title = "떠나시는 건가요? 아쉬워요🥺",
                 description = "회원 탈퇴 시 회원 정보는 전부 삭제됩니다.",
                 cancelText = "취소",
                 confirmText = "다음",
-                onCancel = { showWithdrawSheet = false },
-                onConfirm = {
+                onCancel = {
+                    showWithdrawSheet = false
+                    onClearError()
+                },
+                onConfirm = { _ ->
                     showWithdrawReasons = true
                     showWithdrawSheet = false
                 },
@@ -293,23 +342,30 @@ fun MypageScreen(
             )
         }
 
+        // 회원탈퇴 사유 선택 바텀시트
         if (showWithdrawReasons) {
             CommonBottomSheet(
                 showSheet = showWithdrawReasons,
-                onDismissRequest = { showWithdrawReasons = false },
+                onDismissRequest = {
+                    showWithdrawReasons = false
+                    onClearError()
+                },
                 title = "회원 탈퇴 사유 선택",
                 description = "회원 탈퇴 사유를 선택해주세요.",
                 cancelText = "취소",
                 confirmText = "탈퇴하기",
-                onCancel = { showWithdrawReasons = false },
-                onConfirm = {
-                    // 탈퇴 처리
+                onCancel = {
+                    showWithdrawReasons = false
+                    onClearError()
+                },
+                onConfirm = { reason ->
+                    // 뷰모델의 deleteAccount 함수 호출
+                    onWithdrawClick(reason)
                     showWithdrawReasons = false
                 },
                 showWithdrawReasons = true
             )
         }
-
     }
 }
 

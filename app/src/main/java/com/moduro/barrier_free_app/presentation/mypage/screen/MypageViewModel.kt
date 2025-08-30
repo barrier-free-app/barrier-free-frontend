@@ -26,10 +26,26 @@ enum class NicknameChangeStatus {
     NONE, SUCCESS, DUPLICATE, LIMIT_EXCEEDED, ERROR, LOADING
 }
 
+enum class FacilityUpdateStatus {
+    NONE, SUCCESS, ERROR, LOADING
+}
+
+enum class UserTypeUpdateStatus {
+    NONE, SUCCESS, ERROR, LOADING
+}
+
+enum class PasswordUpdateStatus {
+    NONE, SUCCESS, ERROR, LOADING
+}
+
+enum class AccountDeleteStatus {
+    NONE, SUCCESS, ERROR, LOADING
+}
+
 @HiltViewModel
 class MypageViewModel @Inject constructor(
     private val mypageRepository: MypageRepository,
-    private val favoriteToggleRepository: FavoriteToggleRepository
+    private val favoriteToggleRepository: FavoriteToggleRepository,
 ) : ViewModel() {
 
     private val _userInfo = MutableStateFlow<UserInfo?>(null)
@@ -43,6 +59,22 @@ class MypageViewModel @Inject constructor(
 
     private val _nicknameChangeStatus = MutableStateFlow(NicknameChangeStatus.NONE)
     val nicknameChangeStatus: StateFlow<NicknameChangeStatus> = _nicknameChangeStatus.asStateFlow()
+
+    private val _userTypeUpdateStatus = MutableStateFlow(UserTypeUpdateStatus.NONE)
+    val userTypeUpdateStatus: StateFlow<UserTypeUpdateStatus> = _userTypeUpdateStatus.asStateFlow()
+
+    private val _facilityUpdateStatus = MutableStateFlow(FacilityUpdateStatus.NONE)
+    val facilityUpdateStatus: StateFlow<FacilityUpdateStatus> = _facilityUpdateStatus.asStateFlow()
+
+    private val _passwordUpdateStatus = MutableStateFlow(PasswordUpdateStatus.NONE)
+    val passwordUpdateStatus: StateFlow<PasswordUpdateStatus> = _passwordUpdateStatus.asStateFlow()
+
+    private val _accountDeleteStatus = MutableStateFlow(AccountDeleteStatus.NONE)
+    val accountDeleteStatus: StateFlow<AccountDeleteStatus> = _accountDeleteStatus.asStateFlow()
+
+    private val _logoutState = MutableStateFlow<Result<String>?>(null)
+    val logoutState: StateFlow<Result<String>?> = _logoutState
+
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -133,14 +165,6 @@ class MypageViewModel @Inject constructor(
         }
     }
 
-    fun removeFavoritePlace(place: FavoritePlaceEntity) {
-        toggleFavorite(place)
-    }
-
-    fun refreshFavoritePlaces() {
-        loadFavoritePlaces()
-    }
-
     fun changeNickname(newNickname: String) {
         if (newNickname.isBlank()) {
             _errorMessage.value = "닉네임을 입력해주세요."
@@ -167,17 +191,72 @@ class MypageViewModel @Inject constructor(
         }
     }
 
+    private fun validatePassword(password: String, verifyPassword: String): String? {
+        return when {
+            password.isBlank() || verifyPassword.isBlank() -> "비밀번호를 입력해주세요."
+            password != verifyPassword -> "비밀번호가 일치하지 않습니다."
+            password.length < 8 -> "비밀번호는 8자 이상이어야 합니다."
+            else -> null
+        }
+    }
+
+    fun updatePassword(password: String, verifyPassword: String) {
+        val validationError = validatePassword(password, verifyPassword)
+        if (validationError != null) {
+            _errorMessage.value = validationError
+            _passwordUpdateStatus.value = PasswordUpdateStatus.ERROR
+            return
+        }
+
+        viewModelScope.launch {
+            _passwordUpdateStatus.value = PasswordUpdateStatus.LOADING
+            _isLoading.value = true
+            _errorMessage.value = null
+
+            val result = mypageRepository.updatePassword(password, verifyPassword)
+            result.onSuccess {
+                _passwordUpdateStatus.value = PasswordUpdateStatus.SUCCESS
+            }.onFailure { throwable ->
+                _passwordUpdateStatus.value = PasswordUpdateStatus.ERROR
+                _errorMessage.value = throwable.message ?: "비밀번호 변경에 실패했습니다."
+            }
+
+            _isLoading.value = false
+        }
+    }
+
     fun updateUserType(userType: String) {
         viewModelScope.launch {
+            _userTypeUpdateStatus.value = UserTypeUpdateStatus.LOADING
             _isLoading.value = true
             _errorMessage.value = null
 
             val result = mypageRepository.updateUserType(userType)
             result.onSuccess { message ->
-                // 성공 시 유저 정보 새로고침
+                _userTypeUpdateStatus.value = UserTypeUpdateStatus.SUCCESS
                 loadUserInfo()
             }.onFailure { throwable ->
+                _userTypeUpdateStatus.value = UserTypeUpdateStatus.ERROR
                 _errorMessage.value = throwable.message ?: "유저 타입 변경에 실패했습니다."
+            }
+
+            _isLoading.value = false
+        }
+    }
+
+    fun updateFacilities(facilityIds: List<Int>) {
+        viewModelScope.launch {
+            _facilityUpdateStatus.value = FacilityUpdateStatus.LOADING
+            _isLoading.value = true
+            _errorMessage.value = null
+
+            val result = mypageRepository.updateFacilities(facilityIds)
+            result.onSuccess { message ->
+                _facilityUpdateStatus.value = FacilityUpdateStatus.SUCCESS
+                loadUserInfo()
+            }.onFailure { throwable ->
+                _facilityUpdateStatus.value = FacilityUpdateStatus.ERROR
+                _errorMessage.value = throwable.message ?: "편의시설 정보 변경에 실패했습니다."
             }
 
             _isLoading.value = false
@@ -188,20 +267,54 @@ class MypageViewModel @Inject constructor(
         _nicknameChangeStatus.value = NicknameChangeStatus.NONE
     }
 
+    fun resetFacilityUpdateStatus() {
+        _facilityUpdateStatus.value = FacilityUpdateStatus.NONE
+    }
+
+    fun resetUserTypeUpdateStatus() {
+        _userTypeUpdateStatus.value = UserTypeUpdateStatus.NONE
+    }
+
+    fun resetPasswordUpdateStatus() {
+        _passwordUpdateStatus.value = PasswordUpdateStatus.NONE
+    }
+
+    fun deleteAccount(reason: String) {
+        if (reason.isBlank()) {
+            _errorMessage.value = "탈퇴 사유를 입력해주세요."
+            _accountDeleteStatus.value = AccountDeleteStatus.ERROR
+            return
+        }
+
+        viewModelScope.launch {
+            _accountDeleteStatus.value = AccountDeleteStatus.LOADING
+            _isLoading.value = true
+            _errorMessage.value = null
+
+            val result = mypageRepository.deleteAccount(reason)
+            result.onSuccess {
+                _accountDeleteStatus.value = AccountDeleteStatus.SUCCESS
+            }.onFailure { throwable ->
+                _accountDeleteStatus.value = AccountDeleteStatus.ERROR
+                _errorMessage.value = throwable.message ?: "회원 탈퇴에 실패했습니다."
+            }
+
+            _isLoading.value = false
+        }
+    }
+
     fun clearErrorMessage() {
         _errorMessage.value = null
     }
 
     fun onLogoutClick() {
-        // 로그아웃 처리
-    }
-
-    fun onReviewClick() {
-        // 내가 쓴 리뷰 화면 이동 처리
+        viewModelScope.launch {
+            val result = mypageRepository.signOut()
+            _logoutState.value = result
+        }
     }
 
     fun refreshUserInfo() {
         loadUserInfo()
     }
-
 }

@@ -81,6 +81,23 @@ class MypageRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun updatePassword(password: String, verifyPassword: String): Result<String> {
+        return try {
+            val response = mypageDataSource.updatePassword(password, verifyPassword)
+            if (response.isSuccess && response.result != null) {
+                Result.success(response.result.result)
+            } else {
+                Result.failure(Exception(response.message ?: "비밀번호 변경 실패"))
+            }
+        } catch (e: retrofit2.HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorMessage = parseErrorMessage(errorBody)
+            Result.failure(Exception(errorMessage ?: "비밀번호 변경 실패 (HTTP ${e.code()})"))
+        } catch (e: Exception) {
+            Result.failure(Exception("비밀번호 변경 실패: ${e.message}"))
+        }
+    }
+
     override suspend fun updateUserType(userType: String): Result<String> {
         return try {
             val response = mypageDataSource.updateUserType(userType)
@@ -98,8 +115,22 @@ class MypageRepositoryImpl @Inject constructor(
         }
     }
 
-
-
+    override suspend fun updateFacilities(facilityIds: List<Int>): Result<String> {
+        return try {
+            val response = mypageDataSource.updateFacilities(facilityIds)
+            if (response.isSuccess && response.result != null) {
+                Result.success(response.result.result)
+            } else {
+                Result.failure(Exception(response.message ?: "시설 정보 업데이트 실패"))
+            }
+        } catch (e: retrofit2.HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorMessage = parseErrorMessage(errorBody)
+            Result.failure(Exception(errorMessage ?: "시설 정보 업데이트 실패 (HTTP ${e.code()})"))
+        } catch (e: Exception) {
+            Result.failure(Exception("시설 정보 업데이트 실패: ${e.message}"))
+        }
+    }
 
     override suspend fun getUserInfo(): Result<UserEntity> {
         return runCatching {
@@ -119,6 +150,31 @@ class MypageRepositoryImpl @Inject constructor(
                     )
                 }
             )
+        }
+    }
+
+    override suspend fun deleteAccount(reason: String): Result<String> {
+        return try {
+            val response = mypageDataSource.deleteAccount(reason)
+            if (response.isSuccess && response.result != null) {
+                Result.success(response.result.result)
+            } else {
+                Result.failure(Exception(response.message ?: "회원 탈퇴 실패"))
+            }
+        } catch (e: retrofit2.HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorMessage = parseErrorMessage(errorBody)
+            Result.failure(Exception(errorMessage ?: "회원 탈퇴 실패 (HTTP ${e.code()})"))
+        } catch (e: Exception) {
+            Result.failure(Exception("회원 탈퇴 실패: ${e.message}"))
+        }
+    }
+
+    override suspend fun signOut(): Result<String> {
+        return runCatching {
+            val response = mypageDataSource.signOut()
+            val result = response.result?.result ?: throw Exception("로그아웃 결과가 null입니다.")
+            result
         }
     }
 
