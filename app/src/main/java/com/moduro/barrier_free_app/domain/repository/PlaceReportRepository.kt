@@ -10,8 +10,8 @@ interface PlaceReportRepository {
         address : String,
         imageType : Int,
         facilities : List<Int>,
-        homepage : String,
-        openingHours : String,
-        contact : String
+        homepage : String?,
+        openingHours : String?,
+        contact : String?
     ) : Result<JsonElement>
 }

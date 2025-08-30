@@ -79,7 +79,7 @@ val defaultbarrierFreeTypography = barrierFreeTypography(
     H5_B_5 = TextStyle(
         fontFamily = barrierFreeFontBold,
         fontSize = 18.sp,
-        lineHeight = 18.sp,
+        lineHeight = 24.sp,
         letterSpacing = (-0.05).em
     ),
     H6_M = TextStyle(

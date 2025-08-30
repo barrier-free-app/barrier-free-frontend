@@ -10,7 +10,7 @@ data class RequestPlaceReportDto (
     @SerialName("address") val address : String,
     @SerialName("imageType") val imageType : Int,
     @SerialName("facilities") val facilities : List<Int>,
-    @SerialName("homepage") val homepage : String,
-    @SerialName("openingHours") val openingHours : String,
-    @SerialName("contact") val contact : String,
+    @SerialName("homepage") val homepage : String?,
+    @SerialName("openingHours") val openingHours : String?,
+    @SerialName("contact") val contact : String?,
     )

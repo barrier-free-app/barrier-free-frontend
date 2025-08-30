@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.material.ripple.RippleTheme
@@ -23,23 +22,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
-import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.moduro.barrier_free_app.R
 import com.moduro.barrier_free_app.core_ui.component.BottomNavigationItem
-import com.moduro.barrier_free_app.core_ui.theme.Barrier_free_appTheme
 import com.moduro.barrier_free_app.core_ui.theme.LocalbarrierFreeTypographyProvider
 import com.moduro.barrier_free_app.core_ui.theme.Text4
-import com.moduro.barrier_free_app.presentation.example.navigation.ExampleNavigator
-import com.moduro.barrier_free_app.presentation.example.screen.ExampleRoute
 import com.moduro.barrier_free_app.presentation.home.navigation.HomeNavigator
 import com.moduro.barrier_free_app.presentation.home.screen.HomeRoute
 import com.moduro.barrier_free_app.presentation.main.navigation.MainNavigator
@@ -84,12 +74,12 @@ fun MainScreen(
 
     Scaffold(
         bottomBar = {
-            NavigationBar(
-                modifier = Modifier.background(White),
-                containerColor = White
-            ) {
-                items.forEachIndexed { index, item ->
-                    CompositionLocalProvider(LocalRippleTheme provides NoRippleTheme) {
+            CompositionLocalProvider(LocalRippleTheme provides NoRippleTheme) {
+                NavigationBar(
+                    modifier = Modifier.background(White),
+                    containerColor = White
+                ) {
+                    items.forEachIndexed { index, item ->
                         NavigationBarItem(
                             icon = {
                                 Icon(
@@ -110,26 +100,30 @@ fun MainScreen(
                             colors = NavigationBarItemDefaults.colors(
                                 selectedTextColor = Black,
                                 unselectedTextColor = Text4,
+                                indicatorColor = Color.Transparent
                             ),
                         )
                     }
                 }
             }
         }
-    ) { innerPadding ->
+    )
+    { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             when (selectedItem) {
                 0 -> {
                     HomeRoute(navigator = HomeNavigator(navController = navController))
                 }
+
                 1 -> {
                     MapRoute(navigator = MapNavigator(navController = navController))
 
                 }
+
                 2 -> {
                     MypageRoute(navigator = MypageNavigator(navController = navController))
                 }
-                }
+            }
         }
 
     }
